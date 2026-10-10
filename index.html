@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610101324-->
+<!--build:202610101346-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога — для гостей дня рождения Ксении">
@@ -135,13 +135,20 @@ input[type=search],input[type=password]{width:100%;padding:11px 16px;border:1px 
 .task h4{font-size:16px;font-weight:700}
 .task .g{font-size:12.5px;font-weight:600;color:var(--olive-2);letter-spacing:.02em}
 .task .mn{font-size:14px;color:var(--ink)}
+details.day-tasks{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+details.day-tasks > summary{cursor:pointer;list-style:none;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.day-tasks > summary::-webkit-details-marker{display:none}
+details.day-tasks > summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:auto}
+details.day-tasks[open] > summary::after{transform:rotate(-135deg)}
+details.day-tasks > summary .small{margin-left:auto}
+.day-body{padding:0 12px 12px;display:grid;gap:10px}
 details.team{background:var(--surface);border:1px solid var(--line);border-radius:12px}
-details.team summary{cursor:pointer;list-style:none;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-details.team summary::-webkit-details-marker{display:none}
-details.team summary b{font-size:15px}
-details.team summary .small{white-space:nowrap}
-details.team summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:4px}
-details.team[open] summary::after{transform:rotate(-135deg)}
+details.team > summary{cursor:pointer;list-style:none;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.team > summary::-webkit-details-marker{display:none}
+details.team > summary b{font-size:15px}
+details.team > summary .small{white-space:nowrap}
+details.team > summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:4px}
+details.team[open] > summary::after{transform:rotate(-135deg)}
 .team-body{padding:0 14px 12px;display:grid;gap:10px}
 .team-body .row{display:grid;gap:4px;padding-top:10px;border-top:1px dashed var(--line)}
 .team-body .row .t{font-size:13.5px;color:var(--muted)}
@@ -179,7 +186,8 @@ details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-ra
 .plan text{font:700 30px var(--f);fill:var(--olive);pointer-events:none}
 .plan text.sub{font:500 22px var(--f);fill:var(--muted)}
 .plan text.lbl{font:600 20px var(--f);fill:var(--muted);letter-spacing:.1em}
-.plan .me + text{fill:var(--on-olive)}
+.plan .me + text,.plan .me + text + text{fill:var(--on-olive)}
+.plan .me ~ text{fill:var(--on-olive)}
 .plan .dark + text{fill:#F1F0EB}
 .plan .dark ~ text.sub{fill:var(--shield)}
 .rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
@@ -247,7 +255,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610101324'
+  build: '202610101346'
 };
 </script>
 <script>
@@ -492,7 +500,7 @@ function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-
 if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
-var S={viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
+var S={openDays:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
        selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms'};
 var demoRaw=null;
 if(CONFIG.demo){ demoRaw=CONFIG.demo; try{var saved=localStorage.getItem('chembalo.demoRaw2'); if(saved) demoRaw=JSON.parse(saved);}catch(e){} }
@@ -558,6 +566,7 @@ function nowLine(){
   var nx=ev.filter(function(e){return e.a>now}).sort(function(x,y){return x.a-y.a})[0];
   return 'сейчас<b>'+esc(cur.join(' · ')||'свободное время')+'</b>'+(nx?'дальше: '+esc(nx.title)+' в '+esc(nx.start):'');
 }
+function isToday(day){ var d=S.data.dates[day]; if(!d) return false; var p=d.split('.'), n=new Date(); return +p[0]===n.getDate()&&+p[1]===n.getMonth()+1&&+p[2]===n.getFullYear(); }
 function isNow(e){var x=events().filter(function(v){return v.day===e.day&&v.start===e.start&&v.title===e.title})[0]; var n=new Date(); return x&&x.a<=n&&n<x.b;}
 
 /* ---------- кусочки ---------- */
@@ -616,8 +625,8 @@ function vMe(){
   if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(esc).join(', '):''),'home']);}
   if(seat) f.push(['Место на пиру','№ '+seat.seat,'','feast']);
   if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return esc(c.when)+(c.passengers.length?' — '+c.passengers.map(esc).join(', '):'')}).join('<br>'),'road',true]);
-  else if(car) f.push(['Машина','с '+esc(car.driver),esc(car.when),'road']);
-  else f.push(['Машина','не выбрана','выбрать во вкладке «'+esc(tabName('road'))+'»','road']);
+  else if(car) f.push(['Машина','водитель: '+esc(car.driver),esc(car.when),'road']);
+  else f.push(['Машина','пока нет','напиши водителю или Айку','road']);
   if(g.costume) f.push(['Костюм',esc(g.costume),'']);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
   var col=0, facts=f.map(function(x,i){var wide=x[4]||(col===0&&i===f.length-1); col=wide?0:(col+1)%2;
@@ -626,28 +635,29 @@ function vMe(){
   var tasks=d.myTasks.length? ['Пт','Сб','Вс'].map(function(day){
     var ts=d.myTasks.filter(function(t){return t.day===day}); if(!ts.length) return '';
     var teams=d.myTeams.filter(function(t){return t.day===day});
-    return '<div class="dayhead"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></div>'+
+    var open = day in S.openDays ? S.openDays[day] : isToday(day);
+    return '<details class="day-tasks" data-day="'+day+'"'+(open?' open':'')+'><summary><span class="dayhead" style="margin:0"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></span><span class="small muted">'+plural(ts.length,['задача','задачи','задач'])+'</span></summary><div class="day-body">'+
       ts.map(function(t){
         return '<div class="card task"><div class="hd"><span class="g">'+esc(t.guild)+'</span>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><h4>'+esc(t.task)+'</h4>'+
-          (t.myNote?'<div class="mn">Твоё: '+esc(t.myNote)+'</div>':'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
+          (t.myNote?(/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты — '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
           (t.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(t.details)+'</p></details>':'')+
-          (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'<div class="small muted">ты справляешься сам(а)</div>')+
+          (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'')+
         '</div>';
       }).join('')+
       teams.filter(function(t){return t.tasks.length>1}).map(function(t){
         var n={}; t.tasks.forEach(function(k){ if(k.people.length<=8) k.people.forEach(function(p){n[p.name]=1})});
         return '<details class="team"><summary><b>'+esc(t.guild)+' — кто ещё</b><span class="small muted">'+plural(Object.keys(n).length,['человек','человека','человек'])+'</span></summary><div class="team-body">'+
-          (t.lead?'<div class="small">Главный — <b>'+(t.lead===S.me?'ты':esc(t.lead))+'</b>. С вопросами к нему.</div>':'')+
+          (t.lead?(t.lead===S.me?'<div class="small"><b>Ты — главный.</b></div>':'<div class="small">Главный — <b>'+esc(t.lead)+'</b>. С вопросами к нему.</div>'):'')+
           t.tasks.map(function(k){return '<div class="row"><span class="t">'+esc(k.task)+(k.time?' · '+esc(k.time):'')+(k.note?' · '+esc(k.note):'')+'</span><div class="chips">'+(k.label&&k.people.length<=8?'<span class="small muted">'+esc(k.label)+'</span>':people(k.people))+'</div>'+(k.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(k.details)+'</p></details>':'')+'</div>'}).join('')+
         '</div></details>';
-      }).join('');
+      }).join('')+'</div></details>';
   }).join('') : '<p class="muted">Ты свободен от службы — отдыхай и празднуй.</p>';
 
   return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role">'+esc(g.character)+'</div>':'<div class="small muted">без роли в квесте</div>')+
       (d.tg?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+
     (g.about?'<p class="about">'+esc(g.about)+'</p>':'')+
     '<div class="facts">'+facts+'</div>'+
-    '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">По дням и по времени. Под каждым днём — вся твоя команда.</p></div>'+tasks;
+    '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">Открой нужный день. Внутри — твои задачи по времени и вся твоя команда.</p></div>'+tasks;
 }
 
 function vPlan(){
@@ -674,7 +684,7 @@ function vPeople(){
 var PLAN={
   2:{vb:'0 0 1070 770',outer:[180,202,872,550],tower:'60,10 233,10 276,53 276,165 233,208 60,208 17,165 17,53',
      baths:[[265,490,190,110],[465,490,175,110]],
-     rooms:{tower:{poly:'180,202 465,202 465,490 265,490 265,600 180,600',dark:1,lx:196,ly:250,label:'С БАШНЕЙ'},
+     rooms:{tower:{poly:'180,202 465,202 465,490 265,490 265,600 180,600',lx:196,ly:250,label:'С БАШНЕЙ'},
             red:{rect:[465,202,240,288],lx:485,ly:250,label:'КРАСНАЯ'},
             p3:{rect:[705,202,180,133],lx:722,ly:250,label:'№ 3'},
             p2:{rect:[885,202,167,218],lx:902,ly:250,label:'№ 2'},
@@ -701,9 +711,9 @@ function planSvg(fl){
     var cls='room'+(R.dark?' dark':'')+(myRoom&&myRoom.id===id?' me':'')+(S.selRoom===id&&!(myRoom&&myRoom.id===id)?' sel':'');
     var shape=R.rect? '<rect class="'+cls+'" data-act="room" data-id="'+id+'" x="'+R.rect[0]+'" y="'+R.rect[1]+'" width="'+R.rect[2]+'" height="'+R.rect[3]+'"><title>'+esc(room?room.name:id)+'</title></rect>'
                      : '<polygon class="'+cls+'" data-act="room" data-id="'+id+'" points="'+R.poly+'"><title>'+esc(room?room.name:id)+'</title></polygon>';
-    h+='<g>'+shape+'<text x="'+R.lx+'" y="'+R.ly+'">'+R.label+'</text><text class="sub" x="'+R.lx+'" y="'+(R.ly+32)+'">'+(room?room.people.length:0)+' чел.</text></g>';
+    h+='<g>'+shape+'<text x="'+R.lx+'" y="'+R.ly+'">'+R.label+'</text><text class="sub" x="'+R.lx+'" y="'+(R.ly+32)+'">'+(myRoom&&myRoom.id===id?'ты здесь':(room?room.people.length:0)+' чел.')+'</text></g>';
   });
-  if(P.tower){var tw=P.rooms.tower; h+='<polygon class="room dark'+(myRoom&&myRoom.id==='tower'?' me':'')+'" data-act="room" data-id="tower" points="'+P.tower+'"/><text x="100" y="118" style="fill:var(--shield)">БАШНЯ</text>';}
+  if(P.tower){var tw=P.rooms.tower; h+='<polygon class="room'+(myRoom&&myRoom.id==='tower'?' me':'')+(S.selRoom==='tower'&&!(myRoom&&myRoom.id==='tower')?' sel':'')+'" data-act="room" data-id="tower" points="'+P.tower+'"/><text x="100" y="118">БАШНЯ</text>';}
   h+='<rect class="wall" x="'+o[0]+'" y="'+o[1]+'" width="'+o[2]+'" height="'+o[3]+'"/>';
   return '<svg class="plan" viewBox="'+P.vb+'" role="img" aria-label="План '+fl+'-го этажа">'+h+'</svg>';
 }
@@ -722,12 +732,15 @@ function vHome(){
     return seg+'<div class="sub"><span class="eyebrow">суббота, 20:00</span><h2 style="font-size:24px;font-weight:800">Таверна «Пьяный рыцарь»</h2><p class="small muted">'+(seat?'Твоё место — № '+seat.seat+'. ':'')+'Места пронумерованы по часовой стрелке.</p></div>'+
       '<div class="card"><div class="feast"><div class="end" style="grid-row:1">'+seatHtml(23)+seatHtml(24)+'</div><div class="col left" style="grid-column:1;grid-row:2">'+left.map(seatHtml).join('')+'</div><div class="table"><b>Трапезный стол</b></div><div class="col" style="grid-column:3;grid-row:2">'+right.map(seatHtml).join('')+'</div><div class="end" style="grid-row:3">'+seatHtml(12)+seatHtml(11)+'</div></div></div>';
   }
-  return seg+'<p class="small muted">Нажми на комнату, чтобы увидеть жильцов.'+(myRoom?' Твоя закрашена.':'')+'</p>'+[2,3].map(function(fl){
-    return '<div class="card" style="display:grid;gap:12px"><h3 style="font-size:18px">'+(fl===2?'Второй':'Третий')+' этаж</h3>'+planSvg(fl)+
+  var floors=[2,3]; if(myRoom&&myRoom.floor===3) floors=[3,2];
+  return seg+'<p class="small muted">Нажми на комнату, чтобы увидеть жильцов.'+(myRoom?' Твоя закрашена.':'')+'</p>'+floors.map(function(fl,idx){
+    var other = myRoom && idx>0;
+    return (other?'<details class="day-tasks"><summary><b>'+(fl===2?'Второй':'Третий')+' этаж</b><span class="small muted">показать</span></summary><div class="day-body">':'')+
+      '<div class="card" style="display:grid;gap:12px"><h3 style="font-size:18px">'+(fl===2?'Второй':'Третий')+' этаж'+(myRoom&&myRoom.floor===fl?' · твой':'')+'</h3>'+planSvg(fl)+
       '<div class="rooms">'+S.data.rooms.filter(function(r){return r.floor===fl}).map(function(r){
         var me=myRoom&&myRoom.id===r.id;
         return '<button class="card room-card'+(me?' me':'')+(S.selRoom===r.id?' sel':'')+'" data-act="room" data-id="'+r.id+'"><b>'+esc(r.name)+'</b><span class="small muted">'+esc(r.beds)+'</span><div class="chips">'+(r.people.length?r.people.map(function(p){return chip(p)}).join(''):'<span class="muted small">свободно</span>')+'</div></button>';
-      }).join('')+'</div></div>';
+      }).join('')+'</div></div>'+(other?'</div></details>':'');
   }).join('');
 }
 
@@ -866,6 +879,7 @@ document.addEventListener('click',function(e){
     if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
     load().then(function(){ window.scrollTo(0,0); }); }
 });
+document.addEventListener('toggle',function(e){ var t=e.target; if(t.classList&&t.classList.contains('day-tasks')) S.openDays[t.getAttribute('data-day')]=t.open; },true);
 document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); } else if(e.target.id==='when'+S.editCar){ S.draftWhen=e.target.value; } });
 document.addEventListener('submit',function(e){
   var f=e.target.getAttribute('data-form'); if(!f) return; e.preventDefault();
