@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<!--build:202610101311-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога — для гостей дня рождения Ксении">
@@ -144,6 +145,11 @@ details.team[open] summary::after{transform:rotate(-135deg)}
 .team-body{padding:0 14px 12px;display:grid;gap:10px}
 .team-body .row{display:grid;gap:4px;padding-top:10px;border-top:1px dashed var(--line)}
 .team-body .row .t{font-size:13.5px;color:var(--muted)}
+details.more summary{cursor:pointer;color:var(--olive);font-size:14px;font-weight:600;list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
+details.more[open] summary::after{transform:rotate(-135deg)}
+details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-radius:10px;padding:10px 12px;white-space:pre-line}
 
 /* расписание */
 .ev{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:11px 14px;border-top:1px solid var(--line)}
@@ -240,7 +246,8 @@ table.dt td.blk{font-weight:700;color:var(--olive)}
 var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
-  demo: null
+  demo: null,
+  build: '202610101311'
 };
 </script>
 <script>
@@ -308,8 +315,23 @@ function buildPayload(raw, opts) {
   (raw.guilds || []).forEach(function (g) { if (g.block) guilds[g.block] = { name: g.name || g.block, lead: hidden[g.lead] ? '' : (g.lead || ''), about: g.about || '' }; });
   var guildOf = function (b) { return guilds[b] || { name: b, lead: '', about: '' }; };
 
+  // «все водители», «все», «все, кроме Кирилл, Женя» — группы вместо поимённого списка
+  var drivers = [];
+  (raw.cars || []).filter(shown_).forEach(function (c) { if (c.driver && !hidden[c.driver] && drivers.indexOf(c.driver) < 0) drivers.push(c.driver); });
+  function group_(str) {
+    var t = norm_(str);
+    if (t === 'все водители') return { label: 'все водители', people: drivers.map(function (n) { return { name: n, note: '' }; }) };
+    var m = t.match(/^все(?:\s*,?\s*кроме\s*(.*))?$/);
+    if (m) {
+      var except = m[1] ? parsePeople(String(str).replace(/^[^к]*кроме\s*/i, '')).map(function (p) { return p.name; }) : [];
+      return { label: String(str).trim(), people: visGuests.filter(function (g) { return except.indexOf(g.name) < 0; }).map(function (g) { return { name: g.name, note: '' }; }) };
+    }
+    return null;
+  }
   var duties = (raw.duties || []).filter(shown_).map(function (d) {
-    return { block: d.block, guild: guildOf(d.block).name, task: d.task, day: d.day, time: d.time || '', note: d.note || '', people: parsePeople(d.people).filter(vis) };
+    var grp = group_(d.people);
+    return { block: d.block, guild: guildOf(d.block).name, task: d.task, day: d.day, time: d.time || '', note: d.note || '', details: d.details || '',
+      label: grp ? grp.label : '', people: grp ? grp.people : parsePeople(d.people).filter(vis) };
   }).sort(function (a, b) { return DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || timeKey_(a.time) - timeKey_(b.time); });
 
   // Мои задачи по времени + мои команды (гильдии) по дням
@@ -317,7 +339,7 @@ function buildPayload(raw, opts) {
   if (me) {
     duties.forEach(function (d) {
       var mine = d.people.filter(function (p) { return p.name === me; })[0];
-      if (mine) myTasks.push({ day: d.day, time: d.time, task: d.task, note: d.note, myNote: mine.note, block: d.block, guild: d.guild,
+      if (mine) myTasks.push({ day: d.day, time: d.time, task: d.task, note: d.note, details: d.details, label: d.label, myNote: mine.note, block: d.block, guild: d.guild,
         with: d.people.filter(function (p) { return p.name !== me; }), crowd: d.people.length });
     });
     DAYS.forEach(function (day) {
@@ -332,7 +354,18 @@ function buildPayload(raw, opts) {
   }
 
   var cars = (raw.cars || []).filter(shown_).filter(function (c) { return c.driver && !hidden[c.driver]; }).map(function (c) {
-    return { row: c._row, driver: c.driver, when: c.when, seats: Number(c.seats) || 4, passengers: parsePeople(c.passengers).filter(vis).map(function (p) { return p.name; }) };
+    return { row: c._row, driver: c.driver, when: c.when, seats: Number(c.seats) || 4, passengers: parsePeople(c.passengers).filter(vis).map(function (p) { return p.name; }),
+      edit: '' };
+  });
+  var isDriver = !!me && cars.some(function (c) { return c.driver === me; });
+  cars.forEach(function (c) { c.edit = acc.admin ? 'full' : (c.driver === me ? 'own' : (isDriver ? 'add' : '')); c.canEdit = !!c.edit; });
+  var seated_ = {}; cars.forEach(function (c) { seated_[c.driver] = 1; c.passengers.forEach(function (p) { seated_[p] = 1; }); });
+  var loose = visGuests.filter(function (g) { return !seated_[g.name]; }).map(function (g) { return g.name; });
+  var allProps = (raw.props || []).filter(shown_).map(function (p) { return { item: p.item, who: parsePeople(p.who).filter(vis).map(function (x) { return x.name; }) }; });
+  cars.forEach(function (c) {
+    if (c.driver !== me) return;
+    var crew = [c.driver].concat(c.passengers);
+    c.load = allProps.filter(function (p) { return p.who.some(function (w) { return crew.indexOf(w) >= 0; }); });
   });
 
   var tabs = (raw.tabs && raw.tabs.length ? raw.tabs : [{ id: 'me', name: 'Я', show: true }, { id: 'plan', name: 'План', show: true }, { id: 'people', name: 'Жители', show: true }, { id: 'home', name: 'Дом', show: true }, { id: 'road', name: 'Дорога', show: true }])
@@ -350,19 +383,20 @@ function buildPayload(raw, opts) {
     }),
     schedule: (raw.schedule || []).filter(shown_).map(function (e) { return { day: e.day, start: e.start || '', end: e.end || '', title: e.title, note: e.note || '' }; }),
     cars: cars,
-    props: (raw.props || []).filter(shown_).map(function (p) { return { row: p._row, item: p.item, who: parsePeople(p.who).filter(vis).map(function (x) { return x.name; }), taken: isTrue_(p.taken) }; }),
+    myProps: me ? allProps.filter(function (p) { return p.who.indexOf(me) >= 0; }) : [],
     rooms: (raw.rooms || []).map(function (r) { return { id: r.id, floor: Number(r.floor), name: r.name, beds: r.beds || '', people: parsePeople(r.people).filter(vis).map(function (x) { return x.name; }) }; }),
     seats: (raw.seats || []).map(function (x) { return { seat: Number(x.seat), name: x.name && !hidden[x.name] ? x.name : '' }; }),
     contacts: (raw.contacts || []).filter(shown_).filter(function (c) { return c.name && !hidden[c.name]; }).map(function (c) {
       return { name: c.name, role: c.role || '', tg: String(c.tg || c.link || '').trim().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, ''), phone: String(c.phone || '').trim(), top: isTrue_(c.top) };
     }),
     news: (raw.news || []).filter(shown_).filter(function (n) { return n.title || n.text; }).map(function (n) { return { title: n.title || '', text: n.text || '', where: n.where || 'все', top: isTrue_(n.top) }; }),
-    myTasks: myTasks, myTeams: myTeams,
+    myTasks: myTasks, myTeams: myTeams, loose: loose,
     tg: opts.tg ? { linked: !!tgG } : null
   };
-  if (acc.guest) { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; }
+  if (acc.guest) { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; out.addressNote = s['Подпись к адресу'] || ''; }
   if (acc.admin) {
     out.duties = duties;
+    out.props = allProps;
     out.guilds = guilds;
     out.hidden = raw.guests.filter(function (g) { return hidden[g.name]; }).map(function (g) { return { name: g.name, character: g.character || '' }; });
     var inCar = {}; cars.forEach(function (c) { inCar[c.driver] = 1; c.passengers.forEach(function (p) { inCar[p] = 1; }); });
@@ -387,27 +421,40 @@ function applyAction(raw, a, code, tg) {
   var hiddenMe = guest && /не\s*прид/.test(norm_(guest.status));
   function fail(msg) { throw new Error(msg); }
 
-  if (a.type === 'joinCar' || a.type === 'leaveCar') {
-    if (!guest || hiddenMe) fail('Сначала выбери себя во вкладке «Я».');
-    var target = null;
-    if (a.type === 'joinCar') {
-      target = raw.cars.filter(function (c) { return c._row === Number(a.row); })[0];
-      if (!target) fail('Такой машины больше нет — обнови страницу.');
-      if (target.driver === a.me) fail('Ты водитель этой машины.');
-      var now = parsePeople(target.passengers).filter(function (p) { return p.name !== a.me; });
-      if (now.length >= (Number(target.seats) || 4)) fail('В этой машине мест нет.');
+  if (a.type === 'setCar') {
+    var car = raw.cars.filter(function (c) { return c._row === Number(a.row); })[0];
+    if (!car) fail('Такой машины больше нет — обнови страницу.');
+    var names = {}; raw.guests.forEach(function (g) { if (!/не\s*прид/.test(norm_(g.status))) names[g.name] = 1; });
+    var liveCars = raw.cars.filter(shown_);
+    var meDrives = !!guest && !hiddenMe && liveCars.some(function (c) { return c.driver === a.me; });
+    var mode = acc.admin ? 'full' : (meDrives && car.driver === a.me ? 'own' : (meDrives ? 'add' : ''));
+    if (!mode) fail('Менять состав машин могут только водители.');
+    var want = (a.passengers || []).filter(function (n, i, arr) { return names[n] && n !== car.driver && arr.indexOf(n) === i; });
+    if (want.length > (Number(car.seats) || 4)) fail('Мест в машине: ' + (Number(car.seats) || 4) + '.');
+    var old = parsePeople(car.passengers);
+    if (mode !== 'full') {
+      var seatedNow = {};
+      liveCars.forEach(function (c) { seatedNow[c.driver] = 1; parsePeople(c.passengers).forEach(function (p) { seatedNow[p.name] = 1; }); });
+      var oldNames = old.map(function (p) { return p.name; });
+      var added = want.filter(function (n) { return oldNames.indexOf(n) < 0; });
+      var removed = oldNames.filter(function (n) { return names[n] && want.indexOf(n) < 0; });
+      added.forEach(function (n) { if (seatedNow[n]) fail(n + ' уже едет в другой машине. Добавлять можно только тех, кто нигде не записан.'); });
+      if (mode === 'add' && removed.length) fail('Убирать людей из чужой машины может только её водитель.');
+      if (mode === 'add') a.when = '';
     }
+    // скрытые гости, записанные в эту машину, остаются на своих местах
+    var keepHidden = old.filter(function (p) { return !names[p.name]; });
     raw.cars.forEach(function (c) {
-      var list = parsePeople(c.passengers), had = list.some(function (p) { return p.name === a.me; });
-      var next = list.filter(function (p) { return p.name !== a.me; });
-      if (c === target) next.push({ name: a.me, note: '' });
-      if (had || c === target) { c.passengers = joinPeople(next); changes.push({ sheet: 'cars', row: c._row, field: 'passengers', value: c.passengers }); }
+      if (c === car) return;
+      var list = parsePeople(c.passengers), next = list.filter(function (p) { return want.indexOf(p.name) < 0; });
+      if (next.length !== list.length) { c.passengers = joinPeople(next); changes.push({ sheet: 'cars', row: c._row, field: 'passengers', value: c.passengers }); }
     });
-  } else if (a.type === 'toggleProp') {
-    var p = raw.props.filter(function (x) { return x._row === Number(a.row); })[0];
-    if (!p) fail('Такой вещи больше нет — обнови страницу.');
-    p.taken = !!a.taken;
-    changes.push({ sheet: 'props', row: p._row, field: 'taken', value: p.taken });
+    car.passengers = joinPeople(keepHidden.concat(want.map(function (n) { var o = old.filter(function (p) { return p.name === n; })[0]; return o || { name: n, note: '' }; })));
+    changes.push({ sheet: 'cars', row: car._row, field: 'passengers', value: car.passengers });
+    if (typeof a.when === 'string' && a.when.trim() && a.when.trim() !== car.when) {
+      car.when = a.when.trim().slice(0, 60);
+      changes.push({ sheet: 'cars', row: car._row, field: 'when', value: car.when });
+    }
   } else if (a.type === 'linkTg') {
     if (!tg) fail('Привязка работает только внутри Telegram.');
     if (tgG) fail('Твой Telegram уже привязан к гостю «' + tgG.name + '». Если это ошибка — напиши Ксении.');
@@ -441,7 +488,7 @@ function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-
 if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
-var S={data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
+var S={editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
        selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms'};
 var demoRaw=null;
 if(CONFIG.demo){ demoRaw=CONFIG.demo; try{var saved=localStorage.getItem('chembalo.demoRaw2'); if(saved) demoRaw=JSON.parse(saved);}catch(e){} }
@@ -527,7 +574,7 @@ function chip(n,note){return '<span class="chip'+(n===S.me?' me':'')+'">'+(n===S
 function people(list,limit){
   limit=limit||8;
   if(!list.length) return '<span class="small muted">пока никого</span>';
-  if(list.length>limit){ var mine=list.some(function(p){return p.name===S.me}); return (mine?chip(S.me):'')+'<span class="small muted" style="align-self:center">'+(mine?'и ещё '+(list.length-1):list.length+' человек')+'</span>'; }
+  if(list.length>limit) return '<span class="small muted">почти все</span>';
   return list.map(function(p){return chip(p.name,p.note)}).join('');
 }
 function roomOf(n){return S.data.rooms.filter(function(r){return r.people.indexOf(n)>=0})[0]}
@@ -557,7 +604,7 @@ function vMe(){
       }).join('')+'</div>'+(linkMode?'<p class="small muted">Твоего имени нет или оно занято — напиши Ксении.</p>':'');
   }
   var g=guest(S.me), room=roomOf(S.me), seat=seatOf(S.me), car=carOf(S.me), drv=drives(S.me);
-  var mine=d.props.filter(function(p){return p.who.indexOf(S.me)>=0});
+  var mine=d.myProps||[];
   var f=[];
   if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(esc).join(', '):''),'home']);}
   if(seat) f.push(['Место на пиру','№ '+seat.seat,'','feast']);
@@ -576,14 +623,15 @@ function vMe(){
       ts.map(function(t){
         return '<div class="card task"><div class="hd"><span class="g">'+esc(t.guild)+'</span>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><h4>'+esc(t.task)+'</h4>'+
           (t.myNote?'<div class="mn">Твоё: '+esc(t.myNote)+'</div>':'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
-          (t.with.length?'<div class="chips">'+(t.crowd>8?'<span class="small muted">вместе с тобой ещё '+t.with.length+' человек</span>':'<span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join(''))+'</div>':'<div class="small muted">ты справляешься сам(а)</div>')+
+          (t.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(t.details)+'</p></details>':'')+
+          (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'<div class="small muted">ты справляешься сам(а)</div>')+
         '</div>';
       }).join('')+
       teams.filter(function(t){return t.tasks.length>1}).map(function(t){
-        var n={}; t.tasks.forEach(function(k){k.people.forEach(function(p){n[p.name]=1})});
+        var n={}; t.tasks.forEach(function(k){ if(k.people.length<=8) k.people.forEach(function(p){n[p.name]=1})});
         return '<details class="team"><summary><b>'+esc(t.guild)+' — кто ещё</b><span class="small muted">'+plural(Object.keys(n).length,['человек','человека','человек'])+'</span></summary><div class="team-body">'+
           (t.lead?'<div class="small">Главный — <b>'+(t.lead===S.me?'ты':esc(t.lead))+'</b>. С вопросами к нему.</div>':'')+
-          t.tasks.map(function(k){return '<div class="row"><span class="t">'+esc(k.task)+(k.time?' · '+esc(k.time):'')+(k.note?' · '+esc(k.note):'')+'</span><div class="chips">'+people(k.people)+'</div></div>'}).join('')+
+          t.tasks.map(function(k){return '<div class="row"><span class="t">'+esc(k.task)+(k.time?' · '+esc(k.time):'')+(k.note?' · '+esc(k.note):'')+'</span><div class="chips">'+(k.label&&k.people.length<=8?'<span class="small muted">'+esc(k.label)+'</span>':people(k.people))+'</div>'+(k.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(k.details)+'</p></details>':'')+'</div>'}).join('')+
         '</div></details>';
       }).join('');
   }).join('') : '<p class="muted">Ты свободен от службы — отдыхай и празднуй.</p>';
@@ -679,30 +727,42 @@ function vHome(){
 function vRoad(){
   var d=S.data, myCar=carOf(S.me), drv=drives(S.me);
   var addr = d.address!==undefined
-    ? '<div class="card addr"><span class="eyebrow">куда ехать</span><b>'+esc(d.address||'адрес пока не указан')+'</b>'+(d.mapUrl?'<a class="btn ghost sm" style="justify-self:start" href="'+esc(d.mapUrl)+'" target="_blank" rel="noopener">Открыть карту</a>':'')+'<span class="small muted">Не пересылай адрес за пределы чата.</span></div>'
+    ? '<div class="card addr"><span class="eyebrow">куда ехать</span><b>'+esc(d.address||'адрес пока не указан')+'</b>'+(d.mapUrl?'<a class="btn ghost sm" style="justify-self:start" href="'+esc(d.mapUrl)+'" target="_blank" rel="noopener">Открыть карту</a>':'')+(d.addressNote?'<span class="small muted">'+esc(d.addressNote)+'</span>':'')+'</div>'
     : '<form class="card addr" data-form="code"><span class="eyebrow">куда ехать</span><p>Адрес откроется после кодового слова из чата.</p><div class="codeform"><input type="password" id="codeinput" placeholder="Кодовое слово" autocomplete="off" aria-label="Кодовое слово"><button class="btn" type="submit">Открыть</button></div></form>';
-  var by={}, order=[];
-  d.props.forEach(function(p){var k=p.who.join(', ')||'Никто'; if(!by[k]){by[k]=[];order.push(k)} by[k].push(p)});
-  order.sort(function(a,b){return (b.split(', ').indexOf(S.me)>=0)-(a.split(', ').indexOf(S.me)>=0)});
-  var done=d.props.filter(function(p){return p.taken}).length;
+  var rideOf=function(n){var c=carOf(n); return c?c.driver:''};
   return '<h2>Дорога</h2>'+addr+
-    (S.me&&!myCar&&!drv.length?'<p class="note">Ты ещё не в машине. Выбери, с кем едешь.</p>':'')+
-    (S.me?'':'<p class="small muted">Выбери себя во вкладке «'+esc(tabName('me'))+'», чтобы записаться в машину.</p>')+
+    (S.me&&!myCar&&!drv.length?'<p class="note">Ты пока ни в одной машине. Напиши водителю или Айку — тебя впишут.</p>':'')+
+    '<div class="card" style="display:grid;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3 style="font-size:17px">Не в машине</h3><span class="small muted">'+(d.loose.length?plural(d.loose.length,['человек','человека','человек']):'')+'</span></div>'+
+      (d.loose.length?'<div class="chips">'+d.loose.map(function(n){return chip(n)}).join('')+'</div>'+(drv.length?'<span class="small muted">Ты водитель — можешь добавить их в любую машину, где есть места.</span>':''):'<span class="small muted">Все гости распределены по машинам.</span>')+'</div>'+
     '<div class="cars">'+d.cars.map(function(c){
-      var full=c.passengers.length>=c.seats, inIt=c.passengers.indexOf(S.me)>=0, isDrv=c.driver===S.me;
-      var pips=''; for(var i=0;i<c.seats;i++) pips+='<i class="'+(i<c.passengers.length?'f':'')+'"></i>';
-      var btn = !S.me||isDrv ? '' : inIt ? '<button class="btn ghost sm" data-act="leave"'+(S.busy?' disabled':'')+'>Выйти из машины</button>'
-              : full ? '<span class="small muted">мест нет</span>' : '<button class="btn sm" data-act="join" data-row="'+c.row+'"'+(S.busy?' disabled':'')+'>'+(myCar?'Пересесть сюда':'Еду в этой машине')+'</button>';
-      return '<div class="card car'+(inIt||isDrv?' me':'')+'"><div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':esc(c.driver))+'</b><div class="small muted">'+esc(c.when)+'</div></div></div>'+
+      var inIt=c.passengers.indexOf(S.me)>=0, isDrv=c.driver===S.me, editing=S.editCar===c.row;
+      var pips=''; for(var i=0;i<c.seats;i++) pips+='<i class="'+(i<(editing?S.draft.length:c.passengers.length)?'f':'')+'"></i>';
+      var head='<div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':esc(c.driver))+'</b><div class="small muted">'+esc(c.when)+'</div></div></div>';
+      if(editing){
+        var mode=c.edit, pool, hint;
+        if(mode==='full'){ pool=d.guests.filter(function(g){return g.name!==c.driver}).map(function(g){return g.name});
+          hint='Нажми на людей в этой машине. Стрелка — в чьей машине человек сейчас; если выберешь его, он переедет сюда.'; }
+        else if(mode==='own'){ pool=c.passengers.concat(d.loose.filter(function(n){return n!==c.driver}));
+          hint='Нажми, чтобы убрать пассажира или добавить того, кто ещё не в машине.'; }
+        else { pool=d.loose.filter(function(n){return n!==c.driver});
+          hint='Можно добавить только тех, кто ещё ни в одной машине. Убирать людей и менять время может водитель этой машины.'; }
+        var fixed = mode==='add' ? c.passengers.map(function(p){return chip(p)}).join('') : '';
+        return '<div class="card car me" style="grid-column:1/-1">'+head+
+          (mode!=='add'?'<label class="small muted" for="when'+c.row+'">Когда выезжает</label><input type="search" id="when'+c.row+'" value="'+esc(S.draftWhen)+'" placeholder="Например: Пт, 17:30" autocomplete="off">':'')+
+          '<div style="display:flex;align-items:center;gap:8px"><span class="pips">'+pips+'</span><span class="small muted">'+S.draft.length+' из '+c.seats+'</span></div>'+
+          '<div class="small muted">'+hint+'</div>'+
+          (fixed?'<div class="chips">'+fixed+'</div>':'')+
+          '<div class="chips">'+(pool.length?pool.filter(function(n){return mode!=='add'||c.passengers.indexOf(n)<0}).map(function(n){var on=S.draft.indexOf(n)>=0, other=mode==='full'&&!on&&rideOf(n)&&rideOf(n)!==c.driver?rideOf(n):'';
+            return '<button class="chip'+(on?' me':'')+'" data-act="pick" data-name="'+esc(n)+'" style="cursor:pointer">'+esc(n)+(other?'<span class="n">→ '+esc(other)+'</span>':'')+'</button>';}).join(''):'<span class="small muted">Свободных нет — все уже в машинах.</span>')+'</div>'+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" data-act="savecar" data-row="'+c.row+'"'+(S.busy?' disabled':'')+'>Сохранить</button><button class="btn ghost sm" data-act="cancelcar">Отмена</button></div></div>';
+      }
+      var load = c.load&&c.load.length ? '<div class="small" style="display:grid;gap:2px"><span class="muted">Не забудь положить в машину:</span>'+c.load.map(function(p){return '<span>• '+esc(p.item)+' <span class="muted">('+p.who.map(function(w){return w===S.me?'ты':esc(w)}).join(', ')+')</span></span>'}).join('')+'</div>' : '';
+      return '<div class="card car'+(inIt||isDrv?' me':'')+'">'+head+
         '<div style="display:flex;align-items:center;gap:8px"><span class="pips" aria-label="занято '+c.passengers.length+' из '+c.seats+'">'+pips+'</span><span class="small muted">'+c.passengers.length+' из '+c.seats+'</span></div>'+
-        '<div class="chips">'+(c.passengers.length?c.passengers.map(function(p){return chip(p)}).join(''):'<span class="small muted">пока никого</span>')+'</div>'+btn+'</div>';
-    }).join('')+'</div>'+
-    (d.props.length?'<div class="sub" style="margin-top:8px"><h2 style="font-size:22px;font-weight:800">Что везём</h2><p class="small muted">Положил в машину — отметь. Собрано '+done+' из '+d.props.length+'.</p></div>'+
-    '<div class="card" style="display:grid;gap:12px">'+order.map(function(k){
-      return '<div class="pgroup"><h4>'+(k.split(', ').indexOf(S.me)>=0?'<span class="chip me">ты</span> ':'')+esc(k)+'</h4>'+by[k].map(function(p){
-        return '<label class="prop'+(p.taken?' done':'')+'"><input type="checkbox" id="prop'+p.row+'" data-act="prop" data-row="'+p.row+'"'+(p.taken?' checked':'')+(S.busy?' disabled':'')+'><span>'+esc(p.item)+'</span></label>';
-      }).join('')+'</div>';
-    }).join('')+'</div>':'');
+        '<div class="chips">'+(c.passengers.length?c.passengers.map(function(p){return chip(p)}).join(''):'<span class="small muted">пока никого</span>')+'</div>'+load+
+        (c.edit==='full'||c.edit==='own'?'<button class="btn ghost sm" style="justify-self:start" data-act="editcar" data-row="'+c.row+'">Изменить состав и время</button>':
+         c.edit==='add'&&d.loose.length&&c.passengers.length<c.seats?'<button class="btn ghost sm" style="justify-self:start" data-act="editcar" data-row="'+c.row+'">Добавить из «Не в машине»</button>':'')+'</div>';
+    }).join('')+'</div>';
 }
 
 function vAdmin(){
@@ -710,7 +770,7 @@ function vAdmin(){
   var blocks=[]; d.duties.forEach(function(x){if(blocks.indexOf(x.block)<0) blocks.push(x.block)});
   var tasksOf=function(b){var t=[]; d.duties.forEach(function(x){if(x.block===b&&t.indexOf(x.task)<0)t.push(x.task)}); return t;};
   var cell=function(b,t,day){var x=d.duties.filter(function(y){return y.block===b&&y.task===t&&y.day===day})[0]; if(!x) return '<span class="muted">—</span>';
-    return (x.time?'<b>'+esc(x.time)+'</b> ':'')+(x.people.length? x.people.map(function(p){return esc(p.name)+(p.note?' <span class="muted">('+esc(p.note)+')</span>':'')}).join(', ') : '<span class="note" style="padding:1px 8px">никого</span>')+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'');};
+    return (x.time?'<b>'+esc(x.time)+'</b> ':'')+(x.label?esc(x.label)+' <span class="muted">('+x.people.length+')</span>':x.people.length? x.people.map(function(p){return esc(p.name)+(p.note?' <span class="muted">('+esc(p.note)+')</span>':'')}).join(', ') : '<span class="note" style="padding:1px 8px">никого</span>')+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'');};
   var g=d.gaps, gl=[];
   if(g.emptyTasks.length) gl.push('<b>Без людей:</b> '+g.emptyTasks.map(esc).join('; '));
   if(g.noCar.length) gl.push('<b>Без машины:</b> '+g.noCar.map(esc).join(', '));
@@ -725,6 +785,7 @@ function vAdmin(){
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Все гости</h3><div class="glist">'+d.guests.map(function(x){
       return '<div class="grow"><div>'+avatar(x.name,'sm')+'<span>'+esc(x.name)+(x.status==='нет в чате'?' <span class="chip">нет в чате</span>':'')+'</span></div><button class="btn ghost sm" data-act="status" data-name="'+esc(x.name)+'" data-status="не придёт"'+(S.busy?' disabled':'')+'>Скрыть</button></div>';
     }).join('')+'</div></div>'+
+    '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Кто что везёт</h3><div class="glist">'+(d.props||[]).map(function(p){return '<div class="grow"><span>'+esc(p.item)+'</span><span class="small muted">'+p.who.map(esc).join(', ')+'</span></div>'}).join('')+'</div></div>'+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Все задачи</h3><div class="grid-scroll"><table class="dt"><thead><tr><th>Гильдия</th><th>Задача</th><th>Пт</th><th>Сб</th><th>Вс</th></tr></thead><tbody>'+
       blocks.map(function(b){var ts=tasksOf(b); return ts.map(function(t,i){return '<tr>'+(i===0?'<td class="blk" rowspan="'+ts.length+'">'+esc(guildName(b))+'</td>':'')+'<td>'+esc(t)+'</td><td>'+cell(b,t,'Пт')+'</td><td>'+cell(b,t,'Сб')+'</td><td>'+cell(b,t,'Вс')+'</td></tr>'}).join('')}).join('')+
     '</tbody></table></div></div>'+
@@ -757,6 +818,7 @@ function render(){
     contactsHtml()+
     '<main class="wrap"><div class="view">'+news.top+body+news.rest+
       (showAdminLogin?'<div class="foot">'+(S.showAdminLogin?'<form class="codeform" data-form="admin" style="width:min(360px,100%)"><input type="password" id="admininput" placeholder="Код организатора" autocomplete="off" aria-label="Код организатора"><button class="btn" type="submit">Войти</button></form>':'<button class="link" data-act="adminlogin">Вход для организаторов</button>')+'</div>':'')+
+    (S.tab==='me'&&CONFIG.build?'<p class="small muted" style="text-align:center;opacity:.6">версия '+CONFIG.build.slice(6,8)+'.'+CONFIG.build.slice(4,6)+' '+CONFIG.build.slice(8,10)+':'+CONFIG.build.slice(10,12)+'</p>':'')+
     '</div></main>'+
     '<nav class="tabbar" aria-label="Вкладки"><div class="in">'+tabs.map(function(t){
       return '<a href="#'+t.id+'" data-act="tab" data-tab="'+t.id+'" class="'+(t.id===S.tab?'on':'')+'"'+(t.id===S.tab?' aria-current="page"':'')+'><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
@@ -777,8 +839,13 @@ document.addEventListener('click',function(e){
   else if(a==='me'){ S.me=t.getAttribute('data-name'); LS.set('me',S.me); var c=null; try{c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null')}catch(x){} if(c&&!demoRaw){S.data=c} load(); window.scrollTo(0,0); }
   else if(a==='link'){ act({type:'linkTg',name:t.getAttribute('data-name')},'Готово, это ты!'); }
   else if(a==='room'){ S.selRoom=S.selRoom===t.getAttribute('data-id')?'':t.getAttribute('data-id'); render(); }
-  else if(a==='join'){ act({type:'joinCar',row:+t.getAttribute('data-row')},'Записала тебя в машину'); }
-  else if(a==='leave'){ act({type:'leaveCar'},'Ты больше не в этой машине'); }
+  else if(a==='editcar'){ var c=S.data.cars.filter(function(x){return x.row===+t.getAttribute('data-row')})[0]; if(c){S.editCar=c.row; S.draft=c.passengers.slice(); S.draftWhen=c.when; render();} }
+  else if(a==='cancelcar'){ S.editCar=0; render(); }
+  else if(a==='pick'){ var n=t.getAttribute('data-name'), i=S.draft.indexOf(n), cc=S.data.cars.filter(function(x){return x.row===S.editCar})[0];
+    if(i>=0) S.draft.splice(i,1); else if(cc&&S.draft.length>=cc.seats) toast('Мест больше нет'); else S.draft.push(n);
+    var w=document.getElementById('when'+S.editCar); if(w) S.draftWhen=w.value; render(); }
+  else if(a==='savecar'){ var w2=document.getElementById('when'+S.editCar); if(w2) S.draftWhen=w2.value; var row=S.editCar;
+    act({type:'setCar',row:row,passengers:S.draft,when:S.draftWhen},'Сохранено'); S.editCar=0; }
   else if(a==='status'){ act({type:'setStatus',name:t.getAttribute('data-name'),status:t.getAttribute('data-status')}, t.getAttribute('data-status')==='придёт'?'Вернули на страницу':'Скрыли со страницы'); }
   else if(a==='phone'){ var ph=t.getAttribute('data-phone'); var done=function(){toast(fmtPhone(ph)+' — скопирован')};
     try{ navigator.clipboard.writeText(ph).then(done,function(){toast(fmtPhone(ph))}) }catch(x){ toast(fmtPhone(ph)) } }
@@ -786,8 +853,7 @@ document.addEventListener('click',function(e){
   else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
   else if(a==='reload'){ location.reload(); }
 });
-document.addEventListener('change',function(e){ var t=e.target; if(t.getAttribute('data-act')==='prop') act({type:'toggleProp',row:+t.getAttribute('data-row'),taken:t.checked}); });
-document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); } });
+document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); } else if(e.target.id==='when'+S.editCar){ S.draftWhen=e.target.value; } });
 document.addEventListener('submit',function(e){
   var f=e.target.getAttribute('data-form'); if(!f) return; e.preventDefault();
   var v=(document.getElementById(f==='code'?'codeinput':'admininput')||{}).value||'';
@@ -802,6 +868,14 @@ window.addEventListener('hashchange',function(){ var h=(location.hash||'').slice
 setInterval(function(){ if(S.data && !S.busy && document.visibilityState==='visible' && !(document.activeElement&&document.activeElement.tagName==='INPUT')) render(); },60000);
 document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'&&S.data&&!S.busy) load(); });
 
+// самообновление: если на GitHub лежит более новая версия страницы, перезагрузиться на неё
+if(!CONFIG.demo && CONFIG.build){
+  fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+    var m=t.match(/build:(\d+)/); if(!m||m[1]===CONFIG.build) return;
+    try{ if(sessionStorage.getItem('chembalo.reloaded')===m[1]) return; sessionStorage.setItem('chembalo.reloaded',m[1]); }catch(e){}
+    location.replace(location.pathname+'?v='+m[1]);
+  }).catch(function(){});
+}
 if(!CONFIG.demo && !CONFIG.api){ $app.innerHTML='<div class="loading">Страница ещё не подключена к таблице.</div>'; return; }
 // мгновенный показ: сначала то, что видели в прошлый раз, потом свежие данные
 if(!demoRaw){ try{ var cached=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(cached){ S.data=cached; if(cached.tg) S.me=cached.me; render(); } }catch(e){} }
