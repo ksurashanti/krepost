@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610122124-->
+<!--build:202610122133-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -95,6 +95,9 @@ nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-r
 .lb .av{--w:min(70vw,300px);margin-bottom:12px;cursor:zoom-out}
 .lb b{color:var(--on-night);font-size:20px} .lb .r{color:var(--sage);font-size:15px}
 .lb .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.lb .go.yes{background:var(--olive);border-color:var(--olive);color:var(--on-olive)}
+.ask{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:10px 12px;border:1px dashed var(--warn);border-radius:12px;background:var(--warn-bg);color:var(--warn);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.ask b{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--warn);color:var(--warn-bg);font-size:16px}
 .lb .go svg{width:18px;height:18px}
 .lb .go{display:inline-flex;align-items:center;gap:7px;text-decoration:none;border:1px solid var(--sage);color:var(--on-night);background:none;border-radius:999px;padding:9px 18px;font:inherit;font-size:14px;cursor:pointer}
 @keyframes lbin{from{opacity:0}to{opacity:1}}
@@ -277,7 +280,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610122124'
+  build: '202610122133'
 };
 </script>
 <script>
@@ -366,8 +369,9 @@ function buildPayload(raw, opts) {
   }
   var duties = (raw.duties || []).filter(shown_).map(function (d) {
     var grp = group_(d.people);
-    return { block: d.block, guild: guildOf(d.block).name, task: d.task, day: d.day, time: d.time || '', note: d.note || '', details: d.details || '',
-      label: grp ? grp.label : '', people: grp ? grp.people : parsePeople(d.people).filter(vis) };
+    return { row: d._row, block: d.block, guild: guildOf(d.block).name, task: d.task, day: d.day, time: d.time || '', note: d.note || '', details: d.details || '',
+      label: grp ? grp.label : '', people: grp ? grp.people : parsePeople(d.people).filter(vis),
+      declined: parsePeople(d.declined).map(function (p) { return p.name; }) };
   }).sort(function (a, b) { return DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || timeKey_(a.time) - timeKey_(b.time); });
 
   // Мои задачи по времени + мои команды (гильдии) по дням
@@ -375,7 +379,7 @@ function buildPayload(raw, opts) {
   if (me) {
     duties.forEach(function (d) {
       var mine = d.people.filter(function (p) { return p.name === me; })[0];
-      if (mine) myTasks.push({ day: d.day, time: d.time, task: d.task, note: d.note, details: d.details, label: d.label, myNote: mine.note, block: d.block, guild: d.guild,
+      if (mine) myTasks.push({ row: d.row, day: d.day, time: d.time, task: d.task, note: d.note, details: d.details, label: d.label, myNote: mine.note, block: d.block, guild: d.guild,
         with: d.people.filter(function (p) { return p.name !== me; }), crowd: d.people.length });
     });
     DAYS.forEach(function (day) {
@@ -447,6 +451,13 @@ function buildPayload(raw, opts) {
       noRoom: adults.filter(function (g) { return !housed[g.name]; }).map(function (g) { return g.name; }),
       emptyTasks: duties.filter(function (d) { return !d.people.length; }).map(function (d) { return d.day + ' · ' + d.task + (d.note ? ': ' + d.note : ''); })
     };
+    // «?» у участника: ждём ответа; «Отказались»: кто нажал «Не смогу»
+    out.answers = { pending: [], declined: [] };
+    duties.forEach(function (d) {
+      var what = { day: d.day, time: d.time, task: d.task };
+      d.people.forEach(function (p) { if (/^\?+$/.test(p.note)) out.answers.pending.push({ name: p.name, day: what.day, time: what.time, task: what.task }); });
+      d.declined.forEach(function (n) { out.answers.declined.push({ name: n, day: what.day, time: what.time, task: what.task }); });
+    });
   }
   return out;
 }
@@ -504,6 +515,23 @@ function applyAction(raw, a, code, tg) {
     lg.tgId = String(tg.id); lg.tg = tg.username ? '@' + tg.username : '';
     changes.push({ sheet: 'guests', row: lg._row, field: 'tgId', value: lg.tgId });
     if (lg.tg) changes.push({ sheet: 'guests', row: lg._row, field: 'tg', value: lg.tg });
+  } else if (a.type === 'answerTask') {
+    if (!guest || hiddenMe) fail('Сначала выбери себя.');
+    var duty = (raw.duties || []).filter(function (d) { return d._row === Number(a.row); })[0];
+    if (!duty) fail('Такой задачи больше нет, обнови страницу.');
+    var ppl = parsePeople(duty.people), mineP = ppl.filter(function (p) { return p.name === a.me; })[0];
+    if (!mineP || !/^\?+$/.test(mineP.note)) fail('На этот вопрос уже есть ответ.');
+    if (a.answer === 'yes') {
+      mineP.note = '';
+    } else {
+      ppl = ppl.filter(function (p) { return p !== mineP; });
+      var dec = parsePeople(duty.declined);
+      if (!dec.some(function (p) { return p.name === a.me; })) dec.push({ name: a.me, note: '' });
+      duty.declined = joinPeople(dec);
+      changes.push({ sheet: 'duties', row: duty._row, field: 'declined', value: duty.declined });
+    }
+    duty.people = joinPeople(ppl);
+    changes.push({ sheet: 'duties', row: duty._row, field: 'people', value: duty.people });
   } else if (a.type === 'setStatus') {
     if (!acc.admin) fail('Нужен код организатора.');
     var g = raw.guests.filter(function (x) { return x.name === a.name; })[0];
@@ -614,6 +642,13 @@ function avatar(n,cls){
   var g=guest(n), src=g.avatar||(CONFIG.avatarDir?CONFIG.avatarDir+encodeURIComponent(n)+'.jpg':'');
   return '<span class="av '+(cls||'')+'" data-name="'+esc(n||'')+'" aria-hidden="true"><span>'+esc((n||'?').charAt(0))+'</span>'+(src?'<i class="ph"><img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></i>':'')+'</span>';
 }
+function askLb(row){
+  var t=(S.data.myTasks||[]).filter(function(x){return x.row===row})[0]; if(!t) return;
+  var d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Вопрос про задачу');
+  d.innerHTML='<b>Поможешь с этим?</b><span class="r">'+esc(t.task)+' · '+esc(DN[t.day]||t.day)+(t.time?', '+esc(t.time):'')+'</span>'+
+    '<div class="acts"><button class="go yes" data-act="answer" data-row="'+row+'" data-ans="yes">Да, помогу</button><button class="go" data-act="answer" data-row="'+row+'" data-ans="no">Не смогу</button></div>';
+  document.body.appendChild(d);
+}
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
   d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
@@ -707,7 +742,7 @@ function vMe(){
     return '<details class="day-tasks" data-day="'+day+'"'+(open?' open':'')+'><summary><span class="dayhead" style="margin:0"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></span><span class="small muted">'+plural(ts.length,['задача','задачи','задач'])+'</span></summary><div class="day-body">'+
       ts.map(function(t){
         return '<div class="card task"><div class="hd"><span class="g">'+esc(t.guild)+'</span>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><h4>'+esc(t.task)+'</h4>'+
-          (t.myNote?(/^\?+$/.test(t.myNote)?'<div class="mn">Пока под вопросом</div>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
+          (t.myNote?(/^\?+$/.test(t.myNote)?'<button class="ask" data-act="ask" data-row="'+t.row+'"><b>?</b><span>Пока под вопросом. Нажми, чтобы ответить</span></button>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
           (t.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(t.details)+'</p></details>':'')+
           (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'')+
         '</div>';
@@ -866,8 +901,13 @@ function vAdmin(){
   if(g.noRoom.length) gl.push('<b>Без комнаты:</b> '+g.noRoom.map(pnf).join(', '));
   if(g.noSeat.length) gl.push('<b>Без места за столом:</b> '+g.noSeat.map(pnf).join(', '));
   var guildName=function(b){return (d.guilds&&d.guilds[b]&&d.guilds[b].name)||b};
+  var A=d.answers||{pending:[],declined:[]}, ansRow=function(x){return '<div class="grow"><span>'+pn(x.name)+'</span><span class="small muted" style="text-align:right">'+esc(x.task)+' · '+esc(x.day)+(x.time?' '+esc(x.time):'')+'</span></div>'};
+  var answers=(A.pending.length||A.declined.length)?'<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Ответы на «?»</h3>'+
+    (A.declined.length?'<p class="small" style="margin-bottom:4px"><b>Отказались</b></p><div class="glist" style="margin-bottom:10px">'+A.declined.map(ansRow).join('')+'</div>':'')+
+    (A.pending.length?'<p class="small" style="margin-bottom:4px"><b>Ещё не ответили</b></p><div class="glist">'+A.pending.map(ansRow).join('')+'</div>':'<p class="small muted">Все ответили.</p>')+'</div>':'';
   return '<h2>Штаб</h2><p class="small muted">Данные правятся в Google Таблице, страница подтянет их сама в течение минуты.</p>'+
     (gl.length?'<div class="note" style="display:grid;gap:4px">'+gl.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div>':'<p class="small muted">Все распределены: машины, комнаты, места, задачи.</p>')+
+    answers+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Не придут</h3><div class="glist">'+(d.hidden.length?d.hidden.map(function(h){
       return '<div class="grow"><div>'+avatar(h.name,'sm')+'<span>'+pn(h.name)+' <span class="muted small">'+esc(h.character)+'</span></span></div><button class="btn sm" data-act="status" data-name="'+esc(h.name)+'" data-status="придёт"'+(S.busy?' disabled':'')+'>Вернуть</button></div>';
     }).join(''):'<p class="small muted">Никого.</p>')+'</div></div>'+
@@ -952,6 +992,8 @@ document.addEventListener('click',function(e){
   else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
   else if(a==='reload'){ location.reload(); }
   else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
+  else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
+  else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
   else if(a==='viewas'){ S.viewAs=t.getAttribute('data-name'); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab=S.data&&S.data.access.admin?'admin':'me'; }
     if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
