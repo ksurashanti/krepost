@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121208-->
+<!--build:202610121229-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -79,13 +79,11 @@ nav.tabbar a.on{color:var(--olive);font-weight:700}
 nav.tabbar a.on .pill{background:color-mix(in srgb,var(--olive) 16%,transparent)}
 nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-radius:999px}
 
-/* аватар-арка */
-.av{--w:44px;width:var(--w);height:calc(var(--w)*1.12);flex:none;position:relative;display:grid;place-items:center;background:var(--olive);
-  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112' preserveAspectRatio='none'%3E%3Cpath d='M0 112V50A50 50 0 0 1 100 50V112Z'/%3E%3C/svg%3E") center/100% 100% no-repeat;
-          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112' preserveAspectRatio='none'%3E%3Cpath d='M0 112V50A50 50 0 0 1 100 50V112Z'/%3E%3C/svg%3E") center/100% 100% no-repeat}
-.av::before{content:"";position:absolute;inset:2px;background:var(--shield);-webkit-mask:inherit;mask:inherit}
-.av span{position:relative;font-weight:700;font-size:calc(var(--w)*.42);color:var(--olive);margin-top:8%}
-.av img{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:cover;-webkit-mask:inherit;mask:inherit}
+/* аватар-круг */
+.av{--w:44px;width:var(--w);height:var(--w);flex:none;position:relative;display:grid;place-items:center;background:var(--olive);border-radius:50%}
+.av::before{content:"";position:absolute;inset:2px;background:var(--shield);border-radius:50%}
+.av span{position:relative;font-weight:700;font-size:calc(var(--w)*.42);color:var(--olive)}
+.av img{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:cover;object-position:50% 30%;border-radius:50%}
 .av.xl{--w:96px} .av.sm{--w:30px} .av.xs{--w:24px}
 
 /* общие */
@@ -212,13 +210,13 @@ details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-ra
 .seat{display:flex;align-items:center;gap:8px;min-width:0}
 .col.left .seat{flex-direction:row-reverse;text-align:right}
 .end .seat{flex-direction:column;gap:2px;font-size:13px}
-.seat .num{width:28px;height:32px;flex:none;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--olive);position:relative}
+.seat .num{width:30px;height:30px;flex:none;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--olive);position:relative}
 .seat .num svg{position:absolute;inset:0}
-.seat .num span{position:relative;margin-top:4px}
+.seat .num span{position:relative}
 .seat .nm{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .seat.me .nm{font-weight:700;color:var(--olive)}
 .seat.me .num{color:var(--on-olive)}
-.seat.me .num path{fill:var(--olive)}
+.seat.me .num circle{fill:var(--olive)}
 
 /* дорога */
 .addr{display:grid;gap:8px}
@@ -262,7 +260,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121208'
+  build: '202610121229'
 };
 </script>
 <script>
@@ -757,7 +755,7 @@ function planSvg(fl){
 
 function seatHtml(n){
   var s=S.data.seats.filter(function(x){return x.seat===n})[0]||{name:''};
-  return '<div class="seat'+(s.name&&s.name===S.me?' me':'')+'"><span class="num"><svg viewBox="0 0 100 112" aria-hidden="true"><path d="M4 108V50A46 46 0 0 1 96 50V108Z" fill="var(--shield)" stroke="var(--olive)" stroke-width="6"/></svg><span>'+n+'</span></span><span class="nm">'+(s.name?(s.name===S.me?'ты':esc(s.name)):'<span class="muted">свободно</span>')+'</span></div>';
+  return '<div class="seat'+(s.name&&s.name===S.me?' me':'')+'"><span class="num"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="var(--shield)" stroke="var(--olive)" stroke-width="6"/></svg><span>'+n+'</span></span><span class="nm">'+(s.name?(s.name===S.me?'ты':esc(s.name)):'<span class="muted">свободно</span>')+'</span></div>';
 }
 function vHome(){
   var myRoom=roomOf(S.me), seat=seatOf(S.me);
