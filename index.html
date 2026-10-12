@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610122118-->
+<!--build:202610122124-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -277,7 +277,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610122118'
+  build: '202610122124'
 };
 </script>
 <script>
@@ -707,7 +707,7 @@ function vMe(){
     return '<details class="day-tasks" data-day="'+day+'"'+(open?' open':'')+'><summary><span class="dayhead" style="margin:0"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></span><span class="small muted">'+plural(ts.length,['задача','задачи','задач'])+'</span></summary><div class="day-body">'+
       ts.map(function(t){
         return '<div class="card task"><div class="hd"><span class="g">'+esc(t.guild)+'</span>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><h4>'+esc(t.task)+'</h4>'+
-          (t.myNote?(/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
+          (t.myNote?(/^\?+$/.test(t.myNote)?'<div class="mn">Пока под вопросом</div>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
           (t.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(t.details)+'</p></details>':'')+
           (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'')+
         '</div>';
