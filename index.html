@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610122133-->
+<!--build:202610122136-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -280,7 +280,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610122133'
+  build: '202610122136'
 };
 </script>
 <script>
@@ -455,7 +455,7 @@ function buildPayload(raw, opts) {
     out.answers = { pending: [], declined: [] };
     duties.forEach(function (d) {
       var what = { day: d.day, time: d.time, task: d.task };
-      d.people.forEach(function (p) { if (/^\?+$/.test(p.note)) out.answers.pending.push({ name: p.name, day: what.day, time: what.time, task: what.task }); });
+      d.people.forEach(function (p) { if (/\?\s*$/.test(p.note)) out.answers.pending.push({ name: p.name, day: what.day, time: what.time, task: what.task }); });
       d.declined.forEach(function (n) { out.answers.declined.push({ name: n, day: what.day, time: what.time, task: what.task }); });
     });
   }
@@ -520,9 +520,9 @@ function applyAction(raw, a, code, tg) {
     var duty = (raw.duties || []).filter(function (d) { return d._row === Number(a.row); })[0];
     if (!duty) fail('Такой задачи больше нет, обнови страницу.');
     var ppl = parsePeople(duty.people), mineP = ppl.filter(function (p) { return p.name === a.me; })[0];
-    if (!mineP || !/^\?+$/.test(mineP.note)) fail('На этот вопрос уже есть ответ.');
+    if (!mineP || !/\?\s*$/.test(mineP.note)) fail('На этот вопрос уже есть ответ.');
     if (a.answer === 'yes') {
-      mineP.note = '';
+      mineP.note = mineP.note.replace(/\s*\?+\s*$/, '');
     } else {
       ppl = ppl.filter(function (p) { return p !== mineP; });
       var dec = parsePeople(duty.declined);
@@ -742,7 +742,7 @@ function vMe(){
     return '<details class="day-tasks" data-day="'+day+'"'+(open?' open':'')+'><summary><span class="dayhead" style="margin:0"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></span><span class="small muted">'+plural(ts.length,['задача','задачи','задач'])+'</span></summary><div class="day-body">'+
       ts.map(function(t){
         return '<div class="card task"><div class="hd"><span class="g">'+esc(t.guild)+'</span>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><h4>'+esc(t.task)+'</h4>'+
-          (t.myNote?(/^\?+$/.test(t.myNote)?'<button class="ask" data-act="ask" data-row="'+t.row+'"><b>?</b><span>Пока под вопросом. Нажми, чтобы ответить</span></button>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
+          (t.myNote?(/\?\s*$/.test(t.myNote)?(t.myNote.replace(/\s*\?+\s*$/,'')?'<div class="mn">Твоё: '+esc(t.myNote.replace(/\s*\?+\s*$/,''))+'</div>':'')+'<button class="ask" data-act="ask" data-row="'+t.row+'"><b>?</b><span>Пока под вопросом. Нажми, чтобы ответить</span></button>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
           (t.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(t.details)+'</p></details>':'')+
           (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'')+
         '</div>';
