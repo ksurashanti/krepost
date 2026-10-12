@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121045-->
+<!--build:202610121131-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -262,7 +262,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121045'
+  build: '202610121131'
 };
 </script>
 <script>
@@ -409,6 +409,7 @@ function buildPayload(raw, opts) {
     }),
     news: (raw.news || []).filter(shown_).filter(function (n) { return n.title || n.text; }).map(function (n) { return { title: n.title || '', text: n.text || '', where: n.where || 'все', top: isTrue_(n.top) }; }),
     myTasks: myTasks, myTeams: myTeams, loose: loose,
+    arrivals: (function () { var m = {}; visGuests.forEach(function (g) { if (g.arrival) m[g.name] = String(g.arrival); }); return m; })(),
     tg: opts.tg ? { linked: !!tgG } : null,
     viewAs: viewAs
   };
@@ -661,7 +662,7 @@ function vMe(){
     f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>','место № '+seat.seat,'feast']); }
   if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return esc(c.when)+(c.passengers.length?': '+c.passengers.map(esc).join(', '):'')}).join('<br>'),'road',true]);
   else if(car) f.push(['Машина','водитель: '+esc(car.driver),esc(car.when),'road']);
-  else f.push(['Машина','пока нет','','road']);
+  else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
   var col=0, facts=f.map(function(x,i){var wide=x[4]||(col===0&&i===f.length-1); col=wide?0:(col+1)%2;
@@ -789,7 +790,7 @@ function vRoad(){
   return '<h2>Дорога</h2>'+addr+
     (S.me&&!myCar&&!drv.length?'<p class="note">Ты пока ни в одной машине.</p>':'')+
     '<div class="card" style="display:grid;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3 style="font-size:17px">Не в машине</h3><span class="small muted">'+(d.loose.length?plural(d.loose.length,['человек','человека','человек']):'')+'</span></div>'+
-      (d.loose.length?'<div class="chips">'+d.loose.map(function(n){return chip(n)}).join('')+'</div>'+(drv.length?'<span class="small muted">Ты водитель и можешь добавить их в любую машину, где есть места.</span>':''):'<span class="small muted">Все гости распределены по машинам.</span>')+'</div>'+
+      (d.loose.length?'<div class="chips">'+d.loose.map(function(n){return chip(n,(d.arrivals&&d.arrivals[n])||'время уточняется')}).join('')+'</div>'+(drv.length?'<span class="small muted">Ты водитель и можешь добавить их в любую машину, где есть места.</span>':''):'<span class="small muted">Все гости распределены по машинам.</span>')+'</div>'+
     '<div class="cars">'+d.cars.map(function(c){
       var inIt=c.passengers.indexOf(S.me)>=0, isDrv=c.driver===S.me, editing=S.editCar===c.row;
       var pips=''; for(var i=0;i<c.seats;i++) pips+='<i class="'+(i<(editing?S.draft.length:c.passengers.length)?'f':'')+'"></i>';
