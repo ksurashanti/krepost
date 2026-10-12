@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121605-->
+<!--build:202610121611-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -277,7 +277,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121605'
+  build: '202610121611'
 };
 </script>
 <script>
@@ -752,7 +752,7 @@ var PLAN={
             p3:{rect:[705,202,180,133],lx:722,ly:250,label:'№ 3'},
             p2:{rect:[885,202,167,218],lx:902,ly:250,label:'№ 2'},
             p1:{rect:[885,420,167,180],lx:902,ly:468,label:'№ 1'}},
-     extra:[['КОРИДОР',220,690],['САНУЗЕЛ',300,555],['САНУЗЕЛ',495,555]]},
+     extra:[['КОРИДОР',290,690],['САНУЗЕЛ',360,545],['САНУЗЕЛ',552,545]]},
   3:{vb:'0 0 980 620',outer:[8,5,962,605],
      baths:[[365,190,103,163]],
      rooms:{p6:{rect:[13,10,227,138],lx:30,ly:56,label:'№ 6'},
@@ -762,13 +762,13 @@ var PLAN={
             p9:{rect:[725,385,240,220],lx:742,ly:432,label:'№ 9'},
             p5:{rect:[13,148,207,205],lx:30,ly:195,label:'№ 5'},
             p4:{rect:[13,353,287,252],lx:30,ly:400,label:'№ 4'}},
-     extra:[['КОРИДОР',470,500],['САНУЗЕЛ',372,280]]}
+     extra:[['КОРИДОР',535,500],['САНУЗЕЛ',416,272,-90]]}
 };
 function planSvg(fl){
   var P=PLAN[fl], myRoom=roomOf(S.me), o=P.outer, h='';
   h+='<rect class="corr" x="'+o[0]+'" y="'+o[1]+'" width="'+o[2]+'" height="'+o[3]+'"/>';
   P.baths.forEach(function(b){h+='<rect class="bath" x="'+b[0]+'" y="'+b[1]+'" width="'+b[2]+'" height="'+b[3]+'"/>'});
-  P.extra.forEach(function(x){h+='<text class="lbl" x="'+x[1]+'" y="'+x[2]+'">'+x[0]+'</text>'});
+  P.extra.forEach(function(x){h+='<text class="lbl" text-anchor="middle" dominant-baseline="middle" x="'+x[1]+'" y="'+x[2]+'"'+(x[3]?' transform="rotate('+x[3]+' '+x[1]+' '+x[2]+')"':'')+'>'+x[0]+'</text>'});
   Object.keys(P.rooms).forEach(function(id){
     var R=P.rooms[id], room=S.data.rooms.filter(function(r){return r.id===id})[0];
     var cls='room'+(R.dark?' dark':'')+(myRoom&&myRoom.id===id?' me':'')+(S.selRoom===id&&!(myRoom&&myRoom.id===id)?' sel':'');
@@ -776,7 +776,7 @@ function planSvg(fl){
                      : '<polygon class="'+cls+'" data-act="room" data-id="'+id+'" points="'+R.poly+'"><title>'+esc(room?room.name:id)+'</title></polygon>';
     h+='<g>'+shape+'<text x="'+R.lx+'" y="'+R.ly+'">'+R.label+'</text><text class="sub" x="'+R.lx+'" y="'+(R.ly+32)+'">'+(myRoom&&myRoom.id===id?'ты здесь':(room?room.people.length:0)+' чел.')+'</text></g>';
   });
-  if(P.tower){var tw=P.rooms.tower; h+='<polygon class="room'+(myRoom&&myRoom.id==='tower'?' me':'')+(S.selRoom==='tower'&&!(myRoom&&myRoom.id==='tower')?' sel':'')+'" data-act="room" data-id="tower" points="'+P.tower+'"/><text x="100" y="118">БАШНЯ</text>';}
+  if(P.tower){var tw=P.rooms.tower; h+='<polygon class="room'+(myRoom&&myRoom.id==='tower'?' me':'')+(S.selRoom==='tower'&&!(myRoom&&myRoom.id==='tower')?' sel':'')+'" data-act="room" data-id="tower" points="'+P.tower+'"/><text text-anchor="middle" x="146" y="118">БАШНЯ</text>';}
   h+='<rect class="wall" x="'+o[0]+'" y="'+o[1]+'" width="'+o[2]+'" height="'+o[3]+'"/>';
   return '<svg class="plan" viewBox="'+P.vb+'" role="img" aria-label="План '+fl+'-го этажа">'+h+'</svg>';
 }
