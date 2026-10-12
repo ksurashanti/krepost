@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121229-->
+<!--build:202610121437-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -79,11 +79,18 @@ nav.tabbar a.on{color:var(--olive);font-weight:700}
 nav.tabbar a.on .pill{background:color-mix(in srgb,var(--olive) 16%,transparent)}
 nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-radius:999px}
 
-/* аватар-круг */
-.av{--w:44px;width:var(--w);height:var(--w);flex:none;position:relative;display:grid;place-items:center;background:var(--olive);border-radius:50%}
-.av::before{content:"";position:absolute;inset:2px;background:var(--shield);border-radius:50%}
+/* аватар-камея: овал с двойной рамкой */
+.av{--w:44px;width:var(--w);height:calc(var(--w)*1.2);flex:none;position:relative;display:grid;place-items:center;background:var(--olive);border-radius:50%}
+.av::before{content:"";position:absolute;inset:calc(var(--w)*.045);background:var(--shield);border-radius:50%}
 .av span{position:relative;font-weight:700;font-size:calc(var(--w)*.42);color:var(--olive)}
-.av img{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:cover;object-position:50% 30%;border-radius:50%}
+.av .ph{position:absolute;inset:calc(var(--w)*.09);border-radius:50%;overflow:hidden;background:var(--shield);box-shadow:0 0 0 1px var(--olive)}
+.av .ph img{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.2);transform-origin:50% 37%}
+.av.xl .ph img,.lb .av .ph img{transform:none}
+.av:has(img){cursor:zoom-in} button .av{cursor:inherit}
+.lb{position:fixed;inset:0;z-index:60;background:rgba(18,22,10,.94);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:grid;place-items:center;align-content:center;gap:6px;padding:24px;text-align:center;cursor:zoom-out;animation:lbin .18s ease-out}
+.lb .av{--w:min(70vw,300px);margin-bottom:12px;cursor:zoom-out}
+.lb b{color:var(--on-night);font-size:20px} .lb .r{color:var(--sage);font-size:15px}
+@keyframes lbin{from{opacity:0}to{opacity:1}}
 .av.xl{--w:96px} .av.sm{--w:30px} .av.xs{--w:24px}
 
 /* общие */
@@ -260,7 +267,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121229'
+  build: '202610121437'
 };
 </script>
 <script>
@@ -591,8 +598,15 @@ function icon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentCol
 function guest(n){return S.data.guests.filter(function(g){return g.name===n})[0]||{name:n}}
 function avatar(n,cls){
   var g=guest(n), src=g.avatar||(CONFIG.avatarDir?CONFIG.avatarDir+encodeURIComponent(n)+'.jpg':'');
-  return '<span class="av '+(cls||'')+'" aria-hidden="true"><span>'+esc((n||'?').charAt(0))+'</span>'+(src?'<img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">':'')+'</span>';
+  return '<span class="av '+(cls||'')+'" data-name="'+esc(n||'')+'" aria-hidden="true"><span>'+esc((n||'?').charAt(0))+'</span>'+(src?'<i class="ph"><img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></i>':'')+'</span>';
 }
+function openLb(n){
+  var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
+  d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'');
+  var im=d.querySelector('img'); if(im) im.removeAttribute('loading');
+  document.body.appendChild(d);
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ var l=document.querySelector('.lb'); if(l) l.remove(); } });
 function chip(n,note){return '<span class="chip'+(n===S.me?' me':'')+'">'+(n===S.me?'ты':esc(n))+(note?'<span class="n">'+esc(note)+'</span>':'')+'</span>'}
 function people(list,limit){
   limit=limit||8;
@@ -890,6 +904,8 @@ function goTab(id,sub){ S.tab=id; if(sub) S.homeSeg=sub; LS.set('tab',id); try{h
 document.addEventListener('click',function(e){
   var l=e.target.closest('a[target="_blank"]');
   if(l&&TG){ e.preventDefault(); var tg=l.getAttribute('data-tg'); try{ tg?TG.openTelegramLink('https://t.me/'+tg):TG.openLink(l.href) }catch(x){ location.href=l.href } return; }
+  var lb=e.target.closest('.lb'); if(lb){ lb.remove(); return; }
+  var av=e.target.closest('.av'); if(av&&av.querySelector('.ph img')&&!av.closest('button')){ openLb(av.getAttribute('data-name')); return; }
   var t=e.target.closest('[data-act]'); if(!t) return;
   var a=t.getAttribute('data-act');
   if(a==='tab'){ e.preventDefault(); goTab(t.getAttribute('data-tab')); }
