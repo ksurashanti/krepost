@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610122117-->
+<!--build:202610122118-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -277,7 +277,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610122117'
+  build: '202610122118'
 };
 </script>
 <script>
@@ -721,7 +721,7 @@ function vMe(){
       }).join('')+'</div></details>';
   }).join('') : '<p class="muted">Задач нет, отдыхай и празднуй.</p>';
 
-  return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role"><button class="rl plain" data-act="lb" data-name="'+esc(S.me)+'">'+esc(g.character)+'</button></div>':'<div class="small muted">без роли в квесте</div>')+
+  return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role"><button class="rl plain" data-act="lb" data-name="'+esc(S.me)+'">'+esc(g.character)+'</button></div>':'<div class="small muted">'+(g.shared?'тоже '+esc(S.me):'без роли в квесте')+'</div>')+
       (d.tg||d.viewAs?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+
     (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+
     '<div class="facts">'+facts+'</div>'+
