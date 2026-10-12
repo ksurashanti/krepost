@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121552-->
+<!--build:202610121605-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -16,6 +16,7 @@
 :root{
   --paper:#F1F0EB; --surface:#FAFAF5; --ink:#23261E; --muted:#676B5A; --line:#D7D5C8;
   --olive:#3C4F12; --olive-2:#76913A; --sage:#A9BC7E; --sand:#E6DDBA; --shield:#D9CF9C;
+  --top-bg:#E6DDBA; --top-ink:#23261E; --top-accent:#3C4F12;
   --night:#1E2414; --on-night:#F1F0EB; --on-olive:#F3F1E6; --warn:#8A4B1E; --warn-bg:#F3E4CC;
   --d1:#E6DDBA; --d2:#CFDBAE; --d3:#DCDFD2;
   --f:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -24,11 +25,13 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#15170F; --surface:#1E2118; --ink:#ECEADF; --muted:#A3A692; --line:#33372A;
   --olive:#A9BC7E; --olive-2:#8EA65A; --sage:#4D5E33; --sand:#3A3726; --shield:#4A4630;
+  --top-bg:#0F120A; --top-ink:#ECEADF; --top-accent:#8EA65A;
   --night:#0F120A; --on-night:#ECEADF; --on-olive:#15170F; --warn:#E3B37E; --warn-bg:#3A2D1C;
   --d1:#3A3726; --d2:#33402A; --d3:#2C2F27; --plan-dark:#0B0D07; --plan-wall:#8C907C; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#15170F; --surface:#1E2118; --ink:#ECEADF; --muted:#A3A692; --line:#33372A;
   --olive:#A9BC7E; --olive-2:#8EA65A; --sage:#4D5E33; --sand:#3A3726; --shield:#4A4630;
+  --top-bg:#0F120A; --top-ink:#ECEADF; --top-accent:#8EA65A;
   --night:#0F120A; --on-night:#ECEADF; --on-olive:#15170F; --warn:#E3B37E; --warn-bg:#3A2D1C;
   --d1:#3A3726; --d2:#33402A; --d3:#2C2F27; --plan-dark:#0B0D07; --plan-wall:#8C907C; color-scheme:dark}
 
@@ -42,12 +45,12 @@ button,input{font:inherit;color:inherit}
 .eyebrow{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--olive)}
 
 /* шапка */
-.top{background:var(--night);color:var(--on-night);padding:18px 16px 16px}
+.top{background:var(--top-bg);color:var(--top-ink);padding:18px 16px 16px}
 .top .in{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.top .eyebrow{color:var(--sage)}
+.top .eyebrow{color:var(--top-accent)}
 .top h1{font-size:clamp(26px,7vw,34px);font-weight:800;margin-top:4px}
-.top .now{font-size:14px;color:var(--sage);text-align:right;min-width:0}
-.top .now b{display:block;color:var(--on-night);font-size:16px;font-weight:600}
+.top .now{font-size:14px;color:var(--top-accent);text-align:right;min-width:0}
+.top .now b{display:block;color:var(--top-ink);font-size:16px;font-weight:600}
 .sync{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sage);margin-right:6px;vertical-align:middle;animation:pulse 1s infinite alternate}
 @keyframes pulse{from{opacity:.25}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.sync{animation:none}}
@@ -274,7 +277,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121552'
+  build: '202610121605'
 };
 </script>
 <script>
@@ -517,7 +520,7 @@ var LS={get:function(k){try{return localStorage.getItem('chembalo.'+k)||''}catch
 var TG=(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData)?Telegram.WebApp:null;
 if(TG){ try{ TG.ready(); TG.expand(); }catch(e){} }
 function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-theme',TG.colorScheme==='dark'?'dark':'light');
-  var cs=getComputedStyle(document.documentElement); try{ TG.setHeaderColor(cs.getPropertyValue('--night').trim()); TG.setBackgroundColor(cs.getPropertyValue('--paper').trim()); TG.setBottomBarColor&&TG.setBottomBarColor(cs.getPropertyValue('--surface').trim()); }catch(e){} }
+  var cs=getComputedStyle(document.documentElement); try{ TG.setHeaderColor(cs.getPropertyValue('--top-bg').trim()); TG.setBackgroundColor(cs.getPropertyValue('--paper').trim()); TG.setBottomBarColor&&TG.setBottomBarColor(cs.getPropertyValue('--surface').trim()); }catch(e){} }
 if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
