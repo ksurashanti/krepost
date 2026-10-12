@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121611-->
+<!--build:202610122101-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -277,7 +277,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121611'
+  build: '202610122101'
 };
 </script>
 <script>
@@ -334,9 +334,12 @@ function buildPayload(raw, opts) {
   var vis = function (p) { return !hidden[p.name]; };
   var visGuests = raw.guests.filter(function (g) { return g.name && !hidden[g.name]; });
   var known = {}; visGuests.forEach(function (g) { known[g.name] = true; });
-  var me = known[opts.me] ? opts.me : '';
+  // «Общий вход»: аккаунт (например, малыша), под которым может посмотреть любой гость
+  var shared = {}; visGuests.forEach(function (g) { if (isTrue_(g.shared)) shared[g.name] = true; });
+  var adults = visGuests.filter(function (g) { return !shared[g.name]; });
+  var me = known[opts.me] && !shared[opts.me] ? opts.me : '';
   // организатор может посмотреть страницу глазами любого гостя (только просмотр)
-  var viewAs = acc.admin && opts.as && known[opts.as] ? opts.as : '';
+  var viewAs = opts.as && known[opts.as] && (acc.admin || shared[opts.as]) ? opts.as : '';
   if (viewAs) me = viewAs;
 
   var dates = {};
@@ -357,7 +360,7 @@ function buildPayload(raw, opts) {
     var m = t.match(/^все(?:\s*,?\s*кроме\s*(.*))?$/);
     if (m) {
       var except = m[1] ? parsePeople(String(str).replace(/^[^к]*кроме\s*/i, '')).map(function (p) { return p.name; }) : [];
-      return { label: String(str).trim(), people: visGuests.filter(function (g) { return except.indexOf(g.name) < 0; }).map(function (g) { return { name: g.name, note: '' }; }) };
+      return { label: String(str).trim(), people: adults.filter(function (g) { return except.indexOf(g.name) < 0; }).map(function (g) { return { name: g.name, note: '' }; }) };
     }
     return null;
   }
@@ -393,7 +396,7 @@ function buildPayload(raw, opts) {
   var isDriver = !!me && cars.some(function (c) { return c.driver === me; });
   cars.forEach(function (c) { c.edit = acc.admin && !viewAs ? 'full' : (c.driver === me ? 'own' : (isDriver ? 'add' : '')); c.canEdit = !!c.edit; });
   var seated_ = {}; cars.forEach(function (c) { seated_[c.driver] = 1; c.passengers.forEach(function (p) { seated_[p] = 1; }); });
-  var loose = visGuests.filter(function (g) { return !seated_[g.name]; }).map(function (g) { return g.name; });
+  var loose = adults.filter(function (g) { return !seated_[g.name]; }).map(function (g) { return g.name; });
   var allProps = (raw.props || []).filter(shown_).map(function (p) { return { item: p.item, who: parsePeople(p.who).filter(vis).map(function (x) { return x.name; }) }; });
   cars.forEach(function (c) {
     if (c.driver !== me) return;
@@ -409,7 +412,7 @@ function buildPayload(raw, opts) {
     title: s['Название'] || '', subtitle: s['Подзаголовок'] || '', dates: dates,
     access: acc, me: me, tabs: tabs,
     guests: visGuests.map(function (g) {
-      var o = { name: g.name, character: g.character || '', about: g.about || '', costume: g.costume || '', pickup: g.pickup || '', avatar: g.avatar || '', tg: String(g.tg || '').trim().replace(/^https?:\/\/t\.me\//i, '').replace(/^@/, '') };
+      var o = { name: g.name, character: g.character || '', about: g.about || '', costume: g.costume || '', pickup: g.pickup || '', avatar: g.avatar || '', shared: !!shared[g.name], tg: String(g.tg || '').trim().replace(/^https?:\/\/t\.me\//i, '').replace(/^@/, '') };
       if (acc.admin) o.status = g.status;
       if (opts.tg) o.linked = !!(g.tgId || g.tg);
       return o;
@@ -439,9 +442,9 @@ function buildPayload(raw, opts) {
     var seated = {}; out.seats.forEach(function (x) { if (x.name) seated[x.name] = 1; });
     var housed = {}; out.rooms.forEach(function (r) { r.people.forEach(function (p) { housed[p] = 1; }); });
     out.gaps = {
-      noCar: visGuests.filter(function (g) { return !inCar[g.name]; }).map(function (g) { return g.name; }),
-      noSeat: visGuests.filter(function (g) { return !seated[g.name]; }).map(function (g) { return g.name; }),
-      noRoom: visGuests.filter(function (g) { return !housed[g.name]; }).map(function (g) { return g.name; }),
+      noCar: adults.filter(function (g) { return !inCar[g.name]; }).map(function (g) { return g.name; }),
+      noSeat: adults.filter(function (g) { return !seated[g.name]; }).map(function (g) { return g.name; }),
+      noRoom: adults.filter(function (g) { return !housed[g.name]; }).map(function (g) { return g.name; }),
       emptyTasks: duties.filter(function (d) { return !d.people.length; }).map(function (d) { return d.day + ' · ' + d.task + (d.note ? ': ' + d.note : ''); })
     };
   }
@@ -496,6 +499,7 @@ function applyAction(raw, a, code, tg) {
     if (tgG) fail('Твой Telegram уже привязан к гостю «' + tgG.name + '». Если это ошибка, напиши Ксении.');
     var lg = raw.guests.filter(function (x) { return x.name === a.name; })[0];
     if (!lg || /не\s*прид/.test(norm_(lg.status))) fail('Нет такого гостя.');
+    if (isTrue_(lg.shared)) fail('Это общий аккаунт, его нельзя привязать к своему Telegram.');
     if (lg.tgId || lg.tg) fail('К «' + lg.name + '» уже привязан другой Telegram. Если это ты, напиши Ксении.');
     lg.tgId = String(tg.id); lg.tg = tg.username ? '@' + tg.username : '';
     changes.push({ sheet: 'guests', row: lg._row, field: 'tgId', value: lg.tgId });
@@ -614,7 +618,8 @@ function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
   d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
     '<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
-    (g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>';
+    (g.shared&&n!==S.me?'<button class="go" data-act="viewas" data-name="'+esc(n)+'">'+icon('me')+'Зайти в аккаунт</button>':'')+
+    (!g.shared&&g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>';
   var im=d.querySelector('img'); if(im) im.removeAttribute('loading');
   document.body.appendChild(d);
 }
@@ -674,7 +679,7 @@ function vMe(){
     var linkMode=!!d.tg;
     return '<div class="sub"><span class="eyebrow">добро пожаловать</span><h2 style="font-size:24px;font-weight:800">Кто ты в этой крепости?</h2><p class="muted">'+
       (linkMode?'Нажми на своё имя. Это нужно один раз: имя привяжется к твоему Telegram.':'Выбери себя один раз: телефон запомнит, и здесь появится всё твоё.')+'</p></div>'+
-      '<div class="pick">'+d.guests.map(function(g){
+      '<div class="pick">'+d.guests.filter(function(g){return !g.shared}).map(function(g){
         return linkMode
           ? '<button data-act="link" data-name="'+esc(g.name)+'"'+(g.linked||S.busy?' disabled':'')+'>'+avatar(g.name,'sm')+esc(g.name)+(g.linked?' <span class="small muted">уже вошёл</span>':'')+'</button>'
           : '<button data-act="me" data-name="'+esc(g.name)+'">'+avatar(g.name,'sm')+esc(g.name)+'</button>';
@@ -717,7 +722,7 @@ function vMe(){
   }).join('') : '<p class="muted">Задач нет, отдыхай и празднуй.</p>';
 
   return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role"><button class="rl plain" data-act="lb" data-name="'+esc(S.me)+'">'+esc(g.character)+'</button></div>':'<div class="small muted">без роли в квесте</div>')+
-      (d.tg?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+
+      (d.tg||d.viewAs?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+
     (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+
     '<div class="facts">'+facts+'</div>'+
     '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">Открой нужный день. Внутри твои задачи по времени и вся твоя команда.</p></div>'+tasks;
@@ -737,10 +742,10 @@ function vPlan(){
 
 function vPeople(){
   var q=S.q.trim().toLowerCase();
-  var list=S.data.guests.filter(function(g){return g.character}).filter(function(g){return !q||(g.name+' '+g.character+' '+g.about).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return a.character.localeCompare(b.character,'ru')});
+  var list=S.data.guests.filter(function(g){return g.character||g.shared}).filter(function(g){return !q||(g.name+' '+g.character+' '+g.about).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return (a.character||a.name).localeCompare(b.character||b.name,'ru')});
   return '<h2>Роли</h2><input type="search" id="q" placeholder="Имя, роль или слово из описания" value="'+esc(S.q)+'" aria-label="Поиск по жителям">'+
     '<div class="chars">'+(list.length? list.map(function(g){
-      return '<article id="char-'+esc(g.name)+'" class="card char'+(g.name===S.me?' me':'')+'">'+avatar(g.name)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(g.name)+'">'+esc(g.character)+'</button></h3><div class="small"><span class="muted">играет</span> <b>'+(g.name===S.me?'ты':esc(g.name))+'</b></div><p class="about small">'+linkRoles(g.about,g.name)+'</p>'+'</div></article>';
+      return '<article id="char-'+esc(g.name)+'" class="card char'+(g.name===S.me?' me':'')+'">'+avatar(g.name)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(g.name)+'">'+esc(g.character||g.name)+'</button></h3>'+(g.character?'<div class="small"><span class="muted">играет</span> <b>'+(g.name===S.me?'ты':esc(g.name))+'</b></div>':'<div class="small muted">общий аккаунт: зайти может любой</div>')+'<p class="about small">'+linkRoles(g.about,g.name)+'</p>'+'</div></article>';
     }).join('') : '<p class="muted">Никого не нашли.</p>')+'</div>';
 }
 
@@ -901,7 +906,7 @@ function render(){
   var dd=d.dates, from=(dd['Пт']||'').slice(0,2).replace(/^0/,''), to=(dd['Вс']||'').slice(0,2).replace(/^0/,'');
   var showAdminLogin=!d.access.admin&&!d.tg&&S.tab==='me';
   $app.innerHTML=(demoRaw?'<div class="demo">Демо на данных из таблиц. Код гостей «'+esc(demoRaw.settings['Кодовое слово гостей'])+'», организатора «'+esc(demoRaw.settings['Код организатора'])+'» (вход внизу вкладки «Я»).</div>':'')+
-    (d.viewAs?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">Ты смотришь как <b>'+esc(d.viewAs)+'</b>, только просмотр<button class="btn sm" data-act="viewas" data-name="">Вернуться к себе</button></div>':'')+
+    (d.viewAs?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">'+(d.access.admin?'Ты смотришь как <b>'+esc(d.viewAs)+'</b>, только просмотр':'Ты в аккаунте <b>'+esc(d.viewAs)+'</b>')+'<button class="btn sm" data-act="viewas" data-name="">Вернуться к себе</button></div>':'')+
     '<header class="top"><div class="in"><div><span class="eyebrow">'+esc(d.subtitle)+(from?' · '+from+'–'+to+' ноября':'')+'</span><h1>'+esc(d.title)+'</h1></div><div class="now">'+(S.syncing?'<span class="sync" title="обновляю"></span>':'')+nowLine()+'</div></div></header>'+
     contactsHtml()+
     '<main class="wrap"><div class="view">'+news.top+body+news.rest+
@@ -948,7 +953,7 @@ document.addEventListener('click',function(e){
   else if(a==='reload'){ location.reload(); }
   else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
-  else if(a==='viewas'){ S.viewAs=t.getAttribute('data-name'); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab='admin'; }
+  else if(a==='viewas'){ S.viewAs=t.getAttribute('data-name'); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab=S.data&&S.data.access.admin?'admin':'me'; }
     if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
     load().then(function(){ window.scrollTo(0,0); }); }
 });
