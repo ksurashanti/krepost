@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610121527-->
+<!--build:202610121530-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -117,6 +117,8 @@ details.news.story > summary::-webkit-details-marker{display:none}
 details.news.story[open] > summary .small{display:none}
 details.news.story p{margin-top:8px;font-size:15px;line-height:1.55}
 .news .rl{color:inherit}
+.pn{cursor:pointer;text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:3px}
+.chip.pc{cursor:pointer}
 .rl.plain{color:inherit;font-weight:inherit;text-decoration:none;text-align:left}
 .news.soft{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(var(--tabbar) + 14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:14px;z-index:20;max-width:calc(100% - 32px);text-align:center}
@@ -269,7 +271,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610121527'
+  build: '202610121530'
 };
 </script>
 <script>
@@ -609,8 +611,10 @@ function openLb(n){
   var im=d.querySelector('img'); if(im) im.removeAttribute('loading');
   document.body.appendChild(d);
 }
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ var l=document.querySelector('.lb'); if(l) l.remove(); } });
-function chip(n,note){return '<span class="chip'+(n===S.me?' me':'')+'">'+(n===S.me?'ты':esc(n))+(note?'<span class="n">'+esc(note)+'</span>':'')+'</span>'}
+document.addEventListener('keydown',function(e){ if(e.key==='Enter'&&e.target.matches&&e.target.matches('[role=button][data-act]')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape'){ var l=document.querySelector('.lb'); if(l) l.remove(); } });
+function pn(n,label){return '<span class="pn" role="button" tabindex="0" data-act="lb" data-name="'+esc(n)+'">'+(label||esc(n))+'</span>'}
+function pnf(n){return pn(n)}
+function chip(n,note){return '<span class="chip pc'+(n===S.me?' me':'')+'" role="button" tabindex="0" data-act="lb" data-name="'+esc(n)+'">'+(n===S.me?'ты':esc(n))+(note?'<span class="n">'+esc(note)+'</span>':'')+'</span>'}
 function people(list,limit){
   limit=limit||8;
   if(!list.length) return '<span class="small muted">пока никого</span>';
@@ -672,11 +676,11 @@ function vMe(){
   var g=guest(S.me), room=roomOf(S.me), seat=seatOf(S.me), car=carOf(S.me), drv=drives(S.me);
   var mine=d.myProps||[];
   var f=[];
-  if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(esc).join(', '):''),'home']);}
-  if(seat){ var nn=S.data.seats.length, sn=function(k){var x=S.data.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name?esc(x.name):'свободно'};
+  if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(pnf).join(', '):''),'home']);}
+  if(seat){ var nn=S.data.seats.length, sn=function(k){var x=S.data.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name?pn(x.name):'свободно'};
     f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>','место № '+seat.seat,'feast']); }
-  if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return esc(c.when)+(c.passengers.length?': '+c.passengers.map(esc).join(', '):'')}).join('<br>'),'road',true]);
-  else if(car) f.push(['Машина','водитель: '+esc(car.driver),esc(car.when),'road']);
+  if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return esc(c.when)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
+  else if(car) f.push(['Машина','водитель: '+pn(car.driver),esc(car.when),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
@@ -698,7 +702,7 @@ function vMe(){
       teams.filter(function(t){return t.tasks.length>1}).map(function(t){
         var n={}; t.tasks.forEach(function(k){ if(k.people.length<=8) k.people.forEach(function(p){n[p.name]=1})});
         return '<details class="team"><summary><b>'+esc(t.guild)+'</b><span class="small muted">'+plural(Object.keys(n).length,['человек','человека','человек'])+'</span></summary><div class="team-body">'+
-          (t.lead?(t.lead===S.me?'<div class="small"><b>Ты главный.</b></div>':'<div class="small">Главный: <b>'+esc(t.lead)+'</b>. С вопросами к нему.</div>'):'')+
+          (t.lead?(t.lead===S.me?'<div class="small"><b>Ты главный.</b></div>':'<div class="small">Главный: <b>'+pn(t.lead)+'</b>. С вопросами к нему.</div>'):'')+
           t.tasks.map(function(k){return '<div class="row"><span class="t">'+esc(k.task)+(k.time?' · '+esc(k.time):'')+(k.note?' · '+esc(k.note):'')+'</span><div class="chips">'+(k.label&&k.people.length<=8?'<span class="small muted">'+esc(k.label)+'</span>':people(k.people))+'</div>'+(k.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(k.details)+'</p></details>':'')+'</div>'}).join('')+
         '</div></details>';
       }).join('')+'</div></details>';
@@ -772,7 +776,7 @@ function planSvg(fl){
 
 function seatHtml(n){
   var s=S.data.seats.filter(function(x){return x.seat===n})[0]||{name:''};
-  return '<div class="seat'+(s.name&&s.name===S.me?' me':'')+'"><span class="num"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="var(--shield)" stroke="var(--olive)" stroke-width="6"/></svg><span>'+n+'</span></span><span class="nm">'+(s.name?(s.name===S.me?'ты':esc(s.name)):'<span class="muted">свободно</span>')+'</span></div>';
+  return '<div class="seat'+(s.name&&s.name===S.me?' me':'')+'"><span class="num"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="var(--shield)" stroke="var(--olive)" stroke-width="6"/></svg><span>'+n+'</span></span><span class="nm">'+(s.name?(s.name===S.me?'ты':pn(s.name)):'<span class="muted">свободно</span>')+'</span></div>';
 }
 function vHome(){
   var myRoom=roomOf(S.me), seat=seatOf(S.me);
@@ -781,7 +785,7 @@ function vHome(){
     if(S.data.seats.length!==24) return seg+'<p class="muted">Схема рассадки появится позже.</p>';
     var right=[1,2,3,4,5,6,7,8,9,10], left=[22,21,20,19,18,17,16,15,14,13];
     return seg+'<div class="sub"><span class="eyebrow">суббота, 20:00</span><h2 style="font-size:24px;font-weight:800">Таверна «Пьяный рыцарь»</h2><p class="small muted">'+(seat?'Твоё место № '+seat.seat+'. ':'')+'Места пронумерованы по часовой стрелке.</p></div>'+
-      '<p class="note">Рассадка может поменяться, если кто-то не сможет приехать. Загляни сюда ещё раз прямо перед праздником.</p>'+
+      '<p class="note">Рассадка может поменяться, если кто-то не сможет приехать или, наоборот, сможет кто-то из тех, кто отказался. Загляни сюда ещё раз прямо перед праздником.</p>'+
       '<div class="card"><div class="feast"><div class="end" style="grid-row:1">'+seatHtml(23)+seatHtml(24)+'</div><div class="col left" style="grid-column:1;grid-row:2">'+left.map(seatHtml).join('')+'</div><div class="table"><b>Трапезный стол</b></div><div class="col" style="grid-column:3;grid-row:2">'+right.map(seatHtml).join('')+'</div><div class="end" style="grid-row:3">'+seatHtml(12)+seatHtml(11)+'</div></div></div>';
   }
   var floors=[2,3]; if(myRoom&&myRoom.floor===3) floors=[3,2];
@@ -809,7 +813,7 @@ function vRoad(){
     '<div class="cars">'+d.cars.map(function(c){
       var inIt=c.passengers.indexOf(S.me)>=0, isDrv=c.driver===S.me, editing=S.editCar===c.row;
       var pips=''; for(var i=0;i<c.seats;i++) pips+='<i class="'+(i<(editing?S.draft.length:c.passengers.length)?'f':'')+'"></i>';
-      var head='<div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':esc(c.driver))+'</b><div class="small muted">'+esc(c.when)+'</div></div></div>';
+      var head='<div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':pn(c.driver))+'</b><div class="small muted">'+esc(c.when)+'</div></div></div>';
       if(editing){
         var mode=c.edit, pool, hint;
         if(mode==='full'){ pool=d.guests.filter(function(g){return g.name!==c.driver}).map(function(g){return g.name});
@@ -842,20 +846,20 @@ function vAdmin(){
   var blocks=[]; d.duties.forEach(function(x){if(blocks.indexOf(x.block)<0) blocks.push(x.block)});
   var tasksOf=function(b){var t=[]; d.duties.forEach(function(x){if(x.block===b&&t.indexOf(x.task)<0)t.push(x.task)}); return t;};
   var cell=function(b,t,day){var x=d.duties.filter(function(y){return y.block===b&&y.task===t&&y.day===day})[0]; if(!x) return '<span class="muted">·</span>';
-    return (x.time?'<b>'+esc(x.time)+'</b> ':'')+(x.label?esc(x.label)+' <span class="muted">('+x.people.length+')</span>':x.people.length? x.people.map(function(p){return esc(p.name)+(p.note?' <span class="muted">('+esc(p.note)+')</span>':'')}).join(', ') : '<span class="note" style="padding:1px 8px">никого</span>')+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'');};
+    return (x.time?'<b>'+esc(x.time)+'</b> ':'')+(x.label?esc(x.label)+' <span class="muted">('+x.people.length+')</span>':x.people.length? x.people.map(function(p){return pn(p.name)+(p.note?' <span class="muted">('+esc(p.note)+')</span>':'')}).join(', ') : '<span class="note" style="padding:1px 8px">никого</span>')+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'');};
   var g=d.gaps, gl=[];
   if(g.emptyTasks.length) gl.push('<b>Без людей:</b> '+g.emptyTasks.map(esc).join('; '));
-  if(g.noCar.length) gl.push('<b>Без машины:</b> '+g.noCar.map(esc).join(', '));
-  if(g.noRoom.length) gl.push('<b>Без комнаты:</b> '+g.noRoom.map(esc).join(', '));
-  if(g.noSeat.length) gl.push('<b>Без места за столом:</b> '+g.noSeat.map(esc).join(', '));
+  if(g.noCar.length) gl.push('<b>Без машины:</b> '+g.noCar.map(pnf).join(', '));
+  if(g.noRoom.length) gl.push('<b>Без комнаты:</b> '+g.noRoom.map(pnf).join(', '));
+  if(g.noSeat.length) gl.push('<b>Без места за столом:</b> '+g.noSeat.map(pnf).join(', '));
   var guildName=function(b){return (d.guilds&&d.guilds[b]&&d.guilds[b].name)||b};
   return '<h2>Штаб</h2><p class="small muted">Данные правятся в Google Таблице, страница подтянет их сама в течение минуты.</p>'+
     (gl.length?'<div class="note" style="display:grid;gap:4px">'+gl.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div>':'<p class="small muted">Все распределены: машины, комнаты, места, задачи.</p>')+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Не придут</h3><div class="glist">'+(d.hidden.length?d.hidden.map(function(h){
-      return '<div class="grow"><div>'+avatar(h.name,'sm')+'<span>'+esc(h.name)+' <span class="muted small">'+esc(h.character)+'</span></span></div><button class="btn sm" data-act="status" data-name="'+esc(h.name)+'" data-status="придёт"'+(S.busy?' disabled':'')+'>Вернуть</button></div>';
+      return '<div class="grow"><div>'+avatar(h.name,'sm')+'<span>'+pn(h.name)+' <span class="muted small">'+esc(h.character)+'</span></span></div><button class="btn sm" data-act="status" data-name="'+esc(h.name)+'" data-status="придёт"'+(S.busy?' disabled':'')+'>Вернуть</button></div>';
     }).join(''):'<p class="small muted">Никого.</p>')+'</div></div>'+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:4px">Все гости</h3><p class="small muted" style="margin-bottom:8px">«Глазами»: открыть страницу так, как её видит этот гость.</p><div class="glist">'+d.guests.map(function(x){
-      return '<div class="grow"><div>'+avatar(x.name,'sm')+'<span>'+esc(x.name)+(x.status==='нет в чате'?' <span class="chip">нет в чате</span>':'')+'</span></div><span style="display:flex;gap:6px"><button class="btn sm" data-act="viewas" data-name="'+esc(x.name)+'">Глазами</button><button class="btn ghost sm" data-act="status" data-name="'+esc(x.name)+'" data-status="не придёт"'+(S.busy?' disabled':'')+'>Скрыть</button></span></div>';
+      return '<div class="grow"><div>'+avatar(x.name,'sm')+'<span>'+pn(x.name)+(x.status==='нет в чате'?' <span class="chip">нет в чате</span>':'')+'</span></div><span style="display:flex;gap:6px"><button class="btn sm" data-act="viewas" data-name="'+esc(x.name)+'">Глазами</button><button class="btn ghost sm" data-act="status" data-name="'+esc(x.name)+'" data-status="не придёт"'+(S.busy?' disabled':'')+'>Скрыть</button></span></div>';
     }).join('')+'</div></div>'+
     ((d.borrowed||[]).length?'<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Одолжено у Ксении</h3><div class="glist">'+d.borrowed.map(function(b){return '<div class="grow"><span>'+esc(b.name)+'</span><span class="small muted" style="text-align:right">'+esc(b.what)+'</span></div>'}).join('')+'</div></div>':'')+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Кто что везёт</h3><div class="glist">'+(d.props||[]).map(function(p){return '<div class="grow"><span>'+esc(p.item)+'</span><span class="small muted">'+p.who.map(esc).join(', ')+'</span></div>'}).join('')+'</div></div>'+
@@ -869,7 +873,7 @@ function contactsHtml(){
   var list=(S.data.contacts||[]).filter(function(c){return c.top});
   if(!list.length) return '';
   return '<div class="contacts" aria-label="Важные контакты">'+list.map(function(c){
-    return '<div class="ct">'+avatar(c.name,'sm')+'<div class="who"><b>'+esc(c.name)+'</b><span>'+esc(c.role)+'</span></div><div class="acts">'+
+    return '<div class="ct">'+avatar(c.name,'sm')+'<div class="who"><b>'+pn(c.name)+'</b><span>'+esc(c.role)+'</span></div><div class="acts">'+
       (c.tg?'<a class="ic tg" href="https://t.me/'+esc(c.tg)+'" data-tg="'+esc(c.tg)+'" target="_blank" rel="noopener" aria-label="Написать '+esc(c.name)+' в Telegram">'+icon('tg')+'</a>':'')+
       (c.phone?'<button class="ic" data-act="phone" data-phone="'+esc(c.phone)+'" aria-label="Телефон '+esc(c.name)+'">'+icon('phone')+'</button>':'')+
     '</div></div>';
