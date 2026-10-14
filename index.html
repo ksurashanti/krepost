@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141828-->
+<!--build:202610141835-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -337,7 +337,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141828'
+  build: '202610141835'
 };
 </script>
 <script>
@@ -679,9 +679,11 @@ function accept(d){ S.data=d; if(d.viewAs) return;
   if(!demoRaw){ try{ localStorage.setItem('chembalo.'+cacheKey(), JSON.stringify(d)) }catch(e){} } }
 function who(){ return S.data&&S.data.viewAs ? S.data.viewAs : S.me; }
 function load(){
+  // каждый запрос получает номер: опоздавший старый ответ не затирает более новый (например, вход в аккаунт Макара)
+  var my=S.reqId=(S.reqId||0)+1;
   S.syncing=true; if(S.data) render();
-  return api().then(function(d){ S.syncing=false; accept(d); render(); })
-    .catch(function(e){ S.syncing=false;
+  return api().then(function(d){ if(my!==S.reqId) return; S.syncing=false; S.switching=''; accept(d); render(); })
+    .catch(function(e){ if(my!==S.reqId) return; S.syncing=false; if(S.switching){ S.switching=''; S.viewAs=S.prevViewAs||''; }
       if(!S.data){$app.innerHTML='<div class="loading">Не получилось загрузить данные.<br><span class="small muted">'+esc(e.message)+'</span><br><br><button class="btn" data-act="reload">Попробовать ещё раз</button></div>'}
       else { render(); toast('Нет связи, показываю сохранённое'); } });
 }
@@ -890,6 +892,10 @@ function quizCard(){
   }).join('')+'</div></details></div>';
 }
 document.addEventListener('toggle',function(e){ if(e.target.classList&&e.target.classList.contains('qgroup')) S.openQuiz=e.target.open; },true);
+function showSwitching(){
+  var o=document.getElementById('switching'); if(!o){ o=document.createElement('div'); o.id='switching'; o.className='lb'; o.style.cursor='progress'; document.body.appendChild(o); }
+  o.innerHTML='<span class="sync" style="width:28px;height:28px;border-width:3px"></span><b>'+(S.switching==='self'?'Возвращаюсь к себе…':guest(S.switching).shared?'Захожу в аккаунт '+esc(S.switching)+(/[бвгджзклмнпрстфхцчшщ]$/i.test(S.switching)?'а':'')+'…':'Смотрю глазами: '+esc(S.switching)+'…')+'</b>';
+}
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
   d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
@@ -1176,6 +1182,7 @@ function contactsHtml(){
 
 function render(){
   var d=S.data; if(!d) return;
+  if(!S.switching){ var sw=document.getElementById('switching'); if(sw) sw.remove(); }
   if(!S.qzChecked&&S.me&&!d.viewAs){ S.qzChecked=true; setTimeout(quizRecover,0); }
   var realMe=S.me; S.me=who();
   var tabs=d.tabs.slice(); if(d.access.admin) tabs.push({id:'admin',name:'Штаб'});
@@ -1208,6 +1215,7 @@ function goTab(id,sub){ if(S.locked&&id!=='me'){ toast('Сначала выбе�
 document.addEventListener('click',function(e){
   var l=e.target.closest('a[target="_blank"]');
   if(l&&TG){ e.preventDefault(); var tg=l.getAttribute('data-tg'); try{ tg?TG.openTelegramLink('https://t.me/'+tg):TG.openLink(l.href) }catch(x){ location.href=l.href } return; }
+  if(e.target.closest('#switching')) return;
   var lb=e.target.closest('.lb');
   if(lb){ lb.remove(); if(!e.target.closest('[data-act]')) return; }
   else { var av=e.target.closest('.av'); if(av&&av.querySelector('.ph img')&&!av.closest('button')&&!av.closest('.qz')){ openLb(av.getAttribute('data-name')); return; } }
@@ -1244,7 +1252,7 @@ document.addEventListener('click',function(e){
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
-  else if(a==='viewas'){ S.viewAs=t.getAttribute('data-name'); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab=S.data&&S.data.access.admin?'admin':'me'; }
+  else if(a==='viewas'){ if(S.switching) return; S.prevViewAs=S.viewAs; S.viewAs=t.getAttribute('data-name'); S.switching=S.viewAs||'self'; showSwitching(); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab=S.data&&S.data.access.admin?'admin':'me'; }
     if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
     load().then(function(){ window.scrollTo(0,0); }); }
 });
