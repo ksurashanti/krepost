@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141808-->
+<!--build:202610141821-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -327,7 +327,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141808'
+  build: '202610141821'
 };
 </script>
 <script>
@@ -851,7 +851,7 @@ function quizCta(){
 var MG_IMG={bg1:'bg1.jpg',bg2:'bg2.jpg'};
 function playMakar(){
   var run=function(){ MakarGame.open({asset:function(n){return 'game/'+(MG_IMG[n]||n+'.png')+'?v='+(CONFIG.build||'')},
-    onEnd:function(s){ var me=S.me; if(!me||demoRaw&&!S.me) return; api({type:'quizResult',quiz:'makar',score:Math.min(40,s),total:40}).then(function(d){accept(d)}).catch(function(){}); }}); };
+    onEnd:function(s){ var me=S.me; if(!me||demoRaw&&!S.me) return; api({type:'quizResult',quiz:'makar',score:Math.min(40,s),total:40}).then(function(){ return load(); }).catch(function(){}); }}); };
   if(window.MakarGame) return run();
   var sc=document.createElement('script'); sc.src='game/makar.js?v='+(CONFIG.build||''); sc.onload=run; sc.onerror=function(){toast('Не получилось загрузить игру')}; document.head.appendChild(sc);
 }
