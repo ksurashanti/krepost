@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141546-->
+<!--build:202610141641-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -116,6 +116,7 @@ nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-r
 .qcard{display:grid;gap:8px;padding:14px 16px}
 .qcard .qtop{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .qcard h3{font-size:17px}
+.qcard .qtop .btn{white-space:nowrap;flex:none}
 .qcard .lead{display:grid;gap:3px;font-size:14px}
 .qcard .lead div{display:flex;justify-content:space-between;gap:8px}
 .qcard .lead .me{font-weight:700;color:var(--olive)}
@@ -315,7 +316,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141546'
+  build: '202610141641'
 };
 </script>
 <script>
@@ -486,6 +487,16 @@ function buildPayload(raw, opts) {
     out.quiz[k] = Object.keys(best).map(function (n) { return best[n]; })
       .sort(function (a, b) { return b.score - a.score || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0); });
   });
+  // Общий зачёт: лучший результат в каждой игре, приведённый к 10 баллам, складывается
+  var GAMES = ['roles', 'history'], tally = {};
+  GAMES.forEach(function (k) { (out.quiz[k] || []).forEach(function (x) {
+    var t = tally[x.name] || (tally[x.name] = { name: x.name, pts: 0, parts: {}, at: '' });
+    var p = Math.round(x.score / (x.total || 10) * 100) / 10;
+    t.parts[k] = p; t.pts = Math.round((t.pts + p) * 10) / 10; if (x.at > t.at) t.at = x.at;
+  }); });
+  out.quizGames = GAMES;
+  out.quizTotal = Object.keys(tally).map(function (n) { return tally[n]; })
+    .sort(function (a, b) { return b.pts - a.pts || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0); });
   if (acc.guest) { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; out.addressNote = s['Подпись к адресу'] || ''; }
   if (acc.admin) {
     out.duties = duties;
@@ -822,9 +833,18 @@ function quizCta(){
   var fresh=left===QMAX*2;
   return '<button class="qcta" data-act="qzgo"><span class="ic">?</span><span><b>'+(fresh?'Испытай себя!':'Викторины ждут')+'</b><span class="small">'+(fresh?'Две викторины о крепости: кто есть кто и настоящая история Чембало':'Осталось попыток: '+left+'. Попробуй побить рекорд')+'</span></span><span class="go">›</span></button>';
 }
+function totalCard(full){
+  var d=S.data, T=d.quizTotal; if(!T||!T.length) return '';
+  var G=d.quizGames||['roles','history'], max=G.length*10, mine=T.filter(function(x){return x.name===S.me})[0], top=full?T:T.slice(0,5);
+  var fmt=function(v){return String(v).replace('.',',')};
+  var row=function(x,i){ return '<div class="'+(x.name===S.me?'me':'')+'"><span>'+(i+1)+'. '+(x.name===S.me?'ты':pn(x.name))+'</span><span>'+fmt(x.pts)+' / '+max+(full?' <span class="muted small">('+G.map(function(k){return x.parts[k]!=null?fmt(x.parts[k]):'–'}).join(' + ')+')</span>':'')+'</span></div>'; };
+  return '<div class="card qcard"><div><span class="eyebrow">общий зачёт</span><h3>Знатоки крепости</h3></div>'+
+    '<p class="small muted">Складываются лучшие результаты во всех викторинах'+(full?' ('+G.map(function(k){return QT[k]||k}).join(' + ')+')':'')+', каждая из 10 баллов.</p>'+
+    '<div class="lead">'+top.map(row).join('')+(mine&&top.indexOf(mine)<0?row(mine,T.indexOf(mine)):'')+'</div></div>';
+}
 function quizCard(){
   var d=S.data, Z=d.quiz||{};
-  return '<div class="quizzes">'+['roles','history'].map(function(k){
+  return '<div class="quizzes">'+totalCard()+['roles','history'].map(function(k){
     var L=Z[k]||[], mine=L.filter(function(x){return x.name===S.me})[0], top=L.slice(0,5);
     var left=quizLeft(k), free=!S.me||!!d.viewAs;
     var btn=free?(quizGated(k)?'<span class="small muted">сначала свои попытки</span>':'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">Пройти</button>'):left>0?'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">'+(left===QMAX?'Пройти':'Ещё раз')+'</button>':'<span class="small muted">попытки кончились</span>';
@@ -1093,7 +1113,7 @@ function vAdmin(){
     (A.pending.length?'<p class="small" style="margin-bottom:4px"><b>Ещё не ответили</b></p><div class="glist">'+A.pending.map(ansRow).join('')+'</div>':'<p class="small muted">Все ответили.</p>')+'</div>':'';
   return '<h2>Штаб</h2><p class="small muted">Данные правятся в Google Таблице, страница подтянет их сама в течение минуты.</p>'+
     (gl.length?'<div class="note" style="display:grid;gap:4px">'+gl.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div>':'<p class="small muted">Все распределены: машины, комнаты, места, задачи.</p>')+
-    answers+
+    answers+totalCard(true)+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Не придут</h3><div class="glist">'+(d.hidden.length?d.hidden.map(function(h){
       return '<div class="grow"><div>'+avatar(h.name,'sm')+'<span>'+pn(h.name)+' <span class="muted small">'+esc(h.character)+'</span></span></div><button class="btn sm" data-act="status" data-name="'+esc(h.name)+'" data-status="придёт"'+(S.busy?' disabled':'')+'>Вернуть</button></div>';
     }).join(''):'<p class="small muted">Никого.</p>')+'</div></div>'+
