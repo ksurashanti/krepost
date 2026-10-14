@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141827-->
+<!--build:202610141828-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -337,7 +337,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141827'
+  build: '202610141828'
 };
 </script>
 <script>
@@ -878,7 +878,7 @@ function totalCard(full){
 function quizCard(){
   var d=S.data, Z=d.quiz||{};
   var leftAll=['roles','history'].reduce(function(n,k){return n+quizLeft(k)},0), free=!S.me||!!d.viewAs;
-  var sub=free?'2 викторины о крепости':leftAll?'2 викторины · осталось попыток: '+leftAll:'обе пройдены';
+  var sub='Кто есть кто и настоящая история Чембало';
   return '<div class="quizzes">'+totalCard()+'<details class="card qgroup"'+(S.openQuiz?' open':'')+'><summary><span><span class="eyebrow">испытай себя</span><b>Викторины</b><span class="small muted">'+sub+'</span></span></summary><div class="qlist">'+['roles','history'].map(function(k){
     var L=Z[k]||[], mine=L.filter(function(x){return x.name===S.me})[0], top=L.slice(0,5);
     var left=quizLeft(k), free=!S.me||!!d.viewAs;
