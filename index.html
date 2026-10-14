@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141906-->
+<!--build:202610141923-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -337,7 +337,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141906',
+  build: '202610141923',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1249,7 +1249,9 @@ document.addEventListener('click',function(e){
   else if(a==='qzclose'){ quizClose(); }
   else if(a==='qzgo'){ S.openQuiz=true; goTab('people'); }
   else if(a==='mgplay'){ playMakar(); }
-  else if(a==='qzmakar'){ var nm=sharedName(), wait=(Q&&Q.savePromise)||Promise.resolve(); wait.then(function(){ quizClose(true); S.viewAs=nm; S.editCar=0; S.tab='people'; load().then(function(){ window.scrollTo(0,0); }); }); }
+  else if(a==='qzmakar'){ if(S.switching) return; var nm=sharedName(), wait=(Q&&Q.savePromise)||Promise.resolve();
+    S.prevViewAs=S.viewAs; S.switching=nm; quizClose(true); showSwitching();
+    wait.then(function(){ S.viewAs=nm; S.editCar=0; S.tab='people'; S.openQuiz=true; load().then(function(){ window.scrollTo(0,0); }); }); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
