@@ -1251,7 +1251,7 @@ document.addEventListener('click',function(e){
   else if(a==='mgplay'){ playMakar(); }
   else if(a==='qzmakar'){ if(S.switching) return; var nm=sharedName(), wait=(Q&&Q.savePromise)||Promise.resolve();
     S.prevViewAs=S.viewAs; S.switching=nm; quizClose(true); showSwitching();
-    wait.then(function(){ S.viewAs=nm; S.editCar=0; S.tab='people'; S.openQuiz=true; load().then(function(){ window.scrollTo(0,0); }); }); }
+    wait.then(function(){ S.viewAs=nm; S.editCar=0; S.tab='me'; load().then(function(){ window.scrollTo(0,0); }); }); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
