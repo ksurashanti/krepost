@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141821-->
+<!--build:202610141824-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -327,7 +327,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141821'
+  build: '202610141824'
 };
 </script>
 <script>
@@ -502,7 +502,8 @@ function buildPayload(raw, opts) {
   var GAMES = ['roles', 'history', 'makar'], tally = {};
   GAMES.forEach(function (k) { (out.quiz[k] || []).forEach(function (x) {
     var t = tally[x.name] || (tally[x.name] = { name: x.name, pts: 0, parts: {}, at: '' });
-    var p = Math.round(x.score / (x.total || 10) * 100) / 10;
+    // игра: 60 очков = 10 баллов (шкала одна для всех результатов, даже записанных раньше)
+    var p = k === 'makar' ? Math.round(Math.min(x.score, 60) / 60 * 100) / 10 : Math.round(x.score / (x.total || 10) * 100) / 10;
     t.parts[k] = p; t.pts = Math.round((t.pts + p) * 10) / 10; if (x.at > t.at) t.at = x.at;
   }); });
   out.quizGames = GAMES;
@@ -610,7 +611,7 @@ function applyAction(raw, a, code, tg) {
     if (['roles', 'history', 'makar'].indexOf(a.quiz) < 0) fail('Нет такой викторины.');
     var isGame = a.quiz === 'makar';
     var tot = Math.round(Number(a.total)), sc = Math.round(Number(a.score));
-    if (!(tot >= 1 && tot <= (isGame ? 40 : 20) && sc >= 0 && sc <= tot)) fail('Странный результат.');
+    if (!(tot >= 1 && tot <= (isGame ? 60 : 20) && sc >= 0 && sc <= tot)) fail('Странный результат.');
     if (!isGame && (raw.quiz || []).filter(function (r) { return r.quiz === a.quiz && r.name === a.me; }).length >= 3) fail('Все три попытки уже использованы.');
     var rec = { name: a.me, quiz: a.quiz, score: sc, total: tot, at: new Date().toISOString() };
     (raw.quiz = raw.quiz || []).push(rec);
@@ -851,7 +852,7 @@ function quizCta(){
 var MG_IMG={bg1:'bg1.jpg',bg2:'bg2.jpg'};
 function playMakar(){
   var run=function(){ MakarGame.open({asset:function(n){return 'game/'+(MG_IMG[n]||n+'.png')+'?v='+(CONFIG.build||'')},
-    onEnd:function(s){ var me=S.me; if(!me||demoRaw&&!S.me) return; api({type:'quizResult',quiz:'makar',score:Math.min(40,s),total:40}).then(function(){ return load(); }).catch(function(){}); }}); };
+    onEnd:function(s){ var me=S.me; if(!me||demoRaw&&!S.me) return; api({type:'quizResult',quiz:'makar',score:Math.min(60,s),total:60}).then(function(){ return load(); }).catch(function(){}); }}); };
   if(window.MakarGame) return run();
   var sc=document.createElement('script'); sc.src='game/makar.js?v='+(CONFIG.build||''); sc.onload=run; sc.onerror=function(){toast('Не получилось загрузить игру')}; document.head.appendChild(sc);
 }
