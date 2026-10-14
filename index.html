@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141535-->
+<!--build:202610141537-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -308,7 +308,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141535'
+  build: '202610141537'
 };
 </script>
 <script>
@@ -465,7 +465,7 @@ function buildPayload(raw, opts) {
     viewAs: viewAs
   };
   // Викторины: лучший результат каждого гостя, по убыванию баллов (при равенстве раньше выше)
-  out.quiz = {}; out.quizMine = {}; out.quizReal = {};
+  out.quiz = {}; out.quizMine = {}; out.quizReal = {}; out.quizPerfect = {};
   ['roles', 'history'].forEach(function (k) {
     var best = {};
     (raw.quiz || []).forEach(function (r) {
@@ -473,6 +473,7 @@ function buildPayload(raw, opts) {
       var sc = Number(r.score) || 0, tot = Number(r.total) || 10, b = best[r.name];
       if (!b || sc > b.score) best[r.name] = { name: r.name, score: sc, total: tot, at: String(r.at || '') };
     });
+    out.quizPerfect[k] = !!realMe && (raw.quiz || []).some(function (r) { return r.quiz === k && r.name === realMe && Number(r.score) >= Number(r.total || 10); });
     out.quizReal[k] = realMe ? (raw.quiz || []).filter(function (r) { return r.quiz === k && r.name === realMe; }).length : 0;
     out.quizMine[k] = me ? (raw.quiz || []).filter(function (r) { return r.quiz === k && r.name === me; }).length : 0;
     out.quiz[k] = Object.keys(best).map(function (n) { return best[n]; })
@@ -767,9 +768,10 @@ function quizLeft(kind){ var m=(S.data.quizMine||{})[kind]||0; return Math.max(0
 // под чужим аккаунтом (Макар) викторину можно проходить без счёта, но только когда свои попытки уже кончились
 function realLeft(kind){ var m=(S.data.quizReal||{})[kind]||0; return Math.max(0,QMAX-m); }
 function viewingShared(){ var d=S.data; return !!(d&&d.viewAs&&guest(d.viewAs).shared); }
-function quizGated(kind){ return viewingShared()&&realLeft(kind)>0; }
+function quizGated(kind){ return viewingShared()&&realLeft(kind)>0&&!(S.data.quizPerfect||{})[kind]; }
+function sharedName(){ var g=(S.data.guests||[]).filter(function(x){return x.shared})[0]; return g?g.name:''; }
 function quizSave(){ if(!Q||Q.saved) return; Q.saved=true; try{localStorage.removeItem('chembalo.qzrun')}catch(e){}
-  if(S.me&&!(S.data&&S.data.viewAs)) api({type:'quizResult',quiz:Q.kind,score:Q.score,total:Q.qs.length}).then(function(d){accept(d); render();}).catch(function(e){toast(e.message)}); }
+  if(S.me&&!(S.data&&S.data.viewAs)) Q.savePromise=api({type:'quizResult',quiz:Q.kind,score:Q.score,total:Q.qs.length}).then(function(d){accept(d); render();}).catch(function(e){toast(e.message)}); }
 function askConfirm(msg,cb){ if(TG&&TG.showConfirm){ try{ TG.showConfirm(msg,function(ok){ if(ok) cb(); }); return; }catch(e){} } if(window.confirm(msg)) cb(); }
 function quizClose(force){
   if(Q&&!Q.done&&!force&&!Q.free){ askConfirm('Если выйти сейчас, попытка засчитается с текущим счётом ('+Q.score+'). Выйти?',function(){ quizSave(); quizClose(true); }); return; }
@@ -786,6 +788,7 @@ function quizRender(){
     el.innerHTML='<div class="in">'+head+'<p class="center muted">Твой результат</p><div class="score">'+s+' / '+n+'</div><p class="center">'+phrase+'</p>'+
       '<p class="center small muted">'+(Q.free?'Это просмотр без своего аккаунта, результат не сохраняется.':'Лучший результат из трёх попыток попадёт в таблицу знатоков на вкладке «Роли».')+'</p>'+
       (Q.free||quizLeft(Q.kind)-1>0?'<button class="btn" data-act="qzstart" data-kind="'+Q.kind+'">Пройти ещё раз'+(Q.free?'':quizLeft(Q.kind)-1===1?' (последняя попытка)':' (осталось '+(quizLeft(Q.kind)-1)+')')+'</button>':'<p class="center small">Все попытки использованы.</p>')+
+      (!Q.free&&sharedName()&&(s===n||quizLeft(Q.kind)-1<=0)?'<div class="note" style="display:grid;gap:8px">'+(s===n?'Идеально! ':'')+'Хочется пройти ещё? Загляни в аккаунт '+esc(sharedName())+'а: там викторину можно проходить сколько угодно, только не в зачёт.<button class="btn sm" style="justify-self:start" data-act="qzmakar">Зайти под '+esc(sharedName())+'ом</button></div>':'')+
       '<button class="btn ghost" data-act="qzclose">Готово</button></div>';
     el.scrollTop=0; return;
   }
@@ -1166,6 +1169,7 @@ document.addEventListener('click',function(e){
   else if(a==='qzpick'){ quizPick(+t.getAttribute('data-k')); }
   else if(a==='qznext'){ quizNext(); }
   else if(a==='qzclose'){ quizClose(); }
+  else if(a==='qzmakar'){ var nm=sharedName(), wait=(Q&&Q.savePromise)||Promise.resolve(); wait.then(function(){ quizClose(true); S.viewAs=nm; S.editCar=0; S.tab='people'; load().then(function(){ window.scrollTo(0,0); }); }); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
