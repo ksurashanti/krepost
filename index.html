@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141527-->
+<!--build:202610141535-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -308,7 +308,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141527'
+  build: '202610141535'
 };
 </script>
 <script>
@@ -756,7 +756,7 @@ function quizStart(kind){
   var qs=kind==='roles'?rolesQuiz():histQuiz(); if(qs.length<4){toast('Пока мало ролей для викторины');return;}
   var free=!S.me||!!(S.data&&S.data.viewAs);
   if(!free&&quizLeft(kind)<=0){ toast('Попытки закончились'); return; }
-  if(free&&S.data&&S.data.viewAs&&!S.data.access.admin&&realLeft(kind)>0){ toast('Сначала используй свои попытки'); return; }
+  if(free&&quizGated(kind)){ toast('Сначала используй свои попытки'); return; }
   Q={kind:kind,qs:qs,i:0,score:0,picked:-1,done:false,free:free};
   if(!free) try{localStorage.setItem('chembalo.qzrun',JSON.stringify({me:S.me,kind:kind,score:0,total:qs.length}))}catch(e){}
   var el=document.getElementById('qz'); if(!el){el=document.createElement('div');el.id='qz';el.className='qz';el.setAttribute('role','dialog');document.body.appendChild(el);}
@@ -766,6 +766,8 @@ var QMAX=3;
 function quizLeft(kind){ var m=(S.data.quizMine||{})[kind]||0; return Math.max(0,QMAX-m); }
 // под чужим аккаунтом (Макар) викторину можно проходить без счёта, но только когда свои попытки уже кончились
 function realLeft(kind){ var m=(S.data.quizReal||{})[kind]||0; return Math.max(0,QMAX-m); }
+function viewingShared(){ var d=S.data; return !!(d&&d.viewAs&&guest(d.viewAs).shared); }
+function quizGated(kind){ return viewingShared()&&realLeft(kind)>0; }
 function quizSave(){ if(!Q||Q.saved) return; Q.saved=true; try{localStorage.removeItem('chembalo.qzrun')}catch(e){}
   if(S.me&&!(S.data&&S.data.viewAs)) api({type:'quizResult',quiz:Q.kind,score:Q.score,total:Q.qs.length}).then(function(d){accept(d); render();}).catch(function(e){toast(e.message)}); }
 function askConfirm(msg,cb){ if(TG&&TG.showConfirm){ try{ TG.showConfirm(msg,function(ok){ if(ok) cb(); }); return; }catch(e){} } if(window.confirm(msg)) cb(); }
@@ -808,8 +810,8 @@ function quizCard(){
   return '<div class="quizzes">'+['roles','history'].map(function(k){
     var L=Z[k]||[], mine=L.filter(function(x){return x.name===S.me})[0], top=L.slice(0,5);
     var left=quizLeft(k), free=!S.me||!!d.viewAs;
-    var btn=free?(d.viewAs&&!d.access.admin&&realLeft(k)>0?'<span class="small muted">сначала свои попытки</span>':'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">Пройти</button>'):left>0?'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">'+(left===QMAX?'Пройти':'Ещё раз')+'</button>':'<span class="small muted">попытки кончились</span>';
-    return '<div class="card qcard"><div class="qtop"><div><span class="eyebrow">викторина · '+(free&&d.viewAs&&!d.access.admin&&realLeft(k)===0?'без ограничений':free||left===QMAX?QMAX+' попытки':left===1?'осталась 1 попытка':left>1?'осталось '+left+' попытки':'пройдено')+'</span><h3>'+QT[k]+'</h3></div>'+btn+'</div>'+
+    var btn=free?(quizGated(k)?'<span class="small muted">сначала свои попытки</span>':'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">Пройти</button>'):left>0?'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">'+(left===QMAX?'Пройти':'Ещё раз')+'</button>':'<span class="small muted">попытки кончились</span>';
+    return '<div class="card qcard"><div class="qtop"><div><span class="eyebrow">викторина · '+(free?(quizGated(k)?'не в зачёт':'без ограничений, не в зачёт'):left===QMAX?QMAX+' попытки':left===1?'осталась 1 попытка':left>1?'осталось '+left+' попытки':'пройдено')+'</span><h3>'+QT[k]+'</h3></div>'+btn+'</div>'+
       (k==='roles'?'<p class="small muted">Кто есть кто в крепости: роли, описания и кто кого играет.</p>':'<p class="small muted">Настоящая история генуэзской крепости над Балаклавой.</p>')+
       (top.length?'<div class="lead">'+top.map(function(x,i){return '<div class="'+(x.name===S.me?'me':'')+'"><span>'+(i+1)+'. '+(x.name===S.me?'ты':pn(x.name))+'</span><span>'+x.score+' / '+x.total+'</span></div>'}).join('')+
         (mine&&top.indexOf(mine)<0?'<div class="me"><span>'+(L.indexOf(mine)+1)+'. ты</span><span>'+mine.score+' / '+mine.total+'</span></div>':'')+'</div>':'<p class="small muted">Пока никто не прошёл. Будь первым!</p>')+
