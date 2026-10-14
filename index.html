@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141824-->
+<!--build:202610141825-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -327,7 +327,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141824'
+  build: '202610141825'
 };
 </script>
 <script>
@@ -842,7 +842,7 @@ function quizNext(){
 // пульсирующая кнопка на вкладке «Я», пока у гостя остались попытки
 function quizCta(){
   var d=S.data;
-  if(viewingShared()) return '<button class="qcta" data-act="mgplay"><span class="ic">🍷</span><span><b>Всем мешать!</b><span class="small">Мини-игра за Макара: ползи по столу и сбрасывай всё подряд, пока гости не поймали</span></span><span class="go">›</span></button>';
+  if(viewingShared()) return '<button class="qcta" data-act="mgplay"><span class="ic">🍗</span><span><b>Всем мешать!</b><span class="small">Мини-игра за Макара: ползи по столу и сбрасывай всё подряд, пока гости не поймали</span></span><span class="go">›</span></button>';
   if(!S.me||d.viewAs||!d.quizMine) return '';
   var left=['roles','history'].reduce(function(n,k){return n+quizLeft(k)},0); if(!left) return '';
   var fresh=left===QMAX*2;
