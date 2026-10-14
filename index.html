@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610122136-->
+<!--build:202610141527-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -102,6 +102,34 @@ nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-r
 .lb .go{display:inline-flex;align-items:center;gap:7px;text-decoration:none;border:1px solid var(--sage);color:var(--on-night);background:none;border-radius:999px;padding:9px 18px;font:inherit;font-size:14px;cursor:pointer}
 @keyframes lbin{from{opacity:0}to{opacity:1}}
 .av.xl{--w:96px} .av.sm{--w:30px} .av.xs{--w:24px}
+
+
+/* викторины */
+.quizzes{display:grid;gap:10px;margin:4px 0 18px}
+.qcard{display:grid;gap:8px;padding:14px 16px}
+.qcard .qtop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qcard h3{font-size:17px}
+.qcard .lead{display:grid;gap:3px;font-size:14px}
+.qcard .lead div{display:flex;justify-content:space-between;gap:8px}
+.qcard .lead .me{font-weight:700;color:var(--olive)}
+.qz{position:fixed;inset:0;z-index:70;background:var(--paper);overflow:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom))}
+.qz .in{max-width:560px;margin:0 auto;display:grid;gap:14px}
+.qz .bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qz .prog{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.qz .prog i{display:block;height:100%;background:var(--olive);transition:width .25s}
+.qz .x{border:0;background:none;font:inherit;font-size:15px;color:var(--muted);cursor:pointer;padding:6px}
+.qz h2{font-size:22px;line-height:1.25}
+.qz .quote{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-style:italic;color:var(--ink)}
+.qz .who{display:grid;justify-items:center;gap:6px}
+.qz .opts{display:grid;gap:8px}
+.qz .opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;cursor:pointer}
+.qz .opt.ok{border-color:var(--olive);background:color-mix(in srgb,var(--olive) 14%,var(--surface))}
+.qz .opt.bad{border-color:var(--warn);background:var(--warn-bg)}
+.qz .opt[disabled]{cursor:default}
+.qz .expl{font-size:15px;color:var(--muted)}
+.qz .expl b{color:var(--ink)}
+.qz .score{font-size:56px;font-weight:800;color:var(--olive);text-align:center;line-height:1}
+.qz .center{text-align:center}
 
 /* общие */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
@@ -280,7 +308,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610122136'
+  build: '202610141527'
 };
 </script>
 <script>
@@ -343,6 +371,7 @@ function buildPayload(raw, opts) {
   var me = known[opts.me] && !shared[opts.me] ? opts.me : '';
   // организатор может посмотреть страницу глазами любого гостя (только просмотр)
   var viewAs = opts.as && known[opts.as] && (acc.admin || shared[opts.as]) ? opts.as : '';
+  var realMe = me;
   if (viewAs) me = viewAs;
 
   var dates = {};
@@ -435,6 +464,20 @@ function buildPayload(raw, opts) {
     tg: opts.tg ? { linked: !!tgG } : null,
     viewAs: viewAs
   };
+  // Викторины: лучший результат каждого гостя, по убыванию баллов (при равенстве раньше выше)
+  out.quiz = {}; out.quizMine = {}; out.quizReal = {};
+  ['roles', 'history'].forEach(function (k) {
+    var best = {};
+    (raw.quiz || []).forEach(function (r) {
+      if (r.quiz !== k || !known[r.name] || shared[r.name]) return;
+      var sc = Number(r.score) || 0, tot = Number(r.total) || 10, b = best[r.name];
+      if (!b || sc > b.score) best[r.name] = { name: r.name, score: sc, total: tot, at: String(r.at || '') };
+    });
+    out.quizReal[k] = realMe ? (raw.quiz || []).filter(function (r) { return r.quiz === k && r.name === realMe; }).length : 0;
+    out.quizMine[k] = me ? (raw.quiz || []).filter(function (r) { return r.quiz === k && r.name === me; }).length : 0;
+    out.quiz[k] = Object.keys(best).map(function (n) { return best[n]; })
+      .sort(function (a, b) { return b.score - a.score || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0); });
+  });
   if (acc.guest) { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; out.addressNote = s['Подпись к адресу'] || ''; }
   if (acc.admin) {
     out.duties = duties;
@@ -532,6 +575,15 @@ function applyAction(raw, a, code, tg) {
     }
     duty.people = joinPeople(ppl);
     changes.push({ sheet: 'duties', row: duty._row, field: 'people', value: duty.people });
+  } else if (a.type === 'quizResult') {
+    if (!guest || hiddenMe || isTrue_(guest.shared)) fail('Сначала выбери себя.');
+    if (['roles', 'history'].indexOf(a.quiz) < 0) fail('Нет такой викторины.');
+    var tot = Math.round(Number(a.total)), sc = Math.round(Number(a.score));
+    if (!(tot >= 1 && tot <= 20 && sc >= 0 && sc <= tot)) fail('Странный результат.');
+    if ((raw.quiz || []).filter(function (r) { return r.quiz === a.quiz && r.name === a.me; }).length >= 3) fail('Все три попытки уже использованы.');
+    var rec = { name: a.me, quiz: a.quiz, score: sc, total: tot, at: new Date().toISOString() };
+    (raw.quiz = raw.quiz || []).push(rec);
+    changes.push({ sheet: 'quiz', append: true, values: rec });
   } else if (a.type === 'setStatus') {
     if (!acc.admin) fail('Нужен код организатора.');
     var g = raw.guests.filter(function (x) { return x.name === a.name; })[0];
@@ -648,6 +700,121 @@ function askLb(row){
   d.innerHTML='<b>Поможешь с этим?</b><span class="r">'+esc(t.task)+' · '+esc(DN[t.day]||t.day)+(t.time?', '+esc(t.time):'')+'</span>'+
     '<div class="acts"><button class="go yes" data-act="answer" data-row="'+row+'" data-ans="yes">Да, помогу</button><button class="go" data-act="answer" data-row="'+row+'" data-ans="no">Не смогу</button></div>';
   document.body.appendChild(d);
+}
+
+/* ---------- викторины ---------- */
+var HIST=[
+ {q:'Где стоит крепость Чембало?',a:['Над Балаклавской бухтой','В Судаке','В Феодосии','В Ялте'],e:'Чембало стоит на горе Кастрон (Крепостной) над Балаклавской бухтой, сейчас это часть Севастополя. В Судаке и Феодосии тоже были генуэзские крепости: Солдайя и Кафа.'},
+ {q:'Кто построил крепость в том виде, в каком она дошла до нас?',a:['Генуэзцы','Венецианцы','Византийцы','Османы'],e:'Крепость построила Генуэзская республика, скорее всего на месте более раннего византийского укрепления.'},
+ {q:'В каком веке генуэзцы обосновались в Чембало?',a:['В XIV веке','В XII веке','В XVI веке','В X веке'],e:'Генуэзцы закрепились здесь в середине XIV века, примерно в 1340-1350-х годах.'},
+ {q:'Откуда взялось название «Чембало»?',a:['От греческого названия бухты, Символон','От музыкального инструмента','От имени первого консула','От татарского «каменная гора»'],e:'Греки называли бухту Символон (Символон-Лимен), генуэзцы переделали это на итальянский лад в Чембало.'},
+ {q:'Как называлась верхняя часть крепости, где стоял замок консула?',a:['Город святого Николая','Город святого Георгия','Город святого Марка','Город святого Петра'],e:'Наверху, на скале, был город святого Николая с замком консула. Внизу, у бухты, был город святого Георгия, где жили ремесленники и рыбаки.'},
+ {q:'На какой срок назначали консула Чембало?',a:['На один год','Пожизненно','На пять лет','Пока не женится'],e:'Консула присылали из Генуи на один год. Частая смена должна была мешать казнокрадству.'},
+ {q:'Кому досталась крепость после восстания 1433 года?',a:['Княжеству Феодоро','Золотой Орде','Венеции','Османам'],e:'В 1433 году жители восстали, и крепость перешла к соседнему греческому княжеству Феодоро.'},
+ {q:'Как генуэзцы в 1434 году вернули крепость?',a:['Перерубили цепь на входе в бухту и пошли на штурм','Подкупили стражу','Взяли город измором','Выменяли на вино'],e:'Генуя прислала эскадру с войском около шести тысяч человек. Вход в бухту перегораживала цепь, её перерубили и штурмом взяли крепость.'},
+ {q:'Кто захватил Чембало в 1475 году?',a:['Османы','Феодориты','Венецианцы','Русские'],e:'В 1475 году Османская империя захватила все генуэзские колонии в Крыму, включая Чембало.'},
+ {q:'Что означает турецкое название «Балаклава»?',a:['«Рыбье гнездо»','«Каменная гавань»','«Тихая бухта»','«Город на скале»'],e:'При османах место называли Балык-юва, «рыбье гнездо». Отсюда и Балаклава.'},
+ {q:'Что изображено на флаге Генуи?',a:['Красный крест на белом поле','Золотой лев на синем','Белый орёл на красном','Три башни'],e:'Флаг Генуи: красный крест святого Георгия на белом поле. Такой же крест археологи нашли на гербе в Чембало.'},
+ {q:'Какой город был главным центром генуэзцев в Крыму?',a:['Кафа (нынешняя Феодосия)','Чембало','Солдайя (нынешний Судак)','Херсонес'],e:'Главным портом и центром управления генуэзских владений в Крыму была Кафа. Чембало был её западным форпостом.'},
+ {q:'Как генуэзцы называли Судак?',a:['Солдайя','Каламита','Кафа','Чембало'],e:'Генуэзская крепость в Судаке называлась Солдайя. Каламита была крепостью княжества Феодоро, там, где сейчас Инкерман.'},
+ {q:'Где была столица княжества Феодоро?',a:['На горе Мангуп','В Бахчисарае','В Херсонесе','В Кафе'],e:'Столица Феодоро, город Дорос (Феодоро), стояла на горе Мангуп, недалеко от нынешнего Бахчисарая.'},
+ {q:'Какой князь Феодоро поддержал восстание в Чембало в 1433 году?',a:['Алексей','Исаак','Дмитрий','Константин'],e:'Восстание греков в Чембало в 1433 году поддержал феодоритский князь Алексей, и крепость на время перешла к Феодоро.'},
+ {q:'Кому Генуя в 1453 году передала управление своими крымскими владениями?',a:['Банку святого Георгия','Ордену тамплиеров','Папе Римскому','Венеции'],e:'В 1453 году республика передала управление Газарией, своими владениями в Крыму, Банку святого Георгия. Это был могущественный генуэзский банк, по сути государство в государстве.'},
+ {q:'После падения какого города в 1453 году генуэзским колониям стало трудно держать связь с Генуей?',a:['Константинополя','Рима','Венеции','Трапезунда'],e:'В 1453 году османы взяли Константинополь и стали хозяевами проливов, через которые шёл весь путь из Генуи в Чёрное море.'},
+ {q:'С осадой какого крымского города связывают приход «Чёрной смерти» в Европу?',a:['Кафы','Чембало','Солдайи','Херсонеса'],e:'Войско Джанибека осаждало Кафу, и, по рассказам современников, через стены перебрасывали тела умерших от чумы. Считается, что оттуда чума попала в Европу в 1347 году.'},
+ {q:'Что, кроме Чембало, османы взяли в Крыму в 1475 году?',a:['Кафу и Мангуп','Константинополь','Венецию','Только Солдайю, остальное устояло'],e:'В 1475 году османы сначала взяли Кафу, а в декабре пал и Мангуп, столица Феодоро. Генуэзскому Крыму пришёл конец.'},
+ {q:'Какое знаменитое сражение прошло у Балаклавы в 1854 году?',a:['Балаклавское сражение с «атакой лёгкой бригады»','Полтавская битва','Бородинское сражение','Чесменское сражение'],e:'25 октября 1854 года, во время Крымской войны, у Балаклавы случилась знаменитая и гибельная атака британской лёгкой кавалерии.'},
+ {q:'Кто написал «Листригонов», рассказы о балаклавских рыбаках?',a:['Александр Куприн','Антон Чехов','Александр Грин','Константин Паустовский'],e:'Куприн жил в Балаклаве и назвал местных рыбаков листригонами, в честь великанов из «Одиссеи».'},
+ {q:'С какой гаванью из «Одиссеи» по одной из версий связывают Балаклавскую бухту?',a:['С гаванью лестригонов','С Итакой','С островом Цирцеи','С островом циклопов'],e:'Есть версия, что именно Балаклавскую бухту Гомер описал как гавань лестригонов, великанов-людоедов. Тогда это было бы самое раннее упоминание Крыма в литературе.'},
+ {q:'Почему в XX веке археологи долго почти не изучали Чембало?',a:['Балаклава была закрытым городом с секретной базой подводных лодок','Крепость затопило море','Её считали выдумкой','Раскопки запрещала церковь'],e:'В советское время Балаклава была закрытой: там стояла секретная база подводных лодок. Большие раскопки начались только около 2000 года.'}
+];
+var Q=null;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function cap(s){s=String(s||'').trim();return s.charAt(0).toUpperCase()+s.slice(1)}
+function firstSentence(s){var t=String(s||''), out='', re=/[^.!?]+[.!?]*\s*/g, m; while((m=re.exec(t))&&out.length<60){out+=m[0]} return out.trim()}
+// пол роли: варианты ответа подбираются того же пола (Маня играет мужчину, поэтому её имя идёт среди мужских ролей)
+var ROLE_F=['Монашка Акулина','Диана Йеремия','Аделина','Матильда Вольтер','Роза Грубер','Галатея Руссо','Марла Зингер','Джулия Грубер','Далила Тони','Гаянэ Исхаки','Динара Карагунис','Миледи Айя','Отшельница Хани'];
+var ROLE_M=['Геракл Майкон','Родриго Сакки','Август Конигула','Ганнибал Вектор','Аким Ким','Абрам Херес','Хамон Херес','Сулейман Бакарра','Фредерик Вольтер','Епископ Антуан','Персей Майкон','Чезаре Пранделли'];
+function roleSex(c){c=String(c||'').trim(); return ROLE_F.indexOf(c)>=0?'f':ROLE_M.indexOf(c)>=0?'m':'';}
+function rolesQuiz(){
+  var gs=S.data.guests.filter(function(g){return g.character&&g.about&&!g.shared});
+  var pick=shuffle(gs).slice(0,Math.min(10,gs.length));
+  return pick.map(function(g,i){
+    var same=gs.filter(function(x){return x!==g&&roleSex(x.character)===roleSex(g.character)});
+    var others=shuffle(roleSex(g.character)&&same.length>=3?same:gs.filter(function(x){return x!==g})).slice(0,3), t=i%3;
+    var reveal='<b>'+esc(g.character)+'</b>, играет '+(g.name===S.me?'ты':'<b>'+esc(g.name)+'</b>')+'.';
+    if(t===0) return {q:'Кто это?',quote:cap(firstSentence(g.about)),opts:shuffle([g].concat(others)).map(function(x){return {html:esc(x.character),ok:x===g}}),e:reveal};
+    if(t===1) return {q:'Кто играет роль «'+esc(g.character)+'»?',opts:shuffle([g].concat(others)).map(function(x){return {html:avatar(x.name,'sm')+esc(x.name),ok:x===g}}),e:reveal};
+    return {q:g.name===S.me?'Кого играешь ты?':'Кого играет '+esc(g.name)+'?',who:g.name,opts:shuffle([g].concat(others)).map(function(x){return {html:esc(x.character),ok:x===g}}),e:reveal};
+  });
+}
+function histQuiz(){
+  return shuffle(HIST).slice(0,10).map(function(h){return {q:esc(h.q),opts:shuffle(h.a.map(function(a,i){return {html:esc(a),ok:i===0}})),e:esc(h.e)}});
+}
+var QT={roles:'Жители крепости',history:'История Чембало'};
+function quizStart(kind){
+  var qs=kind==='roles'?rolesQuiz():histQuiz(); if(qs.length<4){toast('Пока мало ролей для викторины');return;}
+  var free=!S.me||!!(S.data&&S.data.viewAs);
+  if(!free&&quizLeft(kind)<=0){ toast('Попытки закончились'); return; }
+  if(free&&S.data&&S.data.viewAs&&!S.data.access.admin&&realLeft(kind)>0){ toast('Сначала используй свои попытки'); return; }
+  Q={kind:kind,qs:qs,i:0,score:0,picked:-1,done:false,free:free};
+  if(!free) try{localStorage.setItem('chembalo.qzrun',JSON.stringify({me:S.me,kind:kind,score:0,total:qs.length}))}catch(e){}
+  var el=document.getElementById('qz'); if(!el){el=document.createElement('div');el.id='qz';el.className='qz';el.setAttribute('role','dialog');document.body.appendChild(el);}
+  document.body.style.overflow='hidden'; quizRender();
+}
+var QMAX=3;
+function quizLeft(kind){ var m=(S.data.quizMine||{})[kind]||0; return Math.max(0,QMAX-m); }
+// под чужим аккаунтом (Макар) викторину можно проходить без счёта, но только когда свои попытки уже кончились
+function realLeft(kind){ var m=(S.data.quizReal||{})[kind]||0; return Math.max(0,QMAX-m); }
+function quizSave(){ if(!Q||Q.saved) return; Q.saved=true; try{localStorage.removeItem('chembalo.qzrun')}catch(e){}
+  if(S.me&&!(S.data&&S.data.viewAs)) api({type:'quizResult',quiz:Q.kind,score:Q.score,total:Q.qs.length}).then(function(d){accept(d); render();}).catch(function(e){toast(e.message)}); }
+function askConfirm(msg,cb){ if(TG&&TG.showConfirm){ try{ TG.showConfirm(msg,function(ok){ if(ok) cb(); }); return; }catch(e){} } if(window.confirm(msg)) cb(); }
+function quizClose(force){
+  if(Q&&!Q.done&&!force&&!Q.free){ askConfirm('Если выйти сейчас, попытка засчитается с текущим счётом ('+Q.score+'). Выйти?',function(){ quizSave(); quizClose(true); }); return; }
+  var el=document.getElementById('qz'); if(el) el.remove(); document.body.style.overflow=''; Q=null; render();}
+// незаконченная попытка (приложение закрыли посреди викторины) засчитывается при следующем входе
+function quizRecover(){ var r=null; try{ r=JSON.parse(localStorage.getItem('chembalo.qzrun')||'null'); }catch(e){} if(!r||!S.me||r.me!==S.me) return;
+  try{localStorage.removeItem('chembalo.qzrun')}catch(e){}
+  api({type:'quizResult',quiz:r.kind,score:r.score,total:r.total}).then(function(d){accept(d); render(); toast('Незаконченная попытка засчитана: '+r.score+' из '+r.total);}).catch(function(){}); }
+function quizRender(){
+  var el=document.getElementById('qz'); if(!el||!Q) return;
+  var head='<div class="bar"><span class="eyebrow">'+QT[Q.kind]+'</span><button class="x" data-act="qzclose">Закрыть</button></div>';
+  if(Q.done){
+    var n=Q.qs.length, s=Q.score, phrase=s===n?'Безупречно! Ты знаешь крепость как свои пять пальцев.':s>=n*0.7?'Отлично! Консул тобой доволен.':s>=n*0.4?'Неплохо, но стражник у ворот знает больше.':'Похоже, ты только что прибыл в город. Попробуй ещё раз!';
+    el.innerHTML='<div class="in">'+head+'<p class="center muted">Твой результат</p><div class="score">'+s+' / '+n+'</div><p class="center">'+phrase+'</p>'+
+      '<p class="center small muted">'+(Q.free?'Это просмотр без своего аккаунта, результат не сохраняется.':'Лучший результат из трёх попыток попадёт в таблицу знатоков на вкладке «Роли».')+'</p>'+
+      (Q.free||quizLeft(Q.kind)-1>0?'<button class="btn" data-act="qzstart" data-kind="'+Q.kind+'">Пройти ещё раз'+(Q.free?'':quizLeft(Q.kind)-1===1?' (последняя попытка)':' (осталось '+(quizLeft(Q.kind)-1)+')')+'</button>':'<p class="center small">Все попытки использованы.</p>')+
+      '<button class="btn ghost" data-act="qzclose">Готово</button></div>';
+    el.scrollTop=0; return;
+  }
+  var q=Q.qs[Q.i], ans=Q.picked>=0;
+  el.innerHTML='<div class="in">'+head+'<div class="prog" aria-hidden="true"><i style="width:'+Math.round(Q.i/Q.qs.length*100)+'%"></i></div>'+
+    '<span class="small muted">Вопрос '+(Q.i+1)+' из '+Q.qs.length+'</span><h2>'+q.q+'</h2>'+
+    (q.quote?'<div class="quote">'+esc(q.quote)+'</div>':'')+(q.who?'<div class="who">'+avatar(q.who,'xl')+'</div>':'')+
+    '<div class="opts">'+q.opts.map(function(o,k){var c=ans?(o.ok?' ok':(k===Q.picked?' bad':'')):''; return '<button class="opt'+c+'" data-act="qzpick" data-k="'+k+'"'+(ans?' disabled':'')+'>'+o.html+'</button>'}).join('')+'</div>'+
+    (ans?'<p class="expl">'+(q.opts[Q.picked].ok?'<b>Верно!</b> ':'<b>Мимо.</b> ')+q.e+'</p><button class="btn" data-act="qznext">'+(Q.i+1<Q.qs.length?'Дальше':'Узнать результат')+'</button>':'')+
+    '</div>';
+}
+function quizPick(k){ if(!Q||Q.picked>=0) return; Q.picked=k; if(Q.qs[Q.i].opts[k].ok){Q.score++; haptic('success');} else haptic('error');
+  if(!Q.free) try{localStorage.setItem('chembalo.qzrun',JSON.stringify({me:S.me,kind:Q.kind,score:Q.score,total:Q.qs.length}))}catch(e){}
+  quizRender(); }
+function quizNext(){
+  if(!Q) return; Q.i++; Q.picked=-1;
+  if(Q.i>=Q.qs.length){ Q.done=true; quizRender(); if(!Q.free) quizSave(); return; }
+  quizRender(); var el=document.getElementById('qz'); if(el) el.scrollTop=0;
+}
+function quizCard(){
+  var d=S.data, Z=d.quiz||{};
+  return '<div class="quizzes">'+['roles','history'].map(function(k){
+    var L=Z[k]||[], mine=L.filter(function(x){return x.name===S.me})[0], top=L.slice(0,5);
+    var left=quizLeft(k), free=!S.me||!!d.viewAs;
+    var btn=free?(d.viewAs&&!d.access.admin&&realLeft(k)>0?'<span class="small muted">сначала свои попытки</span>':'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">Пройти</button>'):left>0?'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">'+(left===QMAX?'Пройти':'Ещё раз')+'</button>':'<span class="small muted">попытки кончились</span>';
+    return '<div class="card qcard"><div class="qtop"><div><span class="eyebrow">викторина · '+(free&&d.viewAs&&!d.access.admin&&realLeft(k)===0?'без ограничений':free||left===QMAX?QMAX+' попытки':left===1?'осталась 1 попытка':left>1?'осталось '+left+' попытки':'пройдено')+'</span><h3>'+QT[k]+'</h3></div>'+btn+'</div>'+
+      (k==='roles'?'<p class="small muted">Кто есть кто в крепости: роли, описания и кто кого играет.</p>':'<p class="small muted">Настоящая история генуэзской крепости над Балаклавой.</p>')+
+      (top.length?'<div class="lead">'+top.map(function(x,i){return '<div class="'+(x.name===S.me?'me':'')+'"><span>'+(i+1)+'. '+(x.name===S.me?'ты':pn(x.name))+'</span><span>'+x.score+' / '+x.total+'</span></div>'}).join('')+
+        (mine&&top.indexOf(mine)<0?'<div class="me"><span>'+(L.indexOf(mine)+1)+'. ты</span><span>'+mine.score+' / '+mine.total+'</span></div>':'')+'</div>':'<p class="small muted">Пока никто не прошёл. Будь первым!</p>')+
+    '</div>';
+  }).join('')+'</div>';
 }
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
@@ -778,7 +945,7 @@ function vPlan(){
 function vPeople(){
   var q=S.q.trim().toLowerCase();
   var list=S.data.guests.filter(function(g){return g.character||g.shared}).filter(function(g){return !q||(g.name+' '+g.character+' '+g.about).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return (a.character||a.name).localeCompare(b.character||b.name,'ru')});
-  return '<h2>Роли</h2><input type="search" id="q" placeholder="Имя, роль или слово из описания" value="'+esc(S.q)+'" aria-label="Поиск по жителям">'+
+  return '<h2>Роли</h2>'+quizCard()+'<input type="search" id="q" placeholder="Имя, роль или слово из описания" value="'+esc(S.q)+'" aria-label="Поиск по жителям">'+
     '<div class="chars">'+(list.length? list.map(function(g){
       return '<article id="char-'+esc(g.name)+'" class="card char'+(g.name===S.me?' me':'')+'">'+avatar(g.name)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(g.name)+'">'+esc(g.character||g.name)+'</button></h3>'+(g.character?'<div class="small"><span class="muted">играет</span> <b>'+(g.name===S.me?'ты':esc(g.name))+'</b></div>':'')+'<p class="about small">'+linkRoles(g.about,g.name)+'</p>'+'</div></article>';
     }).join('') : '<p class="muted">Никого не нашли.</p>')+'</div>';
@@ -935,6 +1102,7 @@ function contactsHtml(){
 
 function render(){
   var d=S.data; if(!d) return;
+  if(!S.qzChecked&&S.me&&!d.viewAs){ S.qzChecked=true; setTimeout(quizRecover,0); }
   var realMe=S.me; S.me=who();
   var tabs=d.tabs.slice(); if(d.access.admin) tabs.push({id:'admin',name:'Штаб'});
   if(!tabs.some(function(t){return t.id===S.tab})) S.tab=tabs[0]?tabs[0].id:'me';
@@ -968,7 +1136,7 @@ document.addEventListener('click',function(e){
   if(l&&TG){ e.preventDefault(); var tg=l.getAttribute('data-tg'); try{ tg?TG.openTelegramLink('https://t.me/'+tg):TG.openLink(l.href) }catch(x){ location.href=l.href } return; }
   var lb=e.target.closest('.lb');
   if(lb){ lb.remove(); if(!e.target.closest('[data-act]')) return; }
-  else { var av=e.target.closest('.av'); if(av&&av.querySelector('.ph img')&&!av.closest('button')){ openLb(av.getAttribute('data-name')); return; } }
+  else { var av=e.target.closest('.av'); if(av&&av.querySelector('.ph img')&&!av.closest('button')&&!av.closest('.qz')){ openLb(av.getAttribute('data-name')); return; } }
   var t=e.target.closest('[data-act]'); if(!t) return;
   var a=t.getAttribute('data-act');
   if(a==='locked'){ toast('Сначала выбери себя в списке'); }
@@ -992,6 +1160,10 @@ document.addEventListener('click',function(e){
   else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
   else if(a==='reload'){ location.reload(); }
   else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
+  else if(a==='qzstart'){ quizStart(t.getAttribute('data-kind')); }
+  else if(a==='qzpick'){ quizPick(+t.getAttribute('data-k')); }
+  else if(a==='qznext'){ quizNext(); }
+  else if(a==='qzclose'){ quizClose(); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
