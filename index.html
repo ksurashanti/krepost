@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141825-->
+<!--build:202610141827-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -116,6 +116,16 @@ nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-r
 .mg-btn{padding:13px 18px;border:0;border-radius:999px;background:#7a1c24;color:#f4ecd6;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .mg-btn.ghost{background:none;border:2px solid #7a1c24;color:#7a1c24}
 /* викторины */
+.qgroup{padding:0}
+.qgroup>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px}
+.qgroup>summary::-webkit-details-marker{display:none}
+.qgroup>summary>span{display:grid;gap:2px}
+.qgroup>summary b{font-size:17px}
+.qgroup>summary::after{content:'';width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-right:4px;flex:none}
+.qgroup[open]>summary::after{transform:rotate(-135deg)}
+.qlist{display:grid;border-top:1px solid var(--line)}
+.qitem{padding:14px 16px}
+.qitem+.qitem{border-top:1px dashed var(--line)}
 .qcta{display:flex;align-items:center;gap:12px;width:100%;margin:16px 0 6px;padding:14px 16px;border:0;border-radius:16px;background:var(--olive);color:var(--on-olive);font:inherit;text-align:left;cursor:pointer;animation:qpulse 2.2s ease-in-out infinite}
 .qcta .ic{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:var(--on-olive);color:var(--olive);font-weight:800;font-size:20px}
 .qcta b{display:block;font-size:17px}
@@ -327,7 +337,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141825'
+  build: '202610141827'
 };
 </script>
 <script>
@@ -867,16 +877,19 @@ function totalCard(full){
 }
 function quizCard(){
   var d=S.data, Z=d.quiz||{};
-  return '<div class="quizzes">'+totalCard()+['roles','history'].map(function(k){
+  var leftAll=['roles','history'].reduce(function(n,k){return n+quizLeft(k)},0), free=!S.me||!!d.viewAs;
+  var sub=free?'2 викторины о крепости':leftAll?'2 викторины · осталось попыток: '+leftAll:'обе пройдены';
+  return '<div class="quizzes">'+totalCard()+'<details class="card qgroup"'+(S.openQuiz?' open':'')+'><summary><span><span class="eyebrow">испытай себя</span><b>Викторины</b><span class="small muted">'+sub+'</span></span></summary><div class="qlist">'+['roles','history'].map(function(k){
     var L=Z[k]||[], mine=L.filter(function(x){return x.name===S.me})[0], top=L.slice(0,5);
     var left=quizLeft(k), free=!S.me||!!d.viewAs;
     var btn=free?(quizGated(k)?'<span class="small muted">сначала свои попытки</span>':'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">Пройти</button>'):left>0?'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">'+(left===QMAX?'Пройти':'Ещё раз')+'</button>':'<span class="small muted">попытки кончились</span>';
-    return '<div class="card qcard"><div class="qtop"><div><span class="eyebrow">викторина · '+(free?(quizGated(k)?'не в зачёт':'без ограничений, не в зачёт'):left===QMAX?QMAX+' попытки':left===1?'осталась 1 попытка':left>1?'осталось '+left+' попытки':'пройдено')+'</span><h3>'+QT[k]+'</h3></div>'+btn+'</div>'+
+    return '<div class="qcard qitem"><div class="qtop"><div><span class="eyebrow">'+(free?(quizGated(k)?'не в зачёт':'без ограничений, не в зачёт'):left===QMAX?QMAX+' попытки':left===1?'осталась 1 попытка':left>1?'осталось '+left+' попытки':'пройдено')+'</span><h3>'+QT[k]+'</h3></div>'+btn+'</div>'+
       (k==='roles'?'<p class="small muted">Кто есть кто в крепости: роли, описания и кто кого играет.</p>':'<p class="small muted">Настоящая история генуэзской крепости над Балаклавой.</p>')+
       (S.me&&!d.viewAs?(mine?'<div class="lead"><div class="me"><span>Твой лучший результат</span><span>'+mine.score+' / '+mine.total+'</span></div></div>':'<p class="small muted">Ещё не пройдена.</p>'):'')+
     '</div>';
-  }).join('')+'</div>';
+  }).join('')+'</div></details></div>';
 }
+document.addEventListener('toggle',function(e){ if(e.target.classList&&e.target.classList.contains('qgroup')) S.openQuiz=e.target.open; },true);
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
   d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
@@ -1225,7 +1238,7 @@ document.addEventListener('click',function(e){
   else if(a==='qzpick'){ quizPick(+t.getAttribute('data-k')); }
   else if(a==='qznext'){ quizNext(); }
   else if(a==='qzclose'){ quizClose(); }
-  else if(a==='qzgo'){ goTab('people'); }
+  else if(a==='qzgo'){ S.openQuiz=true; goTab('people'); }
   else if(a==='mgplay'){ playMakar(); }
   else if(a==='qzmakar'){ var nm=sharedName(), wait=(Q&&Q.savePromise)||Promise.resolve(); wait.then(function(){ quizClose(true); S.viewAs=nm; S.editCar=0; S.tab='people'; load().then(function(){ window.scrollTo(0,0); }); }); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
