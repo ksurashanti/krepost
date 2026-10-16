@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610161131-->
+<!--build:202610161152-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -349,7 +349,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610161131',
+  build: '202610161152',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -722,7 +722,7 @@ function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }ca
 
 var S={openNews:{},openDays:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
        selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms',
-       host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
+       visitor:LS.get('visitor')==='1',host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
 var demoRaw=null;
 if(CONFIG.demo){ demoRaw=CONFIG.demo; try{var saved=localStorage.getItem('chembalo.demoRaw2'); if(saved) demoRaw=JSON.parse(saved);}catch(e){} }
 
@@ -901,7 +901,7 @@ function quizRender(){
   if(Q.done){
     var n=Q.qs.length, s=Q.score, phrase=s===n?'Безупречно! Ты знаешь крепость как свои пять пальцев.':s>=n*0.7?'Отлично! Консул тобой доволен.':s>=n*0.4?'Неплохо, но стражник у ворот знает больше.':'Похоже, ты только что прибыл в город. Попробуй ещё раз!';
     el.innerHTML='<div class="in">'+head+'<p class="center muted">Твой результат</p><div class="score">'+s+' / '+n+'</div><p class="center">'+phrase+'</p>'+
-      '<p class="center small muted">'+(Q.free?'Это просмотр без своего аккаунта, результат не сохраняется.':'Лучший результат из трёх попыток попадёт в таблицу знатоков на вкладке «Роли».')+'</p>'+
+      '<p class="center small muted">'+(Q.free?(S.visitor&&!S.me?'Гостевой вход: результат не сохраняется, проходи сколько хочешь.':'Это просмотр без своего аккаунта, результат не сохраняется.'):'Лучший результат из трёх попыток попадёт в таблицу знатоков на вкладке «Роли».')+'</p>'+
       (Q.free||quizLeft(Q.kind)-1>0?'<button class="btn" data-act="qzstart" data-kind="'+Q.kind+'">Пройти ещё раз'+(Q.free?'':quizLeft(Q.kind)-1===1?' (последняя попытка)':' (осталось '+(quizLeft(Q.kind)-1)+')')+'</button>':'<p class="center small">Все попытки использованы.</p>')+
       (!Q.free&&sharedName()&&(s===n||quizLeft(Q.kind)-1<=0)?'<div class="note" style="display:grid;gap:8px">'+(s===n?'Идеально! ':'')+'Хочется пройти ещё? Загляни в аккаунт '+esc(sharedName())+'а: там викторину можно проходить сколько угодно, только не в зачёт.<button class="btn sm" style="justify-self:start" data-act="qzmakar">Зайти под '+esc(sharedName())+'ом</button></div>':'')+
       '<button class="btn ghost" data-act="qzclose">Готово</button></div>';
@@ -971,7 +971,7 @@ function showSwitching(){
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
   d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
-    (S.data&&S.data.host?'':'<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
+    (S.data&&(S.data.host||(S.visitor&&!S.me))?'':'<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
     (g.shared&&n!==S.me?'<button class="go" data-act="viewas" data-name="'+esc(n)+'">'+icon('me')+'Зайти в аккаунт</button>':'')+
     (!g.shared&&g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>');
   var im=d.querySelector('img'); if(im) im.removeAttribute('loading');
@@ -1040,6 +1040,7 @@ function vMe(){
           ? '<button data-act="link" data-name="'+esc(g.name)+'"'+(g.linked||S.busy?' disabled':'')+'>'+avatar(g.name,'sm')+esc(g.name)+(g.linked?' <span class="small muted">уже вошёл</span>':'')+'</button>'
           : '<button data-act="me" data-name="'+esc(g.name)+'">'+avatar(g.name,'sm')+esc(g.name)+'</button>';
       }).join('')+'</div>'+(linkMode?'<p class="small muted">Твоего имени нет или оно занято? Напиши Ксении.</p>':'')+
+      '<div class="hostin" style="display:grid;justify-items:center;gap:4px"><button class="btn ghost" data-act="visitor">'+icon('people')+'Гостевой вход</button><span class="small muted" style="text-align:center">Не из гостей? Здесь можно посмотреть роли и пройти викторины без зачёта.</span></div>'+
       ((d.hosts||[]).length?'<div class="hostin"><button class="btn ghost" data-act="hostpick">'+icon('people')+'Ведущий квеста</button></div>':'');
   }
   var g=guest(S.me), room=roomOf(S.me), seat=seatOf(S.me), car=carOf(S.me), drv=drives(S.me);
@@ -1305,16 +1306,19 @@ function render(){
   if(!S.qzChecked&&S.me&&!d.viewAs){ S.qzChecked=true; setTimeout(quizRecover,0); }
   var realMe=S.me; S.me=who();
   var tabs=d.tabs.slice(); if(d.access.admin) tabs.push({id:'admin',name:'Штаб'});
+  var visitor=S.visitor&&!S.me&&!d.access.admin&&!d.host;
   if(d.host){ tabs=[]; S.tab='host'; S.hostStep=''; }
+  else if(visitor){ tabs=tabs.filter(function(t){return t.id==='people'}); if(!tabs.length) tabs=[{id:'people',name:'Роли'}]; S.tab='people'; }
   else if(!tabs.some(function(t){return t.id===S.tab})) S.tab=tabs[0]?tabs[0].id:'me';
-  S.locked=!d.host&&!S.me&&!d.access.admin; if(S.locked) S.tab='me';
+  S.locked=!d.host&&!visitor&&!S.me&&!d.access.admin; if(S.locked) S.tab='me';
   var focusId=document.activeElement&&document.activeElement.id, selStart=document.activeElement&&document.activeElement.selectionStart;
-  var nm=tabName(S.tab), news=d.host?{top:'',rest:''}:newsFor(nm), body;
+  var nm=tabName(S.tab), news=(d.host||visitor)?{top:'',rest:''}:newsFor(nm), body;
   if(S.tab==='me') body=vMe(); else if(S.tab==='plan') body=vPlan(); else if(S.tab==='people') body=vPeople();
   else if(S.tab==='home') body=vHome(); else if(S.tab==='road') body=vRoad(); else if(S.tab==='admin') body=vAdmin(); else if(S.tab==='host') body=vHost(); else body='';
   var dd=d.dates, from=(dd['Пт']||'').slice(0,2).replace(/^0/,''), to=(dd['Вс']||'').slice(0,2).replace(/^0/,'');
   var showAdminLogin=!d.access.admin&&!d.tg&&!d.host&&!S.hostStep&&S.tab==='me';
   $app.innerHTML=(demoRaw?'<div class="demo">Демо на данных из таблиц. Код гостей «'+esc(demoRaw.settings['Кодовое слово гостей'])+'», организатора «'+esc(demoRaw.settings['Код организатора'])+'» (вход внизу вкладки «Я»).</div>':'')+
+    (visitor?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">Гостевой вход: роли и викторины<button class="btn sm" data-act="visitorout">Выйти</button></div>':'')+
     (d.viewAs?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">'+(d.access.admin?'Ты смотришь как <b>'+esc(d.viewAs)+'</b>, только просмотр':'Ты в аккаунте <b>'+esc(d.viewAs)+'</b>')+'<button class="btn sm" data-act="viewas" data-name="">Вернуться к себе</button></div>':'')+
     '<header class="top"><div class="in"><div><span class="eyebrow">'+esc(d.subtitle)+(from?' · '+from+'–'+to+' ноября':'')+'</span><h1>'+esc(d.title)+'</h1></div><div class="now">'+(S.syncing?'<span class="sync" title="обновляю"></span>':'')+nowLine()+'</div></div></header>'+
     contactsHtml()+
@@ -1322,7 +1326,7 @@ function render(){
       (showAdminLogin?'<div class="foot">'+(S.showAdminLogin?'<form class="codeform" data-form="admin" style="width:min(360px,100%)"><input type="password" id="admininput" placeholder="Код организатора" autocomplete="off" aria-label="Код организатора"><button class="btn" type="submit">Войти</button></form>':'<button class="link" data-act="adminlogin">Вход для организаторов</button>')+'</div>':'')+
     (S.tab==='me'&&CONFIG.build?'<p class="small muted" style="text-align:center;opacity:.6">версия '+CONFIG.build.slice(6,8)+'.'+CONFIG.build.slice(4,6)+' '+CONFIG.build.slice(8,10)+':'+CONFIG.build.slice(10,12)+'</p>':'')+
     '</div></main>'+
-    (tabs.length?'<nav class="tabbar" aria-label="Вкладки"><div class="in">'+tabs.map(function(t){
+    (tabs.length>1?'<nav class="tabbar" aria-label="Вкладки"><div class="in">'+tabs.map(function(t){
       if(S.locked&&t.id!=='me') return '<a role="button" aria-disabled="true" class="off" data-act="locked"><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
       return '<a href="#'+t.id+'" data-act="tab" data-tab="'+t.id+'" class="'+(t.id===S.tab?'on':'')+'"'+(t.id===S.tab?' aria-current="page"':'')+'><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
     }).join('')+'</div></nav>':'');
@@ -1362,6 +1366,8 @@ document.addEventListener('click',function(e){
   else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
   else if(a==='reload'){ location.reload(); }
   else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
+  else if(a==='visitor'){ S.visitor=true; LS.set('visitor','1'); S.openQuiz=true; S.q=''; render(); window.scrollTo(0,0); }
+  else if(a==='visitorout'){ quizClose(true); S.visitor=false; LS.set('visitor',''); S.tab='me'; LS.set('tab','me'); try{history.replaceState(null,'','#me')}catch(x){} render(); window.scrollTo(0,0); }
   else if(a==='hostpick'){ S.hostStep='pick'; render(); window.scrollTo(0,0); }
   else if(a==='hostslot'){ S.hostStep=+t.getAttribute('data-slot'); render(); var hi=document.getElementById('hnickin')||document.getElementById('hkeyin'); if(hi) hi.focus(); }
   else if(a==='hostback'){ S.hostStep=S.hostStep==='pick'?'':'pick'; render(); }
