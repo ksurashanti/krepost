@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610161158-->
+<!--build:202610161408-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -248,6 +248,26 @@ details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-ra
 .ev.now{background:var(--olive);color:var(--on-olive)}
 .ev.now .t,.ev.now .muted{color:var(--on-olive);opacity:.85}
 .day{padding:0;overflow:hidden}
+.slots{display:grid;gap:6px;min-width:0;margin-top:10px}
+details.ev,details.ev:first-of-type{display:block;border-top:1px solid var(--line)}
+details.ev > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:start}
+details.ev > summary::-webkit-details-marker{display:none}
+details.ev > summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:5px 4px 0 0}
+details.ev[open] > summary::after{transform:rotate(-135deg);margin-top:9px}
+details.ev.now > summary::after{border-color:var(--on-olive)}
+details.slot{background:var(--paper);border-radius:10px}
+details.slot > summary{cursor:pointer;list-style:none;padding:8px 12px;display:flex;align-items:center;gap:10px;font-size:14.5px}
+details.slot > summary::-webkit-details-marker{display:none}
+details.slot > summary .st{font-variant-numeric:tabular-nums;color:var(--muted);flex:none;min-width:46px}
+details.slot > summary .cnt{margin-left:auto;white-space:nowrap}
+details.slot > summary::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:auto}
+details.slot[open] > summary::after{transform:rotate(-135deg)}
+details.slot.mine > summary{font-weight:700}
+details.slot.empty > summary{cursor:default}
+details.slot.empty > summary::after{display:none}
+details.slot .chips{padding:0 12px 10px}
+.ev.now details.slot{color:var(--ink)}
+.ev.now details.slot > summary .st{color:var(--muted);opacity:1}
 
 /* жители */
 .chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
@@ -349,7 +369,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610161158',
+  build: '202610161408',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -720,7 +740,7 @@ function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-
 if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
-var S={openNews:{},openDays:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
+var S={openNews:{},openDays:{},openEv:{},openSlot:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
        selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms',
        visitor:LS.get('visitor')==='1',host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
 var demoRaw=null;
@@ -1052,6 +1072,7 @@ function vMe(){
   if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return whenFrom(c)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
   else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
+  var vs=mySlot(); if(vs) f.push([esc(vs.ev.title),esc(vs.slot.time),'группа «'+esc(vs.slot.name)+'»','plan']);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(g.pickup) f.push(['Забрать у Ксении','<span style="font-size:16px">'+esc(g.pickup)+'</span>','забери до праздника',null,true]);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
@@ -1128,6 +1149,36 @@ function hostSend(a,okMsg,done){
     .then(function(){ S.busy=false; render(); });
 }
 
+/* слоты внутри события: комментарий вида «13:00 Церковь: Кирилл, Ксения, Саша», по строке на группу */
+function slotsOf(note){
+  var lines=String(note||'').split(/\n|\s\|\s/).map(function(s){return s.trim()}).filter(Boolean);
+  if(lines.length<2) return null;
+  var out=[];
+  for(var i=0;i<lines.length;i++){
+    var m=lines[i].match(/^(\d{1,2}:\d{2}(?:\s*[–-]\s*\d{1,2}:\d{2})?)\s+([^:]+?):\s*(.*)$/);
+    if(!m) return null;
+    out.push({time:m[1].replace(/\s*[–-]\s*/,'–'), name:m[2].trim(), people:m[3].split(',').map(function(s){return s.trim()}).filter(Boolean)});
+  }
+  return out;
+}
+function isGuest(n){ var k=norm_(n); return (S.data.guests||[]).some(function(g){return norm_(g.name)===k}); }
+function guestName(n){ var k=norm_(n), g=(S.data.guests||[]).filter(function(x){return norm_(x.name)===k})[0]; return g?g.name:n; }
+function mySlot(){
+  if(!S.me) return null; var k=norm_(S.me), res=null;
+  S.data.schedule.forEach(function(e){ var sl=slotsOf(e.note); if(!sl||res) return;
+    sl.forEach(function(s){ if(!res&&s.people.some(function(p){return norm_(p)===k})) res={ev:e,slot:s}; }); });
+  return res;
+}
+function slotsHtml(sl){
+  var k=S.me?norm_(S.me):'';
+  return '<div class="slots">'+sl.map(function(s){
+    var mine=k&&s.people.some(function(p){return norm_(p)===k});
+    var any=s.people.some(isGuest);
+    return '<details class="slot'+(mine?' mine':'')+(any?'':' empty')+'" data-slot="'+esc(s.time)+'"'+((s.time in S.openSlot?S.openSlot[s.time]:mine)?' open':'')+'><summary><span class="st">'+esc(s.time)+'</span><span>'+esc(s.name)+'</span><span class="small muted cnt">'+(s.people.every(isGuest)?plural(s.people.length,['человек','человека','человек']):esc(s.people.join(', ')))+'</span></summary>'+
+      (s.people.some(isGuest)?'<div class="chips">'+s.people.map(function(p){return isGuest(p)?chip(guestName(p),guest(guestName(p)).character||''):'<span class="small muted">'+esc(p)+'</span>'}).join('')+'</div>':'')+'</details>';
+  }).join('')+'</div>';
+}
+
 function vPlan(){
   var by={}; S.data.schedule.forEach(function(e){(by[e.day]=by[e.day]||[]).push(e)});
   return '<h2>Три дня в крепости</h2>'+['Пт','Сб','Вс'].map(function(day){
@@ -1135,7 +1186,10 @@ function vPlan(){
     return '<div class="card day"><div style="background:'+DC[day]+';padding:10px 14px;display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:17px">'+DN[day]+'</b><span class="small">'+esc((S.data.dates[day]||'').slice(0,5))+'</span></div>'+
       by[day].map(function(e){
         var tm=e.start&&e.end? e.start+'–'+e.end : (e.start? 'с '+e.start : 'до '+e.end);
-        return '<div class="ev'+(isNow(e)?' now':'')+'"><span class="t">'+esc(tm)+'</span><div><div class="ti">'+esc(e.title)+'</div>'+(e.note?'<div class="small muted">'+esc(e.note)+'</div>':'')+'</div></div>';
+        var sl=slotsOf(e.note);
+        if(sl){ var my=S.me&&sl.filter(function(x){return x.people.some(function(p){return norm_(p)===norm_(S.me)})})[0], key=e.day+e.start+e.title;
+          return '<details class="ev'+(isNow(e)?' now':'')+'" data-ev="'+esc(key)+'"'+(S.openEv[key]?' open':'')+'><summary><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div><div class="small muted">'+(my?'твоя группа в '+esc(my.time)+' · ':'')+plural(sl.filter(function(x){return x.people.some(isGuest)}).length,['группа','группы','групп'])+'</div></div></summary>'+slotsHtml(sl)+'</details>'; }
+        return '<div class="ev'+(isNow(e)?' now':'')+'"><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div>'+(!sl&&e.note?'<div class="small muted">'+esc(e.note)+'</div>':'')+'</div>'+(sl?slotsHtml(sl):'')+'</div>';
       }).join('')+'</div>';
   }).join('');
 }
@@ -1394,7 +1448,7 @@ document.addEventListener('click',function(e){
     if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
     load().then(function(){ window.scrollTo(0,0); }); }
 });
-document.addEventListener('toggle',function(e){ var t=e.target; if(!t.classList) return; if(t.classList.contains('day-tasks')&&t.getAttribute('data-day')) S.openDays[t.getAttribute('data-day')]=t.open; if(t.classList.contains('story')) S.openNews[t.getAttribute('data-news')]=t.open; },true);
+document.addEventListener('toggle',function(e){ var t=e.target; if(!t.classList) return; if(t.classList.contains('day-tasks')&&t.getAttribute('data-day')) S.openDays[t.getAttribute('data-day')]=t.open; if(t.classList.contains('story')) S.openNews[t.getAttribute('data-news')]=t.open; if(t.getAttribute('data-ev')) S.openEv[t.getAttribute('data-ev')]=t.open; if(t.getAttribute('data-slot')) S.openSlot[t.getAttribute('data-slot')]=t.open; },true);
 document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); }
   else if(e.target.id==='hq'){ S.hostQ=e.target.value; render(); }
   else if(e.target.classList&&e.target.classList.contains('hnote')){ var hn=e.target.getAttribute('data-name'); S.hostDraft[hn]=e.target.value;
