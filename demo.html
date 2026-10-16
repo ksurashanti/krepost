@@ -1,0 +1,1489 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<!--build:202610161158-->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Крепость Чембало</title>
+<meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: мобильное приложение: тёмная шапка, полоса контактов, одна вкладка на экране, панель вкладок снизу */
+:root{
+  --paper:#F1F0EB; --surface:#FAFAF5; --ink:#23261E; --muted:#676B5A; --line:#D7D5C8;
+  --olive:#3C4F12; --olive-2:#76913A; --sage:#A9BC7E; --sand:#E6DDBA; --shield:#D9CF9C;
+  --top-bg:#E6DDBA; --top-ink:#23261E; --top-accent:#3C4F12;
+  --night:#1E2414; --on-night:#F1F0EB; --on-olive:#F3F1E6; --warn:#8A4B1E; --warn-bg:#F3E4CC;
+  --d1:#E6DDBA; --d2:#CFDBAE; --d3:#DCDFD2;
+  --f:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px; --tabbar:64px; --plan-dark:#23261E; --plan-wall:#23261E;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15170F; --surface:#1E2118; --ink:#ECEADF; --muted:#A3A692; --line:#33372A;
+  --olive:#A9BC7E; --olive-2:#8EA65A; --sage:#4D5E33; --sand:#3A3726; --shield:#4A4630;
+  --top-bg:#0F120A; --top-ink:#ECEADF; --top-accent:#8EA65A;
+  --night:#0F120A; --on-night:#ECEADF; --on-olive:#15170F; --warn:#E3B37E; --warn-bg:#3A2D1C;
+  --d1:#3A3726; --d2:#33402A; --d3:#2C2F27; --plan-dark:#0B0D07; --plan-wall:#8C907C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#15170F; --surface:#1E2118; --ink:#ECEADF; --muted:#A3A692; --line:#33372A;
+  --olive:#A9BC7E; --olive-2:#8EA65A; --sage:#4D5E33; --sand:#3A3726; --shield:#4A4630;
+  --top-bg:#0F120A; --top-ink:#ECEADF; --top-accent:#8EA65A;
+  --night:#0F120A; --on-night:#ECEADF; --on-olive:#15170F; --warn:#E3B37E; --warn-bg:#3A2D1C;
+  --d1:#3A3726; --d2:#33402A; --d3:#2C2F27; --plan-dark:#0B0D07; --plan-wall:#8C907C; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.45 var(--f);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:700;line-height:1.15;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--olive-2);outline-offset:2px}
+.muted{color:var(--muted)} .small{font-size:14px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--olive)}
+
+/* шапка */
+.top{background:var(--top-bg);color:var(--top-ink);padding:18px 16px 16px}
+.top .in{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.top .eyebrow{color:var(--top-accent)}
+.top h1{font-size:clamp(26px,7vw,34px);font-weight:800;margin-top:4px}
+.top .now{font-size:14px;color:var(--top-accent);text-align:right;min-width:0}
+.top .now b{display:block;color:var(--top-ink);font-size:16px;font-weight:600}
+.sync{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sage);margin-right:6px;vertical-align:middle;animation:pulse 1s infinite alternate}
+@keyframes pulse{from{opacity:.25}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sync{animation:none}}
+
+/* контакты */
+.contacts{max-width:720px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none}
+.contacts::-webkit-scrollbar{display:none}
+.ct{flex:none;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 6px}
+.ct .who{display:grid;line-height:1.15;min-width:0}
+.ct .who b{font-size:14px;font-weight:600}
+.ct .who span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.ct .acts{display:flex;gap:4px}
+.ic{width:34px;height:34px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;background:var(--paper);color:var(--olive)}
+.ic.tg{background:var(--olive);color:var(--on-olive)}
+.ic svg{width:18px;height:18px}
+
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:8px calc(var(--tabbar) + 32px + env(safe-area-inset-bottom,0px))}
+.view{display:grid;gap:16px;padding-top:12px}
+.view > *{min-width:0}
+.view > h2{font-size:26px;font-weight:800}
+.sub{display:grid;gap:4px}
+
+/* панель вкладок */
+nav.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabbar .in{max-width:720px;margin:0 auto;display:flex;height:var(--tabbar)}
+nav.tabbar a{flex:1;display:grid;justify-items:center;align-content:center;gap:3px;text-decoration:none;color:var(--muted);font-size:11.5px;font-weight:500;min-width:0}
+nav.tabbar a svg{width:24px;height:24px}
+nav.tabbar a.off{opacity:.35;cursor:not-allowed}
+nav.tabbar a.on{color:var(--olive);font-weight:700}
+nav.tabbar a.on .pill{background:color-mix(in srgb,var(--olive) 16%,transparent)}
+nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-radius:999px}
+
+/* аватар-камея: овал с двойной рамкой */
+.av{--w:44px;width:var(--w);height:calc(var(--w)*1.2);flex:none;position:relative;display:grid;place-items:center;background:var(--olive);border-radius:50%}
+.av::before{content:"";position:absolute;inset:calc(var(--w)*.045);background:var(--shield);border-radius:50%}
+.av span{position:relative;font-weight:700;font-size:calc(var(--w)*.42);color:var(--olive)}
+.av .ph{position:absolute;inset:calc(var(--w)*.09);border-radius:50%;overflow:hidden;background:var(--shield);box-shadow:0 0 0 1px var(--olive)}
+.av .ph img{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.2);transform-origin:50% 37%}
+.av.xl .ph img,.lb .av .ph img{transform:none}
+.av:has(img){cursor:zoom-in} button .av{cursor:inherit}
+.lb{position:fixed;inset:0;z-index:60;background:rgba(18,22,10,.94);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:grid;place-items:center;align-content:center;gap:6px;padding:24px;text-align:center;cursor:zoom-out;animation:lbin .18s ease-out}
+.lb .av{--w:min(70vw,300px);margin-bottom:12px;cursor:zoom-out}
+.lb b{color:var(--on-night);font-size:20px} .lb .r{color:var(--sage);font-size:15px}
+.lb .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.lb .go.yes{background:var(--olive);border-color:var(--olive);color:var(--on-olive)}
+.ask{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:10px 12px;border:1px dashed var(--warn);border-radius:12px;background:var(--warn-bg);color:var(--warn);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.ask b{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--warn);color:var(--warn-bg);font-size:16px}
+.lb .go svg{width:18px;height:18px}
+.lb .go{display:inline-flex;align-items:center;gap:7px;text-decoration:none;border:1px solid var(--sage);color:var(--on-night);background:none;border-radius:999px;padding:9px 18px;font:inherit;font-size:14px;cursor:pointer}
+@keyframes lbin{from{opacity:0}to{opacity:1}}
+.av.xl{--w:96px} .av.sm{--w:30px} .av.xs{--w:24px}
+
+
+/* мини-игра */
+.mg{position:fixed;inset:0;z-index:80;background:#120e0c;display:grid;place-items:center;touch-action:none;user-select:none;-webkit-user-select:none}
+.mg canvas{display:block;touch-action:none;image-rendering:pixelated}
+.mg-x{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));right:14px;border:0;background:rgba(18,14,12,.6);color:#e8e2d2;font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;z-index:2}
+.mg-over{position:absolute;inset:0;display:none;place-items:center;background:rgba(18,14,12,.6);padding:20px}
+.mg-card{background:#f4ecd6;color:#2a1e14;border:3px solid #5a3a1e;box-shadow:0 0 0 3px #120e0c,0 10px 30px rgba(0,0,0,.5);border-radius:14px;padding:20px 18px;max-width:330px;display:grid;gap:10px;text-align:center}
+.mg-card b{font-size:24px}.mg-card p{margin:0;line-height:1.45}.mg-small{font-size:14px;color:#6a5a44}
+.mg-warn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffd75e;color:#120e0c;font-size:16px!important}
+.mg-big{font-size:64px;font-weight:800;color:#7a1c24;line-height:1}
+.mg-btn{padding:13px 18px;border:0;border-radius:999px;background:#7a1c24;color:#f4ecd6;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.mg-btn.ghost{background:none;border:2px solid #7a1c24;color:#7a1c24}
+/* викторины */
+.qgroup{padding:0}
+.qgroup>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px}
+.qgroup>summary::-webkit-details-marker{display:none}
+.qgroup>summary>span{display:grid;gap:2px}
+.qgroup>summary b{font-size:17px}
+.qgroup>summary::after{content:'';width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-right:4px;flex:none}
+.qgroup[open]>summary::after{transform:rotate(-135deg)}
+.qlist{display:grid;border-top:1px solid var(--line)}
+.qitem{padding:14px 16px}
+.qitem+.qitem{border-top:1px dashed var(--line)}
+.qcta{display:flex;align-items:center;gap:12px;width:100%;margin:16px 0 6px;padding:14px 16px;border:0;border-radius:16px;background:var(--olive);color:var(--on-olive);font:inherit;text-align:left;cursor:pointer;animation:qpulse 2.2s ease-in-out infinite}
+.qcta .ic{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:var(--on-olive);color:var(--olive);font-weight:800;font-size:20px}
+.qcta b{display:block;font-size:17px}
+.qcta .small{display:block;opacity:.85;margin-top:2px}
+.qcta .go{margin-left:auto;font-size:26px;line-height:1;opacity:.8}
+@keyframes qpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 color-mix(in srgb,var(--olive) 45%,transparent)}50%{transform:scale(1.015);box-shadow:0 0 0 9px color-mix(in srgb,var(--olive) 0%,transparent)}}
+@media (prefers-reduced-motion:reduce){.qcta{animation:none}}
+.quizzes{display:grid;gap:10px;margin:4px 0 18px}
+.qcard{display:grid;gap:8px;padding:14px 16px}
+.qcard .qtop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qcard h3{font-size:17px}
+.qcard .qtop .btn{white-space:nowrap;flex:none}
+.qcard .lead{display:grid;gap:3px;font-size:14px}
+.qcard .lead div{display:flex;justify-content:space-between;gap:8px}
+.qcard .lead .me{font-weight:700;color:var(--olive)}
+.qz{position:fixed;inset:0;z-index:70;background:var(--paper);overflow:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom))}
+.qz .in{max-width:560px;margin:0 auto;display:grid;gap:14px}
+.qz .bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qz .prog{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.qz .prog i{display:block;height:100%;background:var(--olive);transition:width .25s}
+.qz .x{border:0;background:none;font:inherit;font-size:15px;color:var(--muted);cursor:pointer;padding:6px}
+.qz h2{font-size:22px;line-height:1.25}
+.qz .quote{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-style:italic;color:var(--ink)}
+.qz .who{display:grid;justify-items:center;gap:6px}
+.qz .opts{display:grid;gap:8px}
+.qz .opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;cursor:pointer}
+.qz .opt.ok{border-color:var(--olive);background:color-mix(in srgb,var(--olive) 14%,var(--surface))}
+.qz .opt.bad{border-color:var(--warn);background:var(--warn-bg)}
+.qz .opt[disabled]{cursor:default}
+.qz .expl{font-size:15px;color:var(--muted)}
+.qz .expl b{color:var(--ink)}
+.qz .score{font-size:56px;font-weight:800;color:var(--olive);text-align:center;line-height:1}
+.qz .center{text-align:center}
+
+/* общие */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.chip{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;padding:3px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:14px;max-width:100%}
+.chip.me{background:var(--olive);border-color:var(--olive);color:var(--on-olive);font-weight:600}
+.chip .n{color:var(--muted);font-size:13px}
+.chip.me .n{color:inherit;opacity:.8}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.btn{cursor:pointer;border:1px solid var(--olive);background:var(--olive);color:var(--on-olive);border-radius:999px;padding:9px 16px;font-weight:600;font-size:15px}
+.btn.ghost{background:transparent;color:var(--olive)}
+.btn.sm{padding:5px 12px;font-size:14px}
+.btn:disabled{opacity:.5;cursor:default}
+.rl{border:0;background:none;padding:0;font:inherit;color:var(--olive);font-weight:600;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+.char.flash{box-shadow:inset 0 0 0 2px var(--olive-2)}
+.link{cursor:pointer;background:none;border:0;padding:0;color:var(--olive);text-decoration:underline;text-underline-offset:3px;font-size:14px}
+input[type=search],input[type=password]{width:100%;padding:11px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.note{padding:10px 14px;border-radius:var(--r);background:var(--warn-bg);color:var(--warn);font-size:14px}
+.news{background:var(--olive);color:var(--on-olive);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px}
+.news b{font-size:16px} .news p{font-size:15px;opacity:.92}
+details.news.story > summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+details.news.story > summary::-webkit-details-marker{display:none}
+details.news.story[open] > summary .small{display:none}
+details.news.story p{margin-top:8px;font-size:15px;line-height:1.55}
+.news .rl{color:inherit}
+.pn{cursor:pointer;text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:3px}
+.chip.pc{cursor:pointer}
+.rl.plain{color:inherit;font-weight:inherit;text-decoration:none;text-align:left}
+.news.soft{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(var(--tabbar) + 14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:14px;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:transparent;border-radius:999px;padding:7px 10px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--olive);color:var(--on-olive)}
+.dayhead{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-top:6px}
+.dayhead i{width:12px;height:12px;border-radius:3px;display:inline-block;box-shadow:inset 0 0 0 1px var(--line)}
+.dayhead span{color:var(--muted);font-weight:500;letter-spacing:.04em}
+
+/* «Я» */
+.pick{display:flex;flex-wrap:wrap;gap:8px}
+.pick button{cursor:pointer;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.pick button:disabled{opacity:.45;cursor:default}
+.hero{display:flex;gap:16px;align-items:center}
+.hero h2{font-size:30px;font-weight:800}
+.hero .role{color:var(--olive-2);font-weight:600;font-size:18px;margin-top:2px}
+.about{font-size:15px;color:var(--muted)}
+.about::first-letter{text-transform:uppercase}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:2px;align-content:start;min-width:0}
+.fact.wide{grid-column:1/-1}
+.fact .k{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-size:18px;font-weight:700}
+.fact .s{font-size:14px;color:var(--muted)}
+.fact a{color:inherit}
+.task{padding:12px 14px;display:grid;gap:6px}
+.task .hd{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.task .tm{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;background:var(--olive);color:var(--on-olive);border-radius:999px;padding:1px 10px}
+.task h4{font-size:16px;font-weight:700}
+.task .g{font-size:12.5px;font-weight:600;color:var(--olive-2);letter-spacing:.02em}
+.task .mn{font-size:14px;color:var(--ink)}
+details.day-tasks{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+details.day-tasks > summary{cursor:pointer;list-style:none;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.day-tasks > summary::-webkit-details-marker{display:none}
+details.day-tasks > summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:auto}
+details.day-tasks[open] > summary::after{transform:rotate(-135deg)}
+details.day-tasks > summary .small{margin-left:auto}
+.day-body{padding:0 12px 12px;display:grid;gap:10px}
+details.team{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.team > summary{cursor:pointer;list-style:none;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.team > summary::-webkit-details-marker{display:none}
+details.team > summary b{font-size:15px}
+details.team > summary .small{white-space:nowrap}
+details.team > summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:4px}
+details.team[open] > summary::after{transform:rotate(-135deg)}
+.team-body{padding:0 14px 12px;display:grid;gap:10px}
+.team-body .row{display:grid;gap:4px;padding-top:10px;border-top:1px dashed var(--line)}
+.team-body .row .t{font-size:13.5px;color:var(--muted)}
+details.more summary{cursor:pointer;color:var(--olive);font-size:14px;font-weight:600;list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px)}
+details.more[open] summary::after{transform:rotate(-135deg)}
+details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-radius:10px;padding:10px 12px;white-space:pre-line}
+
+/* расписание */
+.ev{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:11px 14px;border-top:1px solid var(--line)}
+.ev:first-of-type{border-top:0}
+.ev .t{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);padding-top:1px}
+.ev .ti{font-weight:600}
+.ev.now{background:var(--olive);color:var(--on-olive)}
+.ev.now .t,.ev.now .muted{color:var(--on-olive);opacity:.85}
+.day{padding:0;overflow:hidden}
+.slots{grid-column:1/-1;display:grid;gap:6px;min-width:0}
+details.slot{background:var(--paper);border-radius:10px}
+details.slot > summary{cursor:pointer;list-style:none;padding:8px 12px;display:flex;align-items:center;gap:10px;font-size:14.5px}
+details.slot > summary::-webkit-details-marker{display:none}
+details.slot > summary .st{font-variant-numeric:tabular-nums;color:var(--muted);flex:none;min-width:46px}
+details.slot > summary .cnt{margin-left:auto;white-space:nowrap}
+details.slot > summary::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;margin-left:auto}
+details.slot[open] > summary::after{transform:rotate(-135deg)}
+details.slot.mine > summary{font-weight:700}
+details.slot.empty > summary{cursor:default}
+details.slot.empty > summary::after{display:none}
+details.slot .chips{padding:0 12px 10px}
+.ev.now details.slot{color:var(--ink)}
+.ev.now details.slot > summary .st{color:var(--muted);opacity:1}
+
+/* жители */
+.chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.char{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.char h3{font-size:19px}
+.char.me{border-color:var(--olive);box-shadow:inset 0 0 0 1px var(--olive)}
+.char .about{margin-top:6px}
+
+/* план дома */
+.plan{width:100%;height:auto;display:block}
+.plan .wall{fill:none;stroke:var(--plan-wall);stroke-width:6}
+.plan .corr{fill:var(--sand)}
+.plan .bath{fill:var(--d2);opacity:.7}
+.plan .room{fill:var(--surface);stroke:var(--plan-wall);stroke-width:3;cursor:pointer}
+.plan .room.dark{fill:var(--plan-dark)}
+.plan .room.me{fill:var(--olive)}
+.plan .room.sel{fill:var(--sage)}
+.plan text{font:700 30px var(--f);fill:var(--olive);pointer-events:none}
+.plan text.sub{font:500 22px var(--f);fill:var(--muted)}
+.plan text.lbl{font:600 20px var(--f);fill:var(--muted);letter-spacing:.1em}
+.plan .me + text,.plan .me + text + text{fill:var(--on-olive)}
+.plan .me ~ text{fill:var(--on-olive)}
+.plan .dark + text{fill:#F1F0EB}
+.plan .dark ~ text.sub{fill:var(--shield)}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.room-card{padding:10px 12px;display:grid;gap:6px;cursor:pointer;text-align:left}
+.room-card.me{border-color:var(--olive);box-shadow:inset 0 0 0 1px var(--olive)}
+.room-card.sel{background:color-mix(in srgb,var(--sage) 30%,var(--surface))}
+.room-card b{font-size:15px}
+
+/* пир */
+.feast{display:grid;grid-template-columns:minmax(0,1fr) minmax(48px,100px) minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:8px 10px;max-width:480px;margin:0 auto;width:100%}
+.feast .table{grid-column:2;grid-row:2;background:var(--olive);border-radius:8px;box-shadow:inset 0 0 0 5px var(--olive),inset 0 0 0 6px var(--sage);display:grid;place-items:center;color:var(--on-olive);padding:16px 6px}
+.feast .table b{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;font-size:clamp(16px,4.6vw,22px);letter-spacing:.08em;text-transform:uppercase}
+.feast .col{display:grid;gap:6px}
+.feast .end{grid-column:1/-1;display:flex;justify-content:center;gap:22px}
+.seat{display:flex;align-items:center;gap:8px;min-width:0}
+.col.left .seat{flex-direction:row-reverse;text-align:right}
+.end .seat{flex-direction:column;gap:2px;font-size:13px}
+.seat .num{width:30px;height:30px;flex:none;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--olive);position:relative}
+.seat .num svg{position:absolute;inset:0}
+.seat .num span{position:relative}
+.seat .nm{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seat.me .nm{font-weight:700;color:var(--olive)}
+.seat.me .num{color:var(--on-olive)}
+.seat.me .num circle{fill:var(--olive)}
+
+/* дорога */
+.addr{display:grid;gap:8px}
+.addr b{font-size:20px}
+.codeform{display:flex;gap:8px}
+input.tx,textarea.hnote{width:100%;padding:11px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font:inherit;color:inherit}
+textarea.hnote{resize:vertical;min-height:62px;padding:9px 12px}
+.hostin{display:flex;justify-content:center;padding-top:6px}
+.hostin .btn svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+.hslots{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.hslot{cursor:pointer;display:grid;gap:4px;text-align:left;font:inherit;color:inherit}
+.hform{display:grid;gap:10px;max-width:420px}
+.hfilt{display:flex;flex-wrap:wrap;gap:6px}
+.hfilt .chip,.hmarks .chip{cursor:pointer;font:inherit;font-size:14px}
+.hfilt .chip:not(.me),.hmarks .chip:not(.me){color:var(--ink)}
+.hcard{display:grid;gap:10px}
+.hmarks{display:flex;gap:6px;flex-wrap:wrap}
+.codeform input{flex:1;min-width:0}
+.cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.car{display:grid;gap:10px;align-content:start}
+.car .drv{display:flex;align-items:center;gap:10px}
+.car .drv b{font-size:17px}
+.pips{display:flex;gap:4px}
+.pips i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--olive-2)}
+.pips i.f{background:var(--olive-2)}
+.car.me{border-color:var(--olive);box-shadow:inset 0 0 0 1px var(--olive)}
+.pgroup h4{margin:0 0 4px;font-size:15px}
+.prop{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
+.prop input{width:20px;height:20px;accent-color:var(--olive-2);flex:none}
+.prop.done span{text-decoration:line-through;color:var(--muted)}
+
+/* штаб */
+.grid-scroll{overflow-x:auto}
+table.dt{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+table.dt th,table.dt td{border-top:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+table.dt th{font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+table.dt td.blk{font-weight:700;color:var(--olive)}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));column-gap:24px}
+.grow{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
+.grow > div{display:flex;align-items:center;gap:10px;min-width:0}
+.loading{padding:80px 0;text-align:center;font-size:18px;color:var(--muted)}
+.demo{background:var(--warn-bg);color:var(--warn);font-size:13px;text-align:center;padding:6px 16px}
+.foot{display:grid;justify-items:center;gap:10px;padding-top:24px}
+</style>
+
+</head>
+<body>
+<div id="app"><div class="loading">Открываем ворота крепости…</div></div>
+
+<script>
+/* ↓↓↓ ЕДИНСТВЕННОЕ, ЧТО НУЖНО ПОМЕНЯТЬ: вставь между кавычками адрес веб-приложения Apps Script ↓↓↓ */
+var CONFIG = {
+  api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
+  avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
+  demo: null,
+  build: '202610161158',
+  av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
+};
+</script>
+<script>
+/* ===== Общая логика: одна и та же в Apps Script и в демо-режиме страницы ===== */
+var DAYS = ['Пт', 'Сб', 'Вс'];
+
+function norm_(s) { return String(s == null ? '' : s).trim().toLowerCase().replace(/ё/g, 'е'); }
+function isTrue_(v) { var s = norm_(v); return v === true || s === 'true' || s === 'истина' || s === '✓' || s === 'да' || s === '1'; }
+function shown_(r) { return !isTrue_(r.hide); }
+function timeKey_(t) { var m = String(t || '').match(/(\d{1,2}):(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : -1; }
+
+// «Катейник, Ксения (греческий салат)» → [{name:'Катейник',note:''},{name:'Ксения',note:'греческий салат'}]
+function parsePeople(str) {
+  var out = [], depth = 0, cur = '';
+  String(str == null ? '' : str).split('').forEach(function (ch) {
+    if (ch === '(') depth++;
+    if (ch === ')') depth = Math.max(0, depth - 1);
+    if (ch === ',' && depth === 0) { out.push(cur); cur = ''; } else cur += ch;
+  });
+  out.push(cur);
+  return out.map(function (s) {
+    s = s.trim(); if (!s) return null;
+    var m = s.match(/^([^(]+?)\s*(?:\((.*)\))?$/);
+    return { name: m ? m[1].trim() : s, note: m && m[2] ? m[2].trim() : '' };
+  }).filter(Boolean);
+}
+function joinPeople(list) {
+  return list.map(function (p) { return p.note ? p.name + ' (' + p.note + ')' : p.name; }).join(', ');
+}
+
+// tg — уже проверенный сервером пользователь Telegram {id, username} или null
+function tgGuest_(raw, tg) {
+  if (!tg) return null;
+  var u = norm_(tg.username).replace(/^@/, '');
+  return raw.guests.filter(function (g) {
+    return (g.tgId && String(g.tgId) === String(tg.id)) || (u && norm_(g.tg).replace(/^@/, '') === u);
+  })[0] || null;
+}
+function access_(raw, code, tgMe) {
+  var s = raw.settings, c = norm_(code);
+  var orgs = parsePeople(s['Организаторы']).map(function (p) { return p.name; });
+  var admin = (!!c && c === norm_(s['Код организатора'])) || (!!tgMe && orgs.indexOf(tgMe) >= 0);
+  return { admin: admin, guest: admin || !!tgMe || (!!c && c === norm_(s['Кодовое слово гостей'])) };
+}
+
+// Ведущие квеста: три места, каждое занимают ником и кодовым словом (и привязывают к Telegram)
+var HOSTS_N = 0; // пока выключено; включить: 3
+function hostSlots_(raw) {
+  var by = {};
+  (raw.hosts || []).forEach(function (h) { var n = Number(h.slot); if (n >= 1 && n <= HOSTS_N && !by[n] && (h.nick || h.key)) by[n] = h; });
+  return by;
+}
+function hostOf_(raw, slot, key, tg) {
+  var by = hostSlots_(raw), n;
+  if (tg) for (n in by) if (by[n].tgId && String(by[n].tgId) === String(tg.id)) return by[n];
+  var h = by[Number(slot)];
+  return h && key && norm_(h.key) === norm_(key) ? h : null;
+}
+
+function buildPayload(raw, opts) {
+  opts = opts || {};
+  var s = raw.settings, hidden = {};
+  raw.guests.forEach(function (g) { if (/не\s*прид/.test(norm_(g.status))) hidden[g.name] = true; });
+  var tgG = tgGuest_(raw, opts.tg);
+  if (tgG && hidden[tgG.name]) tgG = null;
+  if (opts.tg) opts.me = tgG ? tgG.name : '';
+  var acc = access_(raw, opts.code, tgG ? tgG.name : '');
+  var hostRow = tgG ? null : hostOf_(raw, opts.host, opts.hkey, opts.tg);
+  if (hostRow) opts.me = '';
+  var vis = function (p) { return !hidden[p.name]; };
+  var visGuests = raw.guests.filter(function (g) { return g.name && !hidden[g.name]; });
+  var known = {}; visGuests.forEach(function (g) { known[g.name] = true; });
+  // «Общий вход»: аккаунт (например, малыша), под которым может посмотреть любой гость
+  var shared = {}; visGuests.forEach(function (g) { if (isTrue_(g.shared)) shared[g.name] = true; });
+  var adults = visGuests.filter(function (g) { return !shared[g.name]; });
+  var me = known[opts.me] && !shared[opts.me] ? opts.me : '';
+  // организатор может посмотреть страницу глазами любого гостя (только просмотр)
+  var viewAs = opts.as && known[opts.as] && (acc.admin || shared[opts.as]) ? opts.as : '';
+  var realMe = me;
+  if (viewAs) me = viewAs;
+
+  var dates = {};
+  String(s['Даты дней'] || '').split(';').forEach(function (part) {
+    var kv = part.split('='); if (kv.length === 2) dates[kv[0].trim()] = kv[1].trim();
+  });
+
+  var guilds = {};
+  (raw.guilds || []).forEach(function (g) { if (g.block) guilds[g.block] = { name: g.name || g.block, lead: hidden[g.lead] ? '' : (g.lead || ''), about: g.about || '' }; });
+  var guildOf = function (b) { return guilds[b] || { name: b, lead: '', about: '' }; };
+
+  // «все водители», «все», «все, кроме Кирилл, Женя» — группы вместо поимённого списка
+  var drivers = [];
+  (raw.cars || []).filter(shown_).forEach(function (c) { if (c.driver && !hidden[c.driver] && drivers.indexOf(c.driver) < 0) drivers.push(c.driver); });
+  function group_(str) {
+    var t = norm_(str);
+    if (t === 'все водители') return { label: 'все водители', people: drivers.map(function (n) { return { name: n, note: '' }; }) };
+    var m = t.match(/^все(?:\s*,?\s*кроме\s*(.*))?$/);
+    if (m) {
+      var except = m[1] ? parsePeople(String(str).replace(/^[^к]*кроме\s*/i, '')).map(function (p) { return p.name; }) : [];
+      return { label: String(str).trim(), people: adults.filter(function (g) { return except.indexOf(g.name) < 0; }).map(function (g) { return { name: g.name, note: '' }; }) };
+    }
+    return null;
+  }
+  var duties = (raw.duties || []).filter(shown_).map(function (d) {
+    var grp = group_(d.people);
+    return { row: d._row, block: d.block, guild: guildOf(d.block).name, task: d.task, day: d.day, time: d.time || '', note: d.note || '', details: d.details || '',
+      label: grp ? grp.label : '', people: grp ? grp.people : parsePeople(d.people).filter(vis),
+      declined: parsePeople(d.declined).map(function (p) { return p.name; }) };
+  }).sort(function (a, b) { return DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || timeKey_(a.time) - timeKey_(b.time); });
+
+  // Мои задачи по времени + мои команды (гильдии) по дням
+  var myTasks = [], myTeams = [];
+  if (me) {
+    duties.forEach(function (d) {
+      var mine = d.people.filter(function (p) { return p.name === me; })[0];
+      if (mine) myTasks.push({ row: d.row, day: d.day, time: d.time, task: d.task, note: d.note, details: d.details, label: d.label, myNote: mine.note, block: d.block, guild: d.guild,
+        with: d.people.filter(function (p) { return p.name !== me; }), crowd: d.people.length });
+    });
+    DAYS.forEach(function (day) {
+      var blocks = [];
+      myTasks.forEach(function (t) { if (t.day === day && blocks.indexOf(t.block) < 0) blocks.push(t.block); });
+      blocks.forEach(function (b) {
+        var g = guildOf(b);
+        myTeams.push({ day: day, block: b, guild: g.name, lead: g.lead, about: g.about,
+          tasks: duties.filter(function (d) { return d.day === day && d.block === b; }) });
+      });
+    });
+  }
+
+  var cars = (raw.cars || []).filter(shown_).filter(function (c) { return c.driver && !hidden[c.driver]; }).map(function (c) {
+    return { row: c._row, driver: c.driver, when: c.when, from: String(c.from || '').trim(), seats: Number(c.seats) || 4, passengers: parsePeople(c.passengers).filter(vis).map(function (p) { return p.name; }),
+      edit: '' };
+  });
+  var isDriver = !!me && cars.some(function (c) { return c.driver === me; });
+  cars.forEach(function (c) { c.edit = acc.admin && !viewAs ? 'full' : (c.driver === me ? 'own' : (isDriver ? 'add' : '')); c.canEdit = !!c.edit; });
+  var seated_ = {}; cars.forEach(function (c) { seated_[c.driver] = 1; c.passengers.forEach(function (p) { seated_[p] = 1; }); });
+  var loose = adults.filter(function (g) { return !seated_[g.name]; }).map(function (g) { return g.name; });
+  var allProps = (raw.props || []).filter(shown_).map(function (p) { return { item: p.item, who: parsePeople(p.who).filter(vis).map(function (x) { return x.name; }) }; });
+  cars.forEach(function (c) {
+    if (c.driver !== me) return;
+    var crew = [c.driver].concat(c.passengers);
+    c.load = allProps.filter(function (p) { return p.who.some(function (w) { return crew.indexOf(w) >= 0; }); });
+  });
+
+  var tabs = (raw.tabs && raw.tabs.length ? raw.tabs : [{ id: 'me', name: 'Я', show: true }, { id: 'plan', name: 'План', show: true }, { id: 'people', name: 'Жители', show: true }, { id: 'home', name: 'Дом', show: true }, { id: 'road', name: 'Дорога', show: true }])
+    .filter(function (t) { return t.id && (t.show === '' || t.show == null || isTrue_(t.show)); })
+    .map(function (t) { return { id: String(t.id).trim(), name: t.name || t.id }; });
+
+  var out = {
+    title: s['Название'] || '', subtitle: s['Подзаголовок'] || '', dates: dates,
+    access: acc, me: me, tabs: tabs,
+    guests: visGuests.map(function (g) {
+      var o = { name: g.name, character: g.character || '', about: g.about || '', costume: g.costume || '', pickup: g.pickup || '', avatar: g.avatar || '', shared: !!shared[g.name], tg: String(g.tg || '').trim().replace(/^https?:\/\/t\.me\//i, '').replace(/^@/, '') };
+      if (acc.admin) o.status = g.status;
+      if (opts.tg) o.linked = !!(g.tgId || g.tg);
+      return o;
+    }),
+    schedule: (raw.schedule || []).filter(shown_).map(function (e) { return { day: e.day, start: e.start || '', end: e.end || '', title: e.title, note: e.note || '' }; }),
+    cars: cars,
+    myProps: me ? allProps.filter(function (p) { return p.who.indexOf(me) >= 0; }) : [],
+    rooms: (raw.rooms || []).map(function (r) { return { id: r.id, floor: Number(r.floor), name: r.name, beds: r.beds || '', people: parsePeople(r.people).filter(vis).map(function (x) { return x.name; }) }; }),
+    seats: (raw.seats || []).map(function (x) { return { seat: Number(x.seat), name: x.name && !hidden[x.name] ? x.name : '' }; }),
+    contacts: (raw.contacts || []).filter(shown_).filter(function (c) { return c.name && !hidden[c.name]; }).map(function (c) {
+      return { name: c.name, role: c.role || '', tg: String(c.tg || c.link || '').trim().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, ''), phone: String(c.phone || '').trim(), top: isTrue_(c.top) };
+    }),
+    news: (raw.news || []).filter(shown_).filter(function (n) { return n.title || n.text; }).map(function (n) { return { title: n.title || '', text: n.text || '', where: n.where || 'все', top: isTrue_(n.top) }; }),
+    myTasks: myTasks, myTeams: myTeams, loose: loose,
+    arrivals: (function () { var m = {}; visGuests.forEach(function (g) { if (g.arrival) m[g.name] = String(g.arrival); }); return m; })(),
+    tg: opts.tg ? { linked: !!tgG } : null,
+    viewAs: viewAs
+  };
+  var slots = hostSlots_(raw);
+  out.hosts = [];
+  for (var hn = 1; hn <= HOSTS_N; hn++) out.hosts.push({ slot: hn, nick: slots[hn] ? String(slots[hn].nick || '') : '', taken: !!slots[hn] });
+  out.host = hostRow ? { slot: Number(hostRow.slot), nick: String(hostRow.nick || '') } : null;
+  if (hostRow) {
+    // заметки ведущих: у каждого свои, чужие видны для сведения
+    out.hostNotes = {};
+    (raw.hostNotes || []).forEach(function (r) {
+      var sl = Number(r.slot); if (!slots[sl] || !known[r.name] || (!r.text && !r.mark)) return;
+      (out.hostNotes[r.name] = out.hostNotes[r.name] || []).push({ slot: sl, nick: String(slots[sl].nick || ''), text: String(r.text || ''), mark: String(r.mark || ''), mine: sl === Number(hostRow.slot) });
+    });
+  }
+  // Викторины: лучший результат каждого гостя, по убыванию баллов (при равенстве раньше выше)
+  out.quiz = {}; out.quizMine = {}; out.quizReal = {}; out.quizPerfect = {};
+  ['roles', 'history', 'makar'].forEach(function (k) {
+    var best = {};
+    (raw.quiz || []).forEach(function (r) {
+      if (r.quiz !== k || !known[r.name] || shared[r.name]) return;
+      var sc = Number(r.score) || 0, tot = Number(r.total) || 10, b = best[r.name];
+      if (!b || sc > b.score) best[r.name] = { name: r.name, score: sc, total: tot, at: String(r.at || '') };
+    });
+    out.quizPerfect[k] = !!realMe && (raw.quiz || []).some(function (r) { return r.quiz === k && r.name === realMe && Number(r.score) >= Number(r.total || 10); });
+    out.quizReal[k] = realMe ? (raw.quiz || []).filter(function (r) { return r.quiz === k && r.name === realMe; }).length : 0;
+    out.quizMine[k] = me ? (raw.quiz || []).filter(function (r) { return r.quiz === k && r.name === me; }).length : 0;
+    out.quiz[k] = Object.keys(best).map(function (n) { return best[n]; })
+      .sort(function (a, b) { return b.score - a.score || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0); });
+  });
+  // Общий зачёт: лучший результат в каждой игре, приведённый к 10 баллам, складывается
+  var GAMES = ['roles', 'history', 'makar'], tally = {};
+  GAMES.forEach(function (k) { (out.quiz[k] || []).forEach(function (x) {
+    var t = tally[x.name] || (tally[x.name] = { name: x.name, pts: 0, parts: {}, at: '' });
+    // игра: 60 очков = 10 баллов (шкала одна для всех результатов, даже записанных раньше)
+    var p = k === 'makar' ? Math.round(Math.min(x.score, 60) / 60 * 100) / 10 : Math.round(x.score / (x.total || 10) * 100) / 10;
+    t.parts[k] = p; t.pts = Math.round((t.pts + p) * 10) / 10; if (x.at > t.at) t.at = x.at;
+  }); });
+  out.quizGames = GAMES;
+  out.quizTotal = Object.keys(tally).map(function (n) { return tally[n]; })
+    .sort(function (a, b) { return b.pts - a.pts || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0); });
+  if (acc.guest) { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; out.addressNote = s['Подпись к адресу'] || ''; }
+  if (acc.admin) {
+    out.duties = duties;
+    out.props = allProps;
+    out.borrowed = visGuests.filter(function (g) { return g.costume || g.pickup; }).map(function (g) { return { name: g.name, what: g.costume || '', pickup: g.pickup || '' }; });
+    out.guilds = guilds;
+    out.hostsAdmin = out.hosts.map(function (h) { var r = slots[h.slot]; return { slot: h.slot, nick: h.nick, taken: h.taken, tg: r ? String(r.tg || '') : '', linked: !!(r && r.tgId) }; });
+    out.hidden = raw.guests.filter(function (g) { return hidden[g.name]; }).map(function (g) { return { name: g.name, character: g.character || '' }; });
+    var inCar = {}; cars.forEach(function (c) { inCar[c.driver] = 1; c.passengers.forEach(function (p) { inCar[p] = 1; }); });
+    var seated = {}; out.seats.forEach(function (x) { if (x.name) seated[x.name] = 1; });
+    var housed = {}; out.rooms.forEach(function (r) { r.people.forEach(function (p) { housed[p] = 1; }); });
+    out.gaps = {
+      noCar: adults.filter(function (g) { return !inCar[g.name]; }).map(function (g) { return g.name; }),
+      noSeat: adults.filter(function (g) { return !seated[g.name]; }).map(function (g) { return g.name; }),
+      noRoom: adults.filter(function (g) { return !housed[g.name]; }).map(function (g) { return g.name; }),
+      emptyTasks: duties.filter(function (d) { return !d.people.length; }).map(function (d) { return d.day + ' · ' + d.task + (d.note ? ': ' + d.note : ''); })
+    };
+    // «?» у участника: ждём ответа; «Отказались»: кто нажал «Не смогу»
+    out.answers = { pending: [], declined: [] };
+    duties.forEach(function (d) {
+      var what = { day: d.day, time: d.time, task: d.task };
+      d.people.forEach(function (p) { if (/\?\s*$/.test(p.note)) out.answers.pending.push({ name: p.name, day: what.day, time: what.time, task: what.task }); });
+      d.declined.forEach(function (n) { out.answers.declined.push({ name: n, day: what.day, time: what.time, task: what.task }); });
+    });
+  }
+  return out;
+}
+
+// Меняет raw и возвращает список изменений ячеек [{sheet, row, field, value}] для записи в таблицу.
+function applyAction(raw, a, code, tg) {
+  var changes = [], tgG = tgGuest_(raw, tg);
+  if (tg) a.me = tgG ? tgG.name : '';
+  var acc = access_(raw, code, tgG ? tgG.name : '');
+  var guest = raw.guests.filter(function (g) { return g.name === a.me; })[0];
+  var hiddenMe = guest && /не\s*прид/.test(norm_(guest.status));
+  function fail(msg) { throw new Error(msg); }
+
+  if (a.type === 'setCar') {
+    var car = raw.cars.filter(function (c) { return c._row === Number(a.row); })[0];
+    if (!car) fail('Такой машины больше нет, обнови страницу.');
+    var names = {}; raw.guests.forEach(function (g) { if (!/не\s*прид/.test(norm_(g.status))) names[g.name] = 1; });
+    var liveCars = raw.cars.filter(shown_);
+    var meDrives = !!guest && !hiddenMe && liveCars.some(function (c) { return c.driver === a.me; });
+    var mode = acc.admin ? 'full' : (meDrives && car.driver === a.me ? 'own' : (meDrives ? 'add' : ''));
+    if (!mode) fail('Менять состав машин могут только водители.');
+    var want = (a.passengers || []).filter(function (n, i, arr) { return names[n] && n !== car.driver && arr.indexOf(n) === i; });
+    if (want.length > (Number(car.seats) || 4)) fail('Мест в машине: ' + (Number(car.seats) || 4) + '.');
+    var old = parsePeople(car.passengers);
+    if (mode !== 'full') {
+      var seatedNow = {};
+      liveCars.forEach(function (c) { seatedNow[c.driver] = 1; parsePeople(c.passengers).forEach(function (p) { seatedNow[p.name] = 1; }); });
+      var oldNames = old.map(function (p) { return p.name; });
+      var added = want.filter(function (n) { return oldNames.indexOf(n) < 0; });
+      var removed = oldNames.filter(function (n) { return names[n] && want.indexOf(n) < 0; });
+      added.forEach(function (n) { if (seatedNow[n]) fail(n + ' уже едет в другой машине. Добавлять можно только тех, кто нигде не записан.'); });
+      if (mode === 'add' && removed.length) fail('Убирать людей из чужой машины может только её водитель.');
+      if (mode === 'add') a.when = '';
+    }
+    // скрытые гости, записанные в эту машину, остаются на своих местах
+    var keepHidden = old.filter(function (p) { return !names[p.name]; });
+    raw.cars.forEach(function (c) {
+      if (c === car) return;
+      var list = parsePeople(c.passengers), next = list.filter(function (p) { return want.indexOf(p.name) < 0; });
+      if (next.length !== list.length) { c.passengers = joinPeople(next); changes.push({ sheet: 'cars', row: c._row, field: 'passengers', value: c.passengers }); }
+    });
+    car.passengers = joinPeople(keepHidden.concat(want.map(function (n) { var o = old.filter(function (p) { return p.name === n; })[0]; return o || { name: n, note: '' }; })));
+    changes.push({ sheet: 'cars', row: car._row, field: 'passengers', value: car.passengers });
+    if (typeof a.when === 'string' && a.when.trim() && a.when.trim() !== car.when) {
+      car.when = a.when.trim().slice(0, 60);
+      changes.push({ sheet: 'cars', row: car._row, field: 'when', value: car.when });
+    }
+  } else if (a.type === 'linkTg') {
+    if (!tg) fail('Привязка работает только внутри Telegram.');
+    if (tgG) fail('Твой Telegram уже привязан к гостю «' + tgG.name + '». Если это ошибка, напиши Ксении.');
+    var lg = raw.guests.filter(function (x) { return x.name === a.name; })[0];
+    if (!lg || /не\s*прид/.test(norm_(lg.status))) fail('Нет такого гостя.');
+    if (isTrue_(lg.shared)) fail('Это общий аккаунт, его нельзя привязать к своему Telegram.');
+    if (lg.tgId || lg.tg) fail('К «' + lg.name + '» уже привязан другой Telegram. Если это ты, напиши Ксении.');
+    lg.tgId = String(tg.id); lg.tg = tg.username ? '@' + tg.username : '';
+    changes.push({ sheet: 'guests', row: lg._row, field: 'tgId', value: lg.tgId });
+    if (lg.tg) changes.push({ sheet: 'guests', row: lg._row, field: 'tg', value: lg.tg });
+  } else if (a.type === 'answerTask') {
+    if (!guest || hiddenMe) fail('Сначала выбери себя.');
+    var duty = (raw.duties || []).filter(function (d) { return d._row === Number(a.row); })[0];
+    if (!duty) fail('Такой задачи больше нет, обнови страницу.');
+    var ppl = parsePeople(duty.people), mineP = ppl.filter(function (p) { return p.name === a.me; })[0];
+    if (!mineP || !/\?\s*$/.test(mineP.note)) fail('На этот вопрос уже есть ответ.');
+    if (a.answer === 'yes') {
+      mineP.note = mineP.note.replace(/\s*\?+\s*$/, '');
+    } else {
+      ppl = ppl.filter(function (p) { return p !== mineP; });
+      var dec = parsePeople(duty.declined);
+      if (!dec.some(function (p) { return p.name === a.me; })) dec.push({ name: a.me, note: '' });
+      duty.declined = joinPeople(dec);
+      changes.push({ sheet: 'duties', row: duty._row, field: 'declined', value: duty.declined });
+    }
+    duty.people = joinPeople(ppl);
+    changes.push({ sheet: 'duties', row: duty._row, field: 'people', value: duty.people });
+  } else if (a.type === 'quizResult') {
+    if (!guest || hiddenMe || isTrue_(guest.shared)) fail('Сначала выбери себя.');
+    if (['roles', 'history', 'makar'].indexOf(a.quiz) < 0) fail('Нет такой викторины.');
+    var isGame = a.quiz === 'makar';
+    var tot = Math.round(Number(a.total)), sc = Math.round(Number(a.score));
+    if (!(tot >= 1 && tot <= (isGame ? 60 : 20) && sc >= 0 && sc <= tot)) fail('Странный результат.');
+    if (!isGame && (raw.quiz || []).filter(function (r) { return r.quiz === a.quiz && r.name === a.me; }).length >= 3) fail('Все три попытки уже использованы.');
+    var rec = { name: a.me, quiz: a.quiz, score: sc, total: tot, at: new Date().toISOString() };
+    (raw.quiz = raw.quiz || []).push(rec);
+    changes.push({ sheet: 'quiz', append: true, values: rec });
+  } else if (a.type === 'claimHost') {
+    var hs = Number(a.slot), byS = hostSlots_(raw);
+    if (!(hs >= 1 && hs <= HOSTS_N)) fail('Нет такого места ведущего.');
+    if (byS[hs]) fail('Это место уже занято. Если оно твоё, введи кодовое слово.');
+    var nick = String(a.nick || '').trim().slice(0, 30), hkey = String(a.hkey || '').trim();
+    if (!nick) fail('Напиши свой ник.');
+    if (hkey.length < 4) fail('Кодовое слово: хотя бы 4 символа.');
+    if (tgG) fail('Этот Telegram уже привязан к гостю «' + tgG.name + '».');
+    if (tg && hostOf_(raw, 0, '', tg)) fail('Этот Telegram уже привязан к другому ведущему.');
+    var hrec = { slot: hs, nick: nick, key: hkey, tgId: tg ? String(tg.id) : '', tg: tg && tg.username ? '@' + tg.username : '', at: new Date().toISOString() };
+    (raw.hosts = raw.hosts || []).push(hrec);
+    changes.push({ sheet: 'hosts', append: true, values: hrec });
+  } else if (a.type === 'hostNote') {
+    var hh = tgG ? null : hostOf_(raw, a.host, a.hkey, tg);
+    if (!hh) fail('Нужно войти как ведущий.');
+    if (!raw.guests.some(function (x) { return x.name === a.name; })) fail('Нет такого игрока.');
+    var nrow = (raw.hostNotes = raw.hostNotes || []).filter(function (r) { return Number(r.slot) === Number(hh.slot) && r.name === a.name; })[0];
+    var ntext = a.text == null ? null : String(a.text).slice(0, 1000), nmark = a.mark == null ? null : String(a.mark).replace(/[^★✓]/g, '');
+    var nat = new Date().toISOString();
+    if (nrow) {
+      if (ntext != null) { nrow.text = ntext; changes.push({ sheet: 'hostNotes', row: nrow._row, field: 'text', value: ntext }); }
+      if (nmark != null) { nrow.mark = nmark; changes.push({ sheet: 'hostNotes', row: nrow._row, field: 'mark', value: nmark }); }
+      changes.push({ sheet: 'hostNotes', row: nrow._row, field: 'at', value: nat });
+    } else {
+      var nrec = { slot: Number(hh.slot), nick: String(hh.nick || ''), name: a.name, text: ntext || '', mark: nmark || '', at: nat };
+      raw.hostNotes.push(nrec);
+      changes.push({ sheet: 'hostNotes', append: true, values: nrec });
+    }
+  } else if (a.type === 'setStatus') {
+    if (!acc.admin) fail('Нужен код организатора.');
+    var g = raw.guests.filter(function (x) { return x.name === a.name; })[0];
+    if (!g) fail('Нет такого гостя.');
+    g.status = a.status;
+    changes.push({ sheet: 'guests', row: g._row, field: 'status', value: a.status });
+  } else fail('Неизвестное действие.');
+  return changes;
+}
+
+</script>
+<script>
+(function(){
+var DN={'Пт':'Пятница','Сб':'Суббота','Вс':'Воскресенье'};
+var DC={'Пт':'var(--d1)','Сб':'var(--d2)','Вс':'var(--d3)'};
+var LS={get:function(k){try{return localStorage.getItem('chembalo.'+k)||''}catch(e){return ''}},
+        set:function(k,v){try{v?localStorage.setItem('chembalo.'+k,v):localStorage.removeItem('chembalo.'+k)}catch(e){}}};
+var TG=(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData)?Telegram.WebApp:null;
+if(TG){ try{ TG.ready(); TG.expand(); }catch(e){} }
+function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-theme',TG.colorScheme==='dark'?'dark':'light');
+  var cs=getComputedStyle(document.documentElement); try{ TG.setHeaderColor(cs.getPropertyValue('--top-bg').trim()); TG.setBackgroundColor(cs.getPropertyValue('--paper').trim()); TG.setBottomBarColor&&TG.setBottomBarColor(cs.getPropertyValue('--surface').trim()); }catch(e){} }
+if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
+function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
+
+var S={openNews:{},openDays:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
+       selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms',
+       visitor:LS.get('visitor')==='1',host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
+var demoRaw=null;
+if(CONFIG.demo){ demoRaw=CONFIG.demo; try{var saved=localStorage.getItem('chembalo.demoRaw2'); if(saved) demoRaw=JSON.parse(saved);}catch(e){} }
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var $app=document.getElementById('app');
+
+/* ---------- данные ---------- */
+function api(action){
+  if(demoRaw){
+    return new Promise(function(res,rej){
+      try{
+        if(action){ applyAction(demoRaw,Object.assign({me:S.me,code:S.code,host:S.host,hkey:S.hostKey},action),S.code); try{localStorage.setItem('chembalo.demoRaw2',JSON.stringify(demoRaw))}catch(e){} }
+        res(buildPayload(demoRaw,{me:S.me,code:S.code,as:S.viewAs,host:S.host,hkey:S.hostKey}));
+      }catch(e){rej(e)}
+    });
+  }
+  var req = action
+    ? fetch(CONFIG.api,{method:'POST',body:JSON.stringify(Object.assign({me:S.me,code:S.code,host:S.host,hkey:S.hostKey,tg:TG?TG.initData:''},action))})
+    : fetch(CONFIG.api+'?me='+encodeURIComponent(S.me)+'&code='+encodeURIComponent(S.code)+(S.viewAs?'&as='+encodeURIComponent(S.viewAs):'')+(S.host?'&host='+encodeURIComponent(S.host)+'&hkey='+encodeURIComponent(S.hostKey):'')+(TG?'&tg='+encodeURIComponent(TG.initData):''));
+  return req.then(function(r){return r.json()}).then(function(j){ if(!j.ok) throw new Error(j.error); return j.data; });
+}
+function cacheKey(){ return 'cache.'+(TG&&TG.initDataUnsafe&&TG.initDataUnsafe.user?TG.initDataUnsafe.user.id:(S.host?'host'+S.host:(S.me||'anon'))); }
+function accept(d){ S.data=d; if(d.viewAs) return;
+  if(S.host&&!d.host){ S.host=''; S.hostKey=''; LS.set('host',''); LS.set('hkey',''); }
+  if(d.tg) S.me=d.me; else if(S.me && d.me!==S.me){S.me='';LS.set('me','')}
+  if(!demoRaw){ try{ localStorage.setItem('chembalo.'+cacheKey(), JSON.stringify(d)) }catch(e){} } }
+function who(){ return S.data&&S.data.viewAs ? S.data.viewAs : S.me; }
+function load(){
+  // каждый запрос получает номер: опоздавший старый ответ не затирает более новый (например, вход в аккаунт Макара)
+  var my=S.reqId=(S.reqId||0)+1;
+  S.syncing=true; if(S.data) render();
+  return api().then(function(d){ if(my!==S.reqId) return; S.syncing=false; S.switching=''; accept(d); render(); })
+    .catch(function(e){ if(my!==S.reqId) return; S.syncing=false; if(S.switching){ S.switching=''; S.viewAs=S.prevViewAs||''; }
+      if(!S.data){$app.innerHTML='<div class="loading">Не получилось загрузить данные.<br><span class="small muted">'+esc(e.message)+'</span><br><br><button class="btn" data-act="reload">Попробовать ещё раз</button></div>'}
+      else { render(); toast('Нет связи, показываю сохранённое'); } });
+}
+function act(a,okMsg){
+  if(S.busy) return;
+  if(S.data&&S.data.viewAs){ toast('Это просмотр глазами гостя, изменения отключены'); return; } S.busy=true; render();
+  api(a).then(function(d){accept(d); haptic('success'); if(okMsg) toast(okMsg);}).catch(function(e){haptic('error'); toast(e.message)})
+    .then(function(){S.busy=false; render();});
+}
+var toastT;
+function toast(m){var t=document.querySelector('.toast'); if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)} t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){t.hidden=true},3000);}
+
+/* ---------- время ---------- */
+function dt(day,hm){var d=S.data.dates[day]; if(!d||!hm) return null; var p=d.split('.'), t=hm.split(':'); return new Date(+p[2],+p[1]-1,+p[0],+t[0],+t[1]);}
+function events(){
+  return S.data.schedule.map(function(e){
+    var a=dt(e.day,e.start), b=dt(e.day,e.end);
+    if(!a&&b) a=new Date(b.getTime()-30*60000);
+    if(a&&!b) b=new Date(a.getTime()+3*3600000);
+    if(a&&b&&b<=a) b=new Date(b.getTime()+86400000);
+    return Object.assign({},e,{a:a,b:b});
+  }).filter(function(e){return e.a});
+}
+function plural(n,f){var m=n%10,h=n%100; return n+' '+(m==1&&h!=11?f[0]:(m>=2&&m<=4&&(h<10||h>=20)?f[1]:f[2]));}
+function nowLine(){
+  var ev=events(), now=new Date(); if(!ev.length) return '';
+  var first=ev.reduce(function(m,e){return e.a<m?e.a:m},ev[0].a), last=ev.reduce(function(m,e){return e.b>m?e.b:m},ev[0].b);
+  if(now<first){ var ms=first-now, d=Math.floor(ms/86400000), h=Math.floor(ms%86400000/3600000);
+    return 'до заезда<b>'+(d?plural(d,['день','дня','дней']):plural(h,['час','часа','часов']))+'</b>'; }
+  if(now>last) return '<b>Спасибо, что были!</b>';
+  var cur=ev.filter(function(e){return e.a<=now&&now<e.b}).map(function(e){return e.title});
+  var nx=ev.filter(function(e){return e.a>now}).sort(function(x,y){return x.a-y.a})[0];
+  return 'сейчас<b>'+esc(cur.join(' · ')||'свободное время')+'</b>'+(nx?'дальше: '+esc(nx.title)+' в '+esc(nx.start):'');
+}
+function isToday(day){ var d=S.data.dates[day]; if(!d) return false; var p=d.split('.'), n=new Date(); return +p[0]===n.getDate()&&+p[1]===n.getMonth()+1&&+p[2]===n.getFullYear(); }
+function isNow(e){var x=events().filter(function(v){return v.day===e.day&&v.start===e.start&&v.title===e.title})[0]; var n=new Date(); return x&&x.a<=n&&n<x.b;}
+
+/* ---------- кусочки ---------- */
+var I={
+  me:'<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"/>',
+  plan:'<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  people:'<circle cx="9" cy="8.5" r="3.2"/><path d="M3 20c.6-3.6 3-5.5 6-5.5s5.4 1.9 6 5.5"/><path d="M15.5 5.6a3 3 0 1 1 1.6 5.6M17.5 14.6c1.9.6 3.1 2.4 3.5 5.4"/>',
+  home:'<path d="M4 20V9l4-3v3l4-3 4 3V6l4 3v11z"/><path d="M10 20v-5h4v5"/>',
+  road:'<path d="M5 17h14l-1.5-6.5a2 2 0 0 0-2-1.5h-7a2 2 0 0 0-2 1.5z"/><circle cx="8" cy="17.5" r="1.8"/><circle cx="16" cy="17.5" r="1.8"/>',
+  admin:'<path d="M6 21V4M6 4h11l-2.5 4L17 12H6"/>',
+  tg:'<path d="M21 4L3 11l5.5 2L18 7l-7.5 7.5L17 20z"/>',
+  phone:'<path d="M6.5 3.5l3 .5 1.5 4-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2 4 1.5.5 3c-.2 1.2-1.3 2-2.5 2C10.5 19.5 4.5 13.5 4.5 6c0-1.2.8-2.3 2-2.5z"/>'
+};
+function icon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">'+I[n]+'</svg>'}
+function guest(n){return S.data.guests.filter(function(g){return g.name===n})[0]||{name:n}}
+function avatar(n,cls){
+  var g=guest(n), src=g.avatar||(CONFIG.avatarDir?CONFIG.avatarDir+encodeURIComponent(n)+'.jpg'+(CONFIG.av&&CONFIG.av[n]?'?v='+CONFIG.av[n]:''):'');
+  return '<span class="av '+(cls||'')+'" data-name="'+esc(n||'')+'" aria-hidden="true"><span>'+esc((n||'?').charAt(0))+'</span>'+(src?'<i class="ph"><img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></i>':'')+'</span>';
+}
+function askLb(row){
+  var t=(S.data.myTasks||[]).filter(function(x){return x.row===row})[0]; if(!t) return;
+  var d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Вопрос про задачу');
+  d.innerHTML='<b>Поможешь с этим?</b><span class="r">'+esc(t.task)+' · '+esc(DN[t.day]||t.day)+(t.time?', '+esc(t.time):'')+'</span>'+
+    '<div class="acts"><button class="go yes" data-act="answer" data-row="'+row+'" data-ans="yes">Да, помогу</button><button class="go" data-act="answer" data-row="'+row+'" data-ans="no">Не смогу</button></div>';
+  document.body.appendChild(d);
+}
+
+/* ---------- викторины ---------- */
+var HIST=[
+ {q:'Где стоит крепость Чембало?',a:['Над Балаклавской бухтой','В Судаке','В Феодосии','В Ялте'],e:'Чембало стоит на горе Кастрон (Крепостной) над Балаклавской бухтой, сейчас это часть Севастополя. В Судаке и Феодосии тоже были генуэзские крепости: Солдайя и Кафа.'},
+ {q:'Кто построил крепость в том виде, в каком она дошла до нас?',a:['Генуэзцы','Венецианцы','Византийцы','Османы'],e:'Крепость построила Генуэзская республика, скорее всего на месте более раннего византийского укрепления.'},
+ {q:'В каком веке генуэзцы обосновались в Чембало?',a:['В XIV веке','В XII веке','В XVI веке','В X веке'],e:'Генуэзцы закрепились здесь в середине XIV века, примерно в 1340-1350-х годах.'},
+ {q:'Откуда взялось название «Чембало»?',a:['От греческого названия бухты, Символон','От музыкального инструмента','От имени первого консула','От татарского «каменная гора»'],e:'Греки называли бухту Символон (Символон-Лимен), генуэзцы переделали это на итальянский лад в Чембало.'},
+ {q:'Как называлась верхняя часть крепости, где стоял замок консула?',a:['Город святого Николая','Город святого Георгия','Город святого Марка','Город святого Петра'],e:'Наверху, на скале, был город святого Николая с замком консула. Внизу, у бухты, был город святого Георгия, где жили ремесленники и рыбаки.'},
+ {q:'На какой срок назначали консула Чембало?',a:['На один год','Пожизненно','На пять лет','Пока не женится'],e:'Консула присылали из Генуи на один год. Частая смена должна была мешать казнокрадству.'},
+ {q:'Кому досталась крепость после восстания 1433 года?',a:['Княжеству Феодоро','Золотой Орде','Венеции','Османам'],e:'В 1433 году жители восстали, и крепость перешла к соседнему греческому княжеству Феодоро.'},
+ {q:'Как генуэзцы в 1434 году вернули крепость?',a:['Перерубили цепь на входе в бухту и пошли на штурм','Подкупили стражу','Взяли город измором','Выменяли на вино'],e:'Генуя прислала эскадру с войском около шести тысяч человек. Вход в бухту перегораживала цепь, её перерубили и штурмом взяли крепость.'},
+ {q:'Кто захватил Чембало в 1475 году?',a:['Османы','Феодориты','Венецианцы','Русские'],e:'В 1475 году Османская империя захватила все генуэзские колонии в Крыму, включая Чембало.'},
+ {q:'Что означает турецкое название «Балаклава»?',a:['«Рыбье гнездо»','«Каменная гавань»','«Тихая бухта»','«Город на скале»'],e:'При османах место называли Балык-юва, «рыбье гнездо». Отсюда и Балаклава.'},
+ {q:'Что изображено на флаге Генуи?',a:['Красный крест на белом поле','Золотой лев на синем','Белый орёл на красном','Три башни'],e:'Флаг Генуи: красный крест святого Георгия на белом поле. Такой же крест археологи нашли на гербе в Чембало.'},
+ {q:'Какой город был главным центром генуэзцев в Крыму?',a:['Кафа (нынешняя Феодосия)','Чембало','Солдайя (нынешний Судак)','Херсонес'],e:'Главным портом и центром управления генуэзских владений в Крыму была Кафа. Чембало был её западным форпостом.'},
+ {q:'Как генуэзцы называли Судак?',a:['Солдайя','Каламита','Кафа','Чембало'],e:'Генуэзская крепость в Судаке называлась Солдайя. Каламита была крепостью княжества Феодоро, там, где сейчас Инкерман.'},
+ {q:'Где была столица княжества Феодоро?',a:['На горе Мангуп','В Бахчисарае','В Херсонесе','В Кафе'],e:'Столица Феодоро, город Дорос (Феодоро), стояла на горе Мангуп, недалеко от нынешнего Бахчисарая.'},
+ {q:'Какой князь Феодоро поддержал восстание в Чембало в 1433 году?',a:['Алексей','Исаак','Дмитрий','Константин'],e:'Восстание греков в Чембало в 1433 году поддержал феодоритский князь Алексей, и крепость на время перешла к Феодоро.'},
+ {q:'Кому Генуя в 1453 году передала управление своими крымскими владениями?',a:['Банку святого Георгия','Ордену тамплиеров','Папе Римскому','Венеции'],e:'В 1453 году республика передала управление Газарией, своими владениями в Крыму, Банку святого Георгия. Это был могущественный генуэзский банк, по сути государство в государстве.'},
+ {q:'После падения какого города в 1453 году генуэзским колониям стало трудно держать связь с Генуей?',a:['Константинополя','Рима','Венеции','Трапезунда'],e:'В 1453 году османы взяли Константинополь и стали хозяевами проливов, через которые шёл весь путь из Генуи в Чёрное море.'},
+ {q:'С осадой какого крымского города связывают приход «Чёрной смерти» в Европу?',a:['Кафы','Чембало','Солдайи','Херсонеса'],e:'Войско Джанибека осаждало Кафу, и, по рассказам современников, через стены перебрасывали тела умерших от чумы. Считается, что оттуда чума попала в Европу в 1347 году.'},
+ {q:'Что, кроме Чембало, османы взяли в Крыму в 1475 году?',a:['Кафу и Мангуп','Константинополь','Венецию','Только Солдайю, остальное устояло'],e:'В 1475 году османы сначала взяли Кафу, а в декабре пал и Мангуп, столица Феодоро. Генуэзскому Крыму пришёл конец.'},
+ {q:'Какое знаменитое сражение прошло у Балаклавы в 1854 году?',a:['Балаклавское сражение с «атакой лёгкой бригады»','Полтавская битва','Бородинское сражение','Чесменское сражение'],e:'25 октября 1854 года, во время Крымской войны, у Балаклавы случилась знаменитая и гибельная атака британской лёгкой кавалерии.'},
+ {q:'Кто написал «Листригонов», рассказы о балаклавских рыбаках?',a:['Александр Куприн','Антон Чехов','Александр Грин','Константин Паустовский'],e:'Куприн жил в Балаклаве и назвал местных рыбаков листригонами, в честь великанов из «Одиссеи».'},
+ {q:'С какой гаванью из «Одиссеи» по одной из версий связывают Балаклавскую бухту?',a:['С гаванью лестригонов','С Итакой','С островом Цирцеи','С островом циклопов'],e:'Есть версия, что именно Балаклавскую бухту Гомер описал как гавань лестригонов, великанов-людоедов. Тогда это было бы самое раннее упоминание Крыма в литературе.'},
+ {q:'Почему в XX веке археологи долго почти не изучали Чембало?',a:['Балаклава была закрытым городом с секретной базой подводных лодок','Крепость затопило море','Её считали выдумкой','Раскопки запрещала церковь'],e:'В советское время Балаклава была закрытой: там стояла секретная база подводных лодок. Большие раскопки начались только около 2000 года.'}
+];
+var Q=null;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function cap(s){s=String(s||'').trim();return s.charAt(0).toUpperCase()+s.slice(1)}
+function firstSentence(s){var t=String(s||''), out='', re=/[^.!?]+[.!?]*\s*/g, m; while((m=re.exec(t))&&out.length<60){out+=m[0]} return out.trim()}
+// пол роли: варианты ответа подбираются того же пола (Маня играет мужчину, поэтому её имя идёт среди мужских ролей)
+var ROLE_F=['Монашка Акулина','Диана Йеремия','Аделина','Матильда Вольтер','Роза Грубер','Галатея Руссо','Марла Зингер','Джулия Грубер','Далила Тони','Гаянэ Исхаки','Динара Карагунис','Миледи Айя','Отшельница Хани'];
+var ROLE_M=['Геракл Майкон','Родриго Сакки','Август Конигула','Ганнибал Вектор','Аким Ким','Абрам Херес','Хамон Херес','Сулейман Бакарра','Фредерик Вольтер','Епископ Антуан','Персей Майкон','Чезаре Пранделли'];
+function roleSex(c){c=String(c||'').trim(); return ROLE_F.indexOf(c)>=0?'f':ROLE_M.indexOf(c)>=0?'m':'';}
+function rolesQuiz(){
+  var gs=S.data.guests.filter(function(g){return g.character&&g.about&&!g.shared});
+  var pick=shuffle(gs).slice(0,Math.min(10,gs.length));
+  return pick.map(function(g,i){
+    var same=gs.filter(function(x){return x!==g&&roleSex(x.character)===roleSex(g.character)});
+    var others=shuffle(roleSex(g.character)&&same.length>=3?same:gs.filter(function(x){return x!==g})).slice(0,3), t=i%3;
+    var reveal='<b>'+esc(g.character)+'</b>, играет '+(g.name===S.me?'ты':'<b>'+esc(g.name)+'</b>')+'.';
+    if(t===0) return {q:'Кто это?',quote:cap(firstSentence(g.about)),opts:shuffle([g].concat(others)).map(function(x){return {html:esc(x.character),ok:x===g}}),e:reveal};
+    if(t===1) return {q:'Кто играет роль «'+esc(g.character)+'»?',opts:shuffle([g].concat(others)).map(function(x){return {html:avatar(x.name,'sm')+esc(x.name),ok:x===g}}),e:reveal};
+    return {q:g.name===S.me?'Кого играешь ты?':'Кого играет '+esc(g.name)+'?',who:g.name,opts:shuffle([g].concat(others)).map(function(x){return {html:esc(x.character),ok:x===g}}),e:reveal};
+  });
+}
+function histQuiz(){
+  return shuffle(HIST).slice(0,10).map(function(h){return {q:esc(h.q),opts:shuffle(h.a.map(function(a,i){return {html:esc(a),ok:i===0}})),e:esc(h.e)}});
+}
+var QT={roles:'Жители крепости',history:'История Чембало',makar:'Всем мешать'};
+function quizStart(kind){
+  var qs=kind==='roles'?rolesQuiz():histQuiz(); if(qs.length<4){toast('Пока мало ролей для викторины');return;}
+  var free=!S.me||!!(S.data&&S.data.viewAs);
+  if(!free&&quizLeft(kind)<=0){ toast('Попытки закончились'); return; }
+  if(free&&quizGated(kind)){ toast('Сначала используй свои попытки'); return; }
+  Q={kind:kind,qs:qs,i:0,score:0,picked:-1,done:false,free:free};
+  if(!free) try{localStorage.setItem('chembalo.qzrun',JSON.stringify({me:S.me,kind:kind,score:0,total:qs.length}))}catch(e){}
+  var el=document.getElementById('qz'); if(!el){el=document.createElement('div');el.id='qz';el.className='qz';el.setAttribute('role','dialog');document.body.appendChild(el);}
+  document.body.style.overflow='hidden'; quizRender();
+}
+var QMAX=3;
+function quizLeft(kind){ var m=(S.data.quizMine||{})[kind]||0; return Math.max(0,QMAX-m); }
+// под чужим аккаунтом (Макар) викторину можно проходить без счёта, но только когда свои попытки уже кончились
+function realLeft(kind){ var m=(S.data.quizReal||{})[kind]||0; return Math.max(0,QMAX-m); }
+function viewingShared(){ var d=S.data; return !!(d&&d.viewAs&&guest(d.viewAs).shared); }
+function quizGated(kind){ return viewingShared()&&realLeft(kind)>0&&!(S.data.quizPerfect||{})[kind]; }
+function sharedName(){ var g=(S.data.guests||[]).filter(function(x){return x.shared})[0]; return g?g.name:''; }
+function quizSave(){ if(!Q||Q.saved) return; Q.saved=true; try{localStorage.removeItem('chembalo.qzrun')}catch(e){}
+  if(S.me&&!(S.data&&S.data.viewAs)) Q.savePromise=api({type:'quizResult',quiz:Q.kind,score:Q.score,total:Q.qs.length}).then(function(d){accept(d); render();}).catch(function(e){toast(e.message)}); }
+function askConfirm(msg,cb){ if(TG&&TG.showConfirm){ try{ TG.showConfirm(msg,function(ok){ if(ok) cb(); }); return; }catch(e){} } if(window.confirm(msg)) cb(); }
+function quizClose(force){
+  if(Q&&!Q.done&&!force&&!Q.free){ askConfirm('Если выйти сейчас, попытка засчитается с текущим счётом ('+Q.score+'). Выйти?',function(){ quizSave(); quizClose(true); }); return; }
+  var el=document.getElementById('qz'); if(el) el.remove(); document.body.style.overflow=''; Q=null; render();}
+// незаконченная попытка (приложение закрыли посреди викторины) засчитывается при следующем входе
+function quizRecover(){ var r=null; try{ r=JSON.parse(localStorage.getItem('chembalo.qzrun')||'null'); }catch(e){} if(!r||!S.me||r.me!==S.me) return;
+  try{localStorage.removeItem('chembalo.qzrun')}catch(e){}
+  api({type:'quizResult',quiz:r.kind,score:r.score,total:r.total}).then(function(d){accept(d); render(); toast('Незаконченная попытка засчитана: '+r.score+' из '+r.total);}).catch(function(){}); }
+function quizRender(){
+  var el=document.getElementById('qz'); if(!el||!Q) return;
+  var head='<div class="bar"><span class="eyebrow">'+QT[Q.kind]+'</span><button class="x" data-act="qzclose">Закрыть</button></div>';
+  if(Q.done){
+    var n=Q.qs.length, s=Q.score, phrase=s===n?'Безупречно! Ты знаешь крепость как свои пять пальцев.':s>=n*0.7?'Отлично! Консул тобой доволен.':s>=n*0.4?'Неплохо, но стражник у ворот знает больше.':'Похоже, ты только что прибыл в город. Попробуй ещё раз!';
+    el.innerHTML='<div class="in">'+head+'<p class="center muted">Твой результат</p><div class="score">'+s+' / '+n+'</div><p class="center">'+phrase+'</p>'+
+      '<p class="center small muted">'+(Q.free?(S.visitor&&!S.me?'Гостевой вход: результат не сохраняется, проходи сколько хочешь.':'Это просмотр без своего аккаунта, результат не сохраняется.'):'Лучший результат из трёх попыток попадёт в таблицу знатоков на вкладке «Роли».')+'</p>'+
+      (Q.free||quizLeft(Q.kind)-1>0?'<button class="btn" data-act="qzstart" data-kind="'+Q.kind+'">Пройти ещё раз'+(Q.free?'':quizLeft(Q.kind)-1===1?' (последняя попытка)':' (осталось '+(quizLeft(Q.kind)-1)+')')+'</button>':'<p class="center small">Все попытки использованы.</p>')+
+      (!Q.free&&sharedName()&&(s===n||quizLeft(Q.kind)-1<=0)?'<div class="note" style="display:grid;gap:8px">'+(s===n?'Идеально! ':'')+'Хочется пройти ещё? Загляни в аккаунт '+esc(sharedName())+'а: там викторину можно проходить сколько угодно, только не в зачёт.<button class="btn sm" style="justify-self:start" data-act="qzmakar">Зайти под '+esc(sharedName())+'ом</button></div>':'')+
+      '<button class="btn ghost" data-act="qzclose">Готово</button></div>';
+    el.scrollTop=0; return;
+  }
+  var q=Q.qs[Q.i], ans=Q.picked>=0;
+  el.innerHTML='<div class="in">'+head+'<div class="prog" aria-hidden="true"><i style="width:'+Math.round(Q.i/Q.qs.length*100)+'%"></i></div>'+
+    '<span class="small muted">Вопрос '+(Q.i+1)+' из '+Q.qs.length+'</span><h2>'+q.q+'</h2>'+
+    (q.quote?'<div class="quote">'+esc(q.quote)+'</div>':'')+(q.who?'<div class="who">'+avatar(q.who,'xl')+'</div>':'')+
+    '<div class="opts">'+q.opts.map(function(o,k){var c=ans?(o.ok?' ok':(k===Q.picked?' bad':'')):''; return '<button class="opt'+c+'" data-act="qzpick" data-k="'+k+'"'+(ans?' disabled':'')+'>'+o.html+'</button>'}).join('')+'</div>'+
+    (ans?'<p class="expl">'+(q.opts[Q.picked].ok?'<b>Верно!</b> ':'<b>Мимо.</b> ')+q.e+'</p><button class="btn" data-act="qznext">'+(Q.i+1<Q.qs.length?'Дальше':'Узнать результат')+'</button>':'')+
+    '</div>';
+}
+function quizPick(k){ if(!Q||Q.picked>=0) return; Q.picked=k; if(Q.qs[Q.i].opts[k].ok){Q.score++; haptic('success');} else haptic('error');
+  if(!Q.free) try{localStorage.setItem('chembalo.qzrun',JSON.stringify({me:S.me,kind:Q.kind,score:Q.score,total:Q.qs.length}))}catch(e){}
+  quizRender(); }
+function quizNext(){
+  if(!Q) return; Q.i++; Q.picked=-1;
+  if(Q.i>=Q.qs.length){ Q.done=true; quizRender(); if(!Q.free) quizSave(); return; }
+  quizRender(); var el=document.getElementById('qz'); if(el) el.scrollTop=0;
+}
+// пульсирующая кнопка на вкладке «Я», пока у гостя остались попытки
+function quizCta(){
+  var d=S.data;
+  if(viewingShared()) return '<button class="qcta" data-act="mgplay"><span class="ic">🍗</span><span><b>Всем мешать!</b><span class="small">Мини-игра за Макара: ползи по столу и сбрасывай всё подряд, пока гости не поймали</span></span><span class="go">›</span></button>';
+  if(!S.me||d.viewAs||!d.quizMine) return '';
+  var left=['roles','history'].reduce(function(n,k){return n+quizLeft(k)},0); if(!left) return '';
+  var fresh=left===QMAX*2;
+  return '<button class="qcta" data-act="qzgo"><span class="ic">?</span><span><b>'+(fresh?'Испытай себя!':'Викторины ждут')+'</b><span class="small">'+(fresh?'Две викторины о крепости: кто есть кто и настоящая история Чембало':'Осталось попыток: '+left+'. Попробуй побить рекорд')+'</span></span><span class="go">›</span></button>';
+}
+// мини-игра грузится отдельным файлом только при нажатии
+var MG_IMG={bg1:'bg1.jpg',bg2:'bg2.jpg'};
+function playMakar(){
+  var run=function(){ MakarGame.open({asset:function(n){return 'game/'+(MG_IMG[n]||n+'.png')+'?v='+(CONFIG.build||'')},
+    onEnd:function(s){ var me=S.me; if(!me||demoRaw&&!S.me) return; api({type:'quizResult',quiz:'makar',score:Math.min(60,s),total:60}).then(function(){ return load(); }).catch(function(){}); }}); };
+  if(window.MakarGame) return run();
+  var sc=document.createElement('script'); sc.src='game/makar.js?v='+(CONFIG.build||''); sc.onload=run; sc.onerror=function(){toast('Не получилось загрузить игру')}; document.head.appendChild(sc);
+}
+function totalCard(full){
+  var d=S.data, T=d.quizTotal; if(!T||!T.length) return '';
+  var G=d.quizGames||['roles','history'], max=G.length*10, mine=T.filter(function(x){return x.name===S.me})[0], top=full?T:T.slice(0,5);
+  var fmt=function(v){return String(v).replace('.',',')};
+  var row=function(x,i){ return '<div class="'+(x.name===S.me?'me':'')+'"><span>'+(i+1)+'. '+(x.name===S.me?'ты':pn(x.name))+'</span><span>'+fmt(x.pts)+' / '+max+(full?' <span class="muted small">('+G.map(function(k){return x.parts[k]!=null?fmt(x.parts[k]):'–'}).join(' + ')+')</span>':'')+'</span></div>'; };
+  return '<div class="card qcard"><div><span class="eyebrow">общий зачёт</span><h3>Знатоки крепости</h3></div>'+
+    '<p class="small muted">Складываются лучшие результаты во всех викторинах и играх'+(full?' ('+G.map(function(k){return QT[k]||k}).join(' + ')+')':'')+', каждая из 10 баллов.</p>'+
+    '<div class="lead">'+top.map(row).join('')+(mine&&top.indexOf(mine)<0?row(mine,T.indexOf(mine)):'')+'</div></div>';
+}
+function quizCard(){
+  var d=S.data, Z=d.quiz||{};
+  var leftAll=['roles','history'].reduce(function(n,k){return n+quizLeft(k)},0), free=!S.me||!!d.viewAs;
+  var sub='Кто есть кто и настоящая история Чембало';
+  return '<div class="quizzes">'+totalCard()+'<details class="card qgroup"'+(S.openQuiz?' open':'')+'><summary><span><span class="eyebrow">испытай себя</span><b>Викторины</b><span class="small muted">'+sub+'</span></span></summary><div class="qlist">'+['roles','history'].map(function(k){
+    var L=Z[k]||[], mine=L.filter(function(x){return x.name===S.me})[0], top=L.slice(0,5);
+    var left=quizLeft(k), free=!S.me||!!d.viewAs;
+    var btn=free?(quizGated(k)?'<span class="small muted">сначала свои попытки</span>':'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">Пройти</button>'):left>0?'<button class="btn sm" data-act="qzstart" data-kind="'+k+'">'+(left===QMAX?'Пройти':'Ещё раз')+'</button>':'<span class="small muted">попытки кончились</span>';
+    return '<div class="qcard qitem"><div class="qtop"><div><span class="eyebrow">'+(free?(quizGated(k)?'не в зачёт':'без ограничений, не в зачёт'):left===QMAX?QMAX+' попытки':left===1?'осталась 1 попытка':left>1?'осталось '+left+' попытки':'пройдено')+'</span><h3>'+QT[k]+'</h3></div>'+btn+'</div>'+
+      (k==='roles'?'<p class="small muted">Кто есть кто в крепости: роли, описания и кто кого играет.</p>':'<p class="small muted">Настоящая история генуэзской крепости над Балаклавой.</p>')+
+      (S.me&&!d.viewAs?(mine?'<div class="lead"><div class="me"><span>Твой лучший результат</span><span>'+mine.score+' / '+mine.total+'</span></div></div>':'<p class="small muted">Ещё не пройдена.</p>'):'')+
+    '</div>';
+  }).join('')+'</div></details></div>';
+}
+document.addEventListener('toggle',function(e){ if(e.target.classList&&e.target.classList.contains('qgroup')) S.openQuiz=e.target.open; },true);
+function showSwitching(){
+  var o=document.getElementById('switching'); if(!o){ o=document.createElement('div'); o.id='switching'; o.className='lb'; o.style.cursor='progress'; document.body.appendChild(o); }
+  o.innerHTML='<span class="sync" style="width:28px;height:28px;border-width:3px"></span><b>'+(S.switching==='self'?'Возвращаюсь к себе…':guest(S.switching).shared?'Захожу в аккаунт '+esc(S.switching)+(/[бвгджзклмнпрстфхцчшщ]$/i.test(S.switching)?'а':'')+'…':'Смотрю глазами: '+esc(S.switching)+'…')+'</b>';
+}
+function openLb(n){
+  var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
+  d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
+    (S.data&&(S.data.host||(S.visitor&&!S.me))?'':'<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
+    (g.shared&&n!==S.me?'<button class="go" data-act="viewas" data-name="'+esc(n)+'">'+icon('me')+'Зайти в аккаунт</button>':'')+
+    (!g.shared&&g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>');
+  var im=d.querySelector('img'); if(im) im.removeAttribute('loading');
+  document.body.appendChild(d);
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Enter'&&e.target.matches&&e.target.matches('[role=button][data-act]')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape'){ var l=document.querySelector('.lb'); if(l) l.remove(); } });
+function pn(n,label){return '<span class="pn" role="button" tabindex="0" data-act="lb" data-name="'+esc(n)+'">'+(label||esc(n))+'</span>'}
+function pnf(n){return pn(n)}
+function chip(n,note){return '<span class="chip pc'+(n===S.me?' me':'')+'" role="button" tabindex="0" data-act="lb" data-name="'+esc(n)+'">'+(n===S.me?'ты':esc(n))+(note?'<span class="n">'+esc(note)+'</span>':'')+'</span>'}
+function people(list,limit){
+  limit=limit||8;
+  if(!list.length) return '<span class="small muted">пока никого</span>';
+  if(list.length>limit) return '<span class="small muted">почти все</span>';
+  return list.map(function(p){return chip(p.name,p.note)}).join('');
+}
+function roomOf(n){return S.data.rooms.filter(function(r){return r.people.indexOf(n)>=0})[0]}
+function seatOf(n){return S.data.seats.filter(function(s){return s.seat&&s.name===n})[0]}
+function carOf(n){return S.data.cars.filter(function(c){return c.passengers.indexOf(n)>=0})[0]}
+function drives(n){return S.data.cars.filter(function(c){return c.driver===n})}
+function fmtPhone(p){var d=String(p).replace(/\D/g,''); if(d.length===11) return '+'+d[0]+' '+d.slice(1,4)+' '+d.slice(4,7)+'-'+d.slice(7,9)+'-'+d.slice(9); return p;}
+function newsFor(tabName){
+  var list=(S.data.news||[]).filter(function(n){var w=String(n.where||'все').trim().toLowerCase(); return w==='все'||w===String(tabName).toLowerCase();});
+  var top=list.filter(function(n){return n.top}), rest=list.filter(function(n){return !n.top});
+  var f=function(n,soft){
+    var long=n.text&&n.text.length>320;
+    var body=n.text?'<p style="white-space:pre-line">'+linkRoles(n.text)+'</p>':'';
+    if(long) return '<details class="news story"'+(S.openNews[n.title]?' open':'')+' data-news="'+esc(n.title)+'"><summary><b>'+esc(n.title||'Подробнее')+'</b><span class="small" style="opacity:.8">читать</span></summary>'+body+'</details>';
+    return '<div class="news'+(soft?' soft':'')+'">'+(n.title?'<b>'+esc(n.title)+'</b>':'')+body+'</div>'};
+  return {top:top.map(function(n){return f(n)}).join(''), rest:rest.map(function(n){return f(n,true)}).join('')};
+}
+// Упоминания ролей в тексте → «Роль (Имя)» со ссылкой на карточку
+var _roleRx=null, _roleKey='';
+function roleRx(){
+  var gs=(S.data.guests||[]).filter(function(g){return g.character});
+  var key=gs.map(function(g){return g.character+'|'+g.name}).join(';');
+  if(key===_roleKey&&_roleRx) return _roleRx;
+  var parts=gs.map(function(g){
+    var words=g.character.split(/\s+/).map(function(w){ var st=w.length>3?w.replace(/[аяеоуыийь]$/i,''):w; return st.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'[а-яё]*'; });
+    return {g:g, src:words.join('\\s+')};
+  }).sort(function(a,b){return b.src.length-a.src.length});
+  _roleKey=key; _roleRx={list:parts, rx:new RegExp('('+parts.map(function(p){return p.src}).join('|')+')','g')};
+  return _roleRx;
+}
+function linkRoles(text, selfName){
+  var html=esc(text); if(!S.data||!S.data.guests) return html;
+  var R=roleRx(); if(!R.list.length) return html;
+  return html.replace(R.rx,function(m){
+    var hit=R.list.filter(function(p){return new RegExp('^'+p.src+'$').test(m)})[0]; if(!hit) return m;
+    var n=hit.g.name; if(n===selfName) return m;
+    return '<button class="rl" data-act="lb" data-name="'+esc(n)+'">'+m+' ('+(n===S.me?'ты':esc(n))+')</button>';
+  });
+}
+function whenFrom(c){ return esc(c.when)+(c.from?' · '+esc(c.from):''); }
+function tabName(id){var t=S.data.tabs.filter(function(x){return x.id===id})[0]; return t?t.name:id;}
+
+/* ---------- вкладки ---------- */
+function vMe(){
+  var d=S.data;
+  if(!S.me&&S.hostStep) return vHostLogin();
+  if(!S.me){
+    var linkMode=!!d.tg;
+    return '<div class="sub"><span class="eyebrow">добро пожаловать</span><h2 style="font-size:24px;font-weight:800">Кто ты в этой крепости?</h2><p class="muted">'+
+      (linkMode?'Нажми на своё имя. Это нужно один раз: имя привяжется к твоему Telegram.':'Выбери себя один раз: телефон запомнит, и здесь появится всё твоё.')+'</p></div>'+
+      '<div class="pick">'+d.guests.filter(function(g){return !g.shared}).map(function(g){
+        return linkMode
+          ? '<button data-act="link" data-name="'+esc(g.name)+'"'+(g.linked||S.busy?' disabled':'')+'>'+avatar(g.name,'sm')+esc(g.name)+(g.linked?' <span class="small muted">уже вошёл</span>':'')+'</button>'
+          : '<button data-act="me" data-name="'+esc(g.name)+'">'+avatar(g.name,'sm')+esc(g.name)+'</button>';
+      }).join('')+'</div>'+(linkMode?'<p class="small muted">Твоего имени нет или оно занято? Напиши Ксении.</p>':'')+
+      '<div class="hostin" style="display:grid;justify-items:center;gap:4px"><button class="btn ghost" data-act="visitor">'+icon('people')+'Гостевой вход</button><span class="small muted" style="text-align:center">Не из гостей? Здесь можно посмотреть роли и пройти викторины без зачёта.</span></div>'+
+      ((d.hosts||[]).length?'<div class="hostin"><button class="btn ghost" data-act="hostpick">'+icon('people')+'Ведущий квеста</button></div>':'');
+  }
+  var g=guest(S.me), room=roomOf(S.me), seat=seatOf(S.me), car=carOf(S.me), drv=drives(S.me);
+  var mine=d.myProps||[];
+  var f=[];
+  if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(pnf).join(', '):''),'home']);}
+  if(seat){ var nn=S.data.seats.length, sn=function(k){var x=S.data.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name?pn(x.name):'свободно'};
+    f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>','место № '+seat.seat,'feast']); }
+  if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return whenFrom(c)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
+  else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
+  else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
+  var vs=mySlot(); if(vs) f.push([esc(vs.ev.title),esc(vs.slot.time),'группа «'+esc(vs.slot.name)+'»','plan']);
+  if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
+  if(g.pickup) f.push(['Забрать у Ксении','<span style="font-size:16px">'+esc(g.pickup)+'</span>','забери до праздника',null,true]);
+  if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
+  var col=0, facts=f.map(function(x,i){var wide=x[4]||(col===0&&i===f.length-1); col=wide?0:(col+1)%2;
+    return '<div class="fact'+(wide?' wide':'')+'"'+(x[3]?' data-act="goto" data-tab="'+x[3]+'" style="cursor:pointer"':'')+'><span class="k">'+x[0]+'</span><span class="v">'+x[1]+'</span>'+(x[2]?'<span class="s">'+x[2]+'</span>':'')+'</div>';}).join('');
+
+  var tasks=d.myTasks.length? ['Пт','Сб','Вс'].map(function(day){
+    var ts=d.myTasks.filter(function(t){return t.day===day}); if(!ts.length) return '';
+    var teams=d.myTeams.filter(function(t){return t.day===day});
+    var open = day in S.openDays ? S.openDays[day] : isToday(day);
+    return '<details class="day-tasks" data-day="'+day+'"'+(open?' open':'')+'><summary><span class="dayhead" style="margin:0"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></span><span class="small muted">'+plural(ts.length,['задача','задачи','задач'])+'</span></summary><div class="day-body">'+
+      ts.map(function(t){
+        return '<div class="card task"><div class="hd"><span class="g">'+esc(t.guild)+'</span>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><h4>'+esc(t.task)+'</h4>'+
+          (t.myNote?(/\?\s*$/.test(t.myNote)?(t.myNote.replace(/\s*\?+\s*$/,'')?'<div class="mn">Твоё: '+esc(t.myNote.replace(/\s*\?+\s*$/,''))+'</div>':'')+'<button class="ask" data-act="ask" data-row="'+t.row+'"><b>?</b><span>Пока под вопросом. Нажми, чтобы ответить</span></button>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
+          (t.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(t.details)+'</p></details>':'')+
+          (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'')+
+        '</div>';
+      }).join('')+
+      teams.filter(function(t){return t.tasks.length>1}).map(function(t){
+        var n={}; t.tasks.forEach(function(k){ if(k.people.length<=8) k.people.forEach(function(p){n[p.name]=1})});
+        return '<details class="team"><summary><b>'+esc(t.guild)+'</b><span class="small muted">'+plural(Object.keys(n).length,['человек','человека','человек'])+'</span></summary><div class="team-body">'+
+          (t.lead?(t.lead===S.me?'<div class="small"><b>Ты главный.</b></div>':'<div class="small">Главный: <b>'+pn(t.lead)+'</b>. С вопросами к нему.</div>'):'')+
+          t.tasks.map(function(k){return '<div class="row"><span class="t">'+esc(k.task)+(k.time?' · '+esc(k.time):'')+(k.note?' · '+esc(k.note):'')+'</span><div class="chips">'+(k.label&&k.people.length<=8?'<span class="small muted">'+esc(k.label)+'</span>':people(k.people))+'</div>'+(k.details?'<details class="more"><summary>Подробнее</summary><p>'+esc(k.details)+'</p></details>':'')+'</div>'}).join('')+
+        '</div></details>';
+      }).join('')+'</div></details>';
+  }).join('') : '<p class="muted">Задач нет, отдыхай и празднуй.</p>';
+
+  return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role"><button class="rl plain" data-act="lb" data-name="'+esc(S.me)+'">'+esc(g.character)+'</button></div>':'<div class="small muted">'+(g.shared?'тоже '+esc(S.me):'без роли в квесте')+'</div>')+
+      (d.tg||d.viewAs?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+quizCta()+
+    (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+
+    '<div class="facts">'+facts+'</div>'+
+    '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">Открой нужный день. Внутри твои задачи по времени и вся твоя команда.</p></div>'+tasks;
+}
+
+/* ---------- ведущие квеста ---------- */
+function vHostLogin(){
+  var d=S.data, hs=d.hosts||[], st=S.hostStep, back='<button class="link" data-act="hostback">Назад</button>';
+  if(st==='pick') return '<div class="sub"><span class="eyebrow">ведущие квеста</span><h2 style="font-size:24px;font-weight:800">Вход для ведущих</h2><p class="muted">Выбери своё место. Свободное займи, придумав ник и кодовое слово. Если место уже твоё, войди по кодовому слову.</p></div>'+
+    '<div class="hslots">'+hs.map(function(h){ return '<button class="card hslot" data-act="hostslot" data-slot="'+h.slot+'"><b>Ведущий '+h.slot+'</b><span class="small '+(h.taken?'':'muted')+'">'+(h.taken?esc(h.nick):'свободно')+'</span></button>'; }).join('')+'</div>'+back;
+  var h=hs.filter(function(x){return x.slot===st})[0]; if(!h){ S.hostStep='pick'; return vHostLogin(); }
+  if(h.taken) return '<div class="sub"><span class="eyebrow">ведущий '+h.slot+'</span><h2 style="font-size:24px;font-weight:800">'+esc(h.nick)+'</h2><p class="muted">Это место занято. Если оно твоё, введи кодовое слово.</p></div>'+
+    '<form class="codeform" data-form="hostlogin"><input type="password" id="hkeyin" placeholder="Кодовое слово" autocomplete="off" aria-label="Кодовое слово"><button class="btn" type="submit"'+(S.busy?' disabled':'')+'>Войти</button></form>'+back;
+  return '<div class="sub"><span class="eyebrow">ведущий '+h.slot+'</span><h2 style="font-size:24px;font-weight:800">Займи место ведущего</h2></div>'+
+    '<form class="hform" data-form="hostnew"><input type="text" class="tx" id="hnickin" maxlength="30" placeholder="Твой ник" autocomplete="off" aria-label="Ник">'+
+    '<input type="text" class="tx" id="hkeyin" placeholder="Придумай кодовое слово" autocomplete="off" aria-label="Кодовое слово">'+
+    '<p class="note">'+(d.tg?'Место привяжется к твоему аккаунту в Telegram: приложение будет сразу узнавать тебя как ведущего, а выбрать себя среди гостей с этого аккаунта уже не получится. Кодовое слово запомни, по нему можно войти с другого устройства.':'Кодовое слово запомни: по нему ты будешь входить как ведущий.')+'</p>'+
+    '<button class="btn" type="submit"'+(S.busy?' disabled':'')+'>Стать ведущим</button></form>'+back;
+}
+function hostMine(n){ return ((S.data.hostNotes||{})[n]||[]).filter(function(x){return x.mine})[0]||{text:'',mark:''}; }
+function vHost(){
+  var d=S.data, h=d.host, q=(S.hostQ||'').trim().toLowerCase(), F=S.hostF||'';
+  var list=d.guests.filter(function(g){return g.character}).sort(function(a,b){return a.character.localeCompare(b.character,'ru')});
+  var star=function(g){return hostMine(g.name).mark.indexOf('★')>=0}, done=function(g){return hostMine(g.name).mark.indexOf('✓')>=0};
+  var shown=list.filter(function(g){return !q||(g.name+' '+g.character).toLowerCase().indexOf(q)>=0})
+    .filter(function(g){return F==='star'?star(g):F==='todo'?!done(g):true});
+  var flt=[['','Все',list.length],['star','★ Важные',list.filter(star).length],['todo','Без ✓',list.filter(function(g){return !done(g)}).length]];
+  return '<div class="sub"><span class="eyebrow">ведущий '+h.slot+'</span><h2 style="font-size:24px;font-weight:800">'+esc(h.nick)+'</h2><p class="small muted">Все игроки и их роли. Заметки и метки видят только ведущие, у каждого свои.</p></div>'+
+    '<input type="search" id="hq" placeholder="Имя или роль" value="'+esc(S.hostQ||'')+'" aria-label="Поиск по игрокам">'+
+    '<div class="hfilt">'+flt.map(function(f){return '<button class="chip'+(F===f[0]?' me':'')+'" data-act="hostf" data-f="'+f[0]+'" aria-pressed="'+(F===f[0])+'">'+f[1]+' <span class="n">'+f[2]+'</span></button>'}).join('')+'</div>'+
+    '<div class="chars">'+(shown.length?shown.map(function(g){
+      var n=g.name, m=hostMine(n), dr=S.hostDraft[n], val=dr!=null?dr:m.text, others=((d.hostNotes||{})[n]||[]).filter(function(x){return !x.mine});
+      return '<article class="card hcard"><div class="char">'+avatar(n)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(n)+'">'+esc(g.character)+'</button></h3><div class="small"><span class="muted">играет</span> <b>'+esc(n)+'</b></div>'+(g.about?'<p class="about small">'+esc(g.about)+'</p>':'')+'</div></div>'+
+        '<div class="hmarks">'+[['★','★ важно'],['✓','✓ отработан']].map(function(k){var on=m.mark.indexOf(k[0])>=0; return '<button class="chip'+(on?' me':'')+'" data-act="hostmark" data-name="'+esc(n)+'" data-mark="'+k[0]+'" aria-pressed="'+on+'"'+(S.busy?' disabled':'')+'>'+k[1]+'</button>'}).join('')+'</div>'+
+        '<textarea class="hnote" id="hn-'+esc(n)+'" data-name="'+esc(n)+'" rows="2" maxlength="1000" placeholder="Заметка" aria-label="Заметка про '+esc(n)+'">'+esc(val)+'</textarea>'+
+        '<div><button class="btn sm" data-act="hostsave" data-name="'+esc(n)+'"'+(val===m.text||S.busy?' disabled':'')+'>Сохранить</button></div>'+
+        others.map(function(o){return '<p class="small"><b>'+esc(o.nick||('Ведущий '+o.slot))+':</b> '+(o.mark?esc(o.mark)+' ':'')+esc(o.text)+'</p>'}).join('')+
+      '</article>';
+    }).join(''):'<p class="muted">Никого не нашли.</p>')+'</div>'+
+    (d.tg?'':'<div class="foot"><button class="link" data-act="hostout">Выйти из режима ведущего</button></div>');
+}
+function hostSend(a,okMsg,done){
+  if(S.busy) return; S.busy=true; render();
+  api(a).then(function(d){ accept(d); if(done) done(); haptic('success'); if(okMsg) toast(okMsg); }).catch(function(e){ haptic('error'); toast(e.message); })
+    .then(function(){ S.busy=false; render(); });
+}
+
+/* слоты внутри события: комментарий вида «13:00 Церковь: Кирилл, Ксения, Саша», по строке на группу */
+function slotsOf(note){
+  var lines=String(note||'').split(/\n|\s\|\s/).map(function(s){return s.trim()}).filter(Boolean);
+  if(lines.length<2) return null;
+  var out=[];
+  for(var i=0;i<lines.length;i++){
+    var m=lines[i].match(/^(\d{1,2}:\d{2}(?:\s*[–-]\s*\d{1,2}:\d{2})?)\s+([^:]+?):\s*(.*)$/);
+    if(!m) return null;
+    out.push({time:m[1].replace(/\s*[–-]\s*/,'–'), name:m[2].trim(), people:m[3].split(',').map(function(s){return s.trim()}).filter(Boolean)});
+  }
+  return out;
+}
+function isGuest(n){ var k=norm_(n); return (S.data.guests||[]).some(function(g){return norm_(g.name)===k}); }
+function guestName(n){ var k=norm_(n), g=(S.data.guests||[]).filter(function(x){return norm_(x.name)===k})[0]; return g?g.name:n; }
+function mySlot(){
+  if(!S.me) return null; var k=norm_(S.me), res=null;
+  S.data.schedule.forEach(function(e){ var sl=slotsOf(e.note); if(!sl||res) return;
+    sl.forEach(function(s){ if(!res&&s.people.some(function(p){return norm_(p)===k})) res={ev:e,slot:s}; }); });
+  return res;
+}
+function slotsHtml(sl){
+  var k=S.me?norm_(S.me):'';
+  return '<div class="slots">'+sl.map(function(s){
+    var mine=k&&s.people.some(function(p){return norm_(p)===k});
+    var any=s.people.some(isGuest);
+    return '<details class="slot'+(mine?' mine':'')+(any?'':' empty')+'"'+(mine?' open':'')+'><summary><span class="st">'+esc(s.time)+'</span><span>'+esc(s.name)+'</span><span class="small muted cnt">'+(s.people.every(isGuest)?plural(s.people.length,['человек','человека','человек']):esc(s.people.join(', ')))+'</span></summary>'+
+      (s.people.some(isGuest)?'<div class="chips">'+s.people.map(function(p){return isGuest(p)?chip(guestName(p)):'<span class="small muted">'+esc(p)+'</span>'}).join('')+'</div>':'')+'</details>';
+  }).join('')+'</div>';
+}
+
+function vPlan(){
+  var by={}; S.data.schedule.forEach(function(e){(by[e.day]=by[e.day]||[]).push(e)});
+  return '<h2>Три дня в крепости</h2>'+['Пт','Сб','Вс'].map(function(day){
+    if(!by[day]) return '';
+    return '<div class="card day"><div style="background:'+DC[day]+';padding:10px 14px;display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:17px">'+DN[day]+'</b><span class="small">'+esc((S.data.dates[day]||'').slice(0,5))+'</span></div>'+
+      by[day].map(function(e){
+        var tm=e.start&&e.end? e.start+'–'+e.end : (e.start? 'с '+e.start : 'до '+e.end);
+        var sl=slotsOf(e.note);
+        return '<div class="ev'+(isNow(e)?' now':'')+'"><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div>'+(!sl&&e.note?'<div class="small muted">'+esc(e.note)+'</div>':'')+'</div>'+(sl?slotsHtml(sl):'')+'</div>';
+      }).join('')+'</div>';
+  }).join('');
+}
+
+function vPeople(){
+  var q=S.q.trim().toLowerCase();
+  var list=S.data.guests.filter(function(g){return g.character||g.shared}).filter(function(g){return !q||(g.name+' '+g.character+' '+g.about).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return (a.character||a.name).localeCompare(b.character||b.name,'ru')});
+  var vis=S.visitor&&!S.me&&!S.data.access.admin;
+  return '<h2>Роли</h2>'+(vis?'':quizCard())+'<input type="search" id="q" placeholder="Имя, роль или слово из описания" value="'+esc(S.q)+'" aria-label="Поиск по жителям">'+
+    '<div class="chars">'+(list.length? list.map(function(g){
+      return '<article id="char-'+esc(g.name)+'" class="card char'+(g.name===S.me?' me':'')+'">'+avatar(g.name)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(g.name)+'">'+esc(g.character||g.name)+'</button></h3>'+(g.character?'<div class="small"><span class="muted">играет</span> <b>'+(g.name===S.me?'ты':esc(g.name))+'</b></div>':'')+'<p class="about small">'+linkRoles(g.about,g.name)+'</p>'+'</div></article>';
+    }).join('') : '<p class="muted">Никого не нашли.</p>')+'</div>'+(vis?'<div style="margin-top:8px">'+quizCard()+'</div>':'');
+}
+
+var PLAN={
+  2:{vb:'0 0 1070 770',outer:[180,202,872,550],tower:'60,10 233,10 276,53 276,165 233,208 60,208 17,165 17,53',
+     baths:[[265,490,190,110],[465,490,175,110]],
+     rooms:{tower:{poly:'180,202 465,202 465,490 265,490 265,600 180,600',lx:196,ly:250,label:'С БАШНЕЙ'},
+            red:{rect:[465,202,240,288],lx:485,ly:250,label:'КРАСНАЯ'},
+            p3:{rect:[705,202,180,133],lx:722,ly:250,label:'№ 3'},
+            p2:{rect:[885,202,167,218],lx:902,ly:250,label:'№ 2'},
+            p1:{rect:[885,420,167,180],lx:902,ly:468,label:'№ 1'}},
+     extra:[['КОРИДОР',290,690],['САНУЗЕЛ',360,545],['САНУЗЕЛ',552,545]]},
+  3:{vb:'0 0 980 620',outer:[8,5,962,605],
+     baths:[[365,190,103,163]],
+     rooms:{p6:{rect:[13,10,227,138],lx:30,ly:56,label:'№ 6'},
+            p7:{poly:'240,10 460,10 460,190 365,190 365,100 240,100',lx:256,ly:56,label:'№ 7'},
+            p8:{rect:[460,10,265,180],lx:478,ly:56,label:'№ 8'},
+            p10:{rect:[725,10,240,375],lx:742,ly:56,label:'№ 10'},
+            p9:{rect:[725,385,240,220],lx:742,ly:432,label:'№ 9'},
+            p5:{rect:[13,148,207,205],lx:30,ly:195,label:'№ 5'},
+            p4:{rect:[13,353,287,252],lx:30,ly:400,label:'№ 4'}},
+     extra:[['КОРИДОР',535,500],['САНУЗЕЛ',416,272,-90]]}
+};
+function planSvg(fl){
+  var P=PLAN[fl], myRoom=roomOf(S.me), o=P.outer, h='';
+  h+='<rect class="corr" x="'+o[0]+'" y="'+o[1]+'" width="'+o[2]+'" height="'+o[3]+'"/>';
+  P.baths.forEach(function(b){h+='<rect class="bath" x="'+b[0]+'" y="'+b[1]+'" width="'+b[2]+'" height="'+b[3]+'"/>'});
+  P.extra.forEach(function(x){h+='<text class="lbl" text-anchor="middle" dominant-baseline="middle" x="'+x[1]+'" y="'+x[2]+'"'+(x[3]?' transform="rotate('+x[3]+' '+x[1]+' '+x[2]+')"':'')+'>'+x[0]+'</text>'});
+  Object.keys(P.rooms).forEach(function(id){
+    var R=P.rooms[id], room=S.data.rooms.filter(function(r){return r.id===id})[0];
+    var cls='room'+(R.dark?' dark':'')+(myRoom&&myRoom.id===id?' me':'')+(S.selRoom===id&&!(myRoom&&myRoom.id===id)?' sel':'');
+    var shape=R.rect? '<rect class="'+cls+'" data-act="room" data-id="'+id+'" x="'+R.rect[0]+'" y="'+R.rect[1]+'" width="'+R.rect[2]+'" height="'+R.rect[3]+'"><title>'+esc(room?room.name:id)+'</title></rect>'
+                     : '<polygon class="'+cls+'" data-act="room" data-id="'+id+'" points="'+R.poly+'"><title>'+esc(room?room.name:id)+'</title></polygon>';
+    h+='<g>'+shape+'<text x="'+R.lx+'" y="'+R.ly+'">'+R.label+'</text><text class="sub" x="'+R.lx+'" y="'+(R.ly+32)+'">'+(myRoom&&myRoom.id===id?'ты здесь':(room?room.people.length:0)+' чел.')+'</text></g>';
+  });
+  if(P.tower){var tw=P.rooms.tower; h+='<polygon class="room'+(myRoom&&myRoom.id==='tower'?' me':'')+(S.selRoom==='tower'&&!(myRoom&&myRoom.id==='tower')?' sel':'')+'" data-act="room" data-id="tower" points="'+P.tower+'"/><text text-anchor="middle" x="146" y="118">БАШНЯ</text>';}
+  h+='<rect class="wall" x="'+o[0]+'" y="'+o[1]+'" width="'+o[2]+'" height="'+o[3]+'"/>';
+  return '<svg class="plan" viewBox="'+P.vb+'" role="img" aria-label="План '+fl+'-го этажа">'+h+'</svg>';
+}
+
+
+function seatHtml(n){
+  var s=S.data.seats.filter(function(x){return x.seat===n})[0]||{name:''};
+  return '<div class="seat'+(s.name&&s.name===S.me?' me':'')+'"><span class="num"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="var(--shield)" stroke="var(--olive)" stroke-width="6"/></svg><span>'+n+'</span></span><span class="nm">'+(s.name?(s.name===S.me?'ты':pn(s.name)):'<span class="muted">свободно</span>')+'</span></div>';
+}
+function vHome(){
+  var myRoom=roomOf(S.me), seat=seatOf(S.me);
+  var seg='<div class="seg" role="tablist"><button data-act="seg" data-seg="rooms" class="'+(S.homeSeg==='rooms'?'on':'')+'">Расселение</button><button data-act="seg" data-seg="feast" class="'+(S.homeSeg==='feast'?'on':'')+'">Пир</button></div>';
+  if(S.homeSeg==='feast'){
+    if(S.data.seats.length!==25) return seg+'<p class="muted">Схема рассадки появится позже.</p>';
+    var right=[1,2,3,4,5,6,7,8,9,10], left=[23,22,21,20,19,18,17,16,15,14,13];
+    return seg+'<div class="sub"><span class="eyebrow">суббота, 20:00</span><h2 style="font-size:24px;font-weight:800">Таверна «Пьяный рыцарь»</h2><p class="small muted">'+(seat?'Твоё место № '+seat.seat+'. ':'')+'Места пронумерованы по часовой стрелке.</p></div>'+
+      '<p class="note">Рассадка может поменяться, если кто-то не сможет приехать или, наоборот, сможет кто-то из тех, кто отказался. Загляни сюда ещё раз прямо перед праздником.</p>'+
+      '<div class="card"><div class="feast"><div class="end" style="grid-row:1">'+seatHtml(24)+seatHtml(25)+'</div><div class="col left" style="grid-column:1;grid-row:2">'+left.map(seatHtml).join('')+'</div><div class="table"><b>Трапезный стол</b></div><div class="col" style="grid-column:3;grid-row:2">'+right.map(seatHtml).join('')+'</div><div class="end" style="grid-row:3">'+seatHtml(12)+seatHtml(11)+'</div></div></div>';
+  }
+  var floors=[2,3]; if(myRoom&&myRoom.floor===3) floors=[3,2];
+  return seg+'<p class="small muted">Нажми на комнату, чтобы увидеть жильцов.'+(myRoom?' Твоя закрашена.':'')+'</p>'+floors.map(function(fl,idx){
+    var other = myRoom && idx>0;
+    return (other?'<details class="day-tasks"><summary><b>'+(fl===2?'Второй':'Третий')+' этаж</b><span class="small muted">показать</span></summary><div class="day-body">':'')+
+      '<div class="card" style="display:grid;gap:12px"><h3 style="font-size:18px">'+(fl===2?'Второй':'Третий')+' этаж'+(myRoom&&myRoom.floor===fl?' · твой':'')+'</h3>'+planSvg(fl)+
+      '<div class="rooms">'+S.data.rooms.filter(function(r){return r.floor===fl}).map(function(r){
+        var me=myRoom&&myRoom.id===r.id;
+        return '<button class="card room-card'+(me?' me':'')+(S.selRoom===r.id?' sel':'')+'" data-act="room" data-id="'+r.id+'"><b>'+esc(r.name)+'</b><span class="small muted">'+esc(r.beds)+'</span><div class="chips">'+(r.people.length?r.people.map(function(p){return chip(p)}).join(''):'<span class="muted small">свободно</span>')+'</div></button>';
+      }).join('')+'</div></div>'+(other?'</div></details>':'');
+  }).join('');
+}
+
+function vRoad(){
+  var d=S.data, myCar=carOf(S.me), drv=drives(S.me);
+  var addr = d.address!==undefined
+    ? '<div class="card addr"><span class="eyebrow">куда ехать</span><b>'+esc(d.address||'адрес пока не указан')+'</b>'+(d.mapUrl?'<a class="btn ghost sm" style="justify-self:start" href="'+esc(d.mapUrl)+'" target="_blank" rel="noopener">Открыть карту</a>':'')+(d.addressNote?'<span class="small muted">'+esc(d.addressNote)+'</span>':'')+'</div>'
+    : '<form class="card addr" data-form="code"><span class="eyebrow">куда ехать</span><p>Адрес откроется после кодового слова из чата.</p><div class="codeform"><input type="password" id="codeinput" placeholder="Кодовое слово" autocomplete="off" aria-label="Кодовое слово"><button class="btn" type="submit">Открыть</button></div></form>';
+  var rideOf=function(n){var c=carOf(n); return c?c.driver:''};
+  return '<h2>Дорога</h2>'+addr+
+    (S.me&&!myCar&&!drv.length?'<p class="note">Ты пока ни в одной машине.</p>':'')+
+    '<div class="card" style="display:grid;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3 style="font-size:17px">Не в машине</h3><span class="small muted">'+(d.loose.length?plural(d.loose.length,['человек','человека','человек']):'')+'</span></div>'+
+      (d.loose.length?'<div class="chips">'+d.loose.map(function(n){return chip(n,(d.arrivals&&d.arrivals[n])||'время уточняется')}).join('')+'</div>'+(drv.length?'<span class="small muted">Ты водитель и можешь добавить их в любую машину, где есть места.</span>':''):'<span class="small muted">Все гости распределены по машинам.</span>')+'</div>'+
+    '<div class="cars">'+d.cars.map(function(c){
+      var inIt=c.passengers.indexOf(S.me)>=0, isDrv=c.driver===S.me, editing=S.editCar===c.row;
+      var pips=''; for(var i=0;i<c.seats;i++) pips+='<i class="'+(i<(editing?S.draft.length:c.passengers.length)?'f':'')+'"></i>';
+      var head='<div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':pn(c.driver))+'</b><div class="small muted">'+whenFrom(c)+'</div></div></div>';
+      if(editing){
+        var mode=c.edit, pool, hint;
+        if(mode==='full'){ pool=d.guests.filter(function(g){return g.name!==c.driver}).map(function(g){return g.name});
+          hint='Нажми на людей в этой машине. Стрелка показывает, в чьей машине человек сейчас. Если выберешь его, он переедет сюда.'; }
+        else if(mode==='own'){ pool=c.passengers.concat(d.loose.filter(function(n){return n!==c.driver}));
+          hint='Нажми, чтобы убрать пассажира или добавить того, кто ещё не в машине.'; }
+        else { pool=d.loose.filter(function(n){return n!==c.driver});
+          hint='Можно добавить только тех, кто ещё ни в одной машине. Убирать людей и менять время может водитель этой машины.'; }
+        var fixed = mode==='add' ? c.passengers.map(function(p){return chip(p)}).join('') : '';
+        return '<div class="card car me" style="grid-column:1/-1">'+head+
+          (mode!=='add'?'<label class="small muted" for="when'+c.row+'">Когда выезжает</label><input type="search" id="when'+c.row+'" value="'+esc(S.draftWhen)+'" placeholder="Например: Пт, 17:30" autocomplete="off">':'')+
+          '<div style="display:flex;align-items:center;gap:8px"><span class="pips">'+pips+'</span><span class="small muted">'+S.draft.length+' из '+c.seats+'</span></div>'+
+          '<div class="small muted">'+hint+'</div>'+
+          (fixed?'<div class="chips">'+fixed+'</div>':'')+
+          '<div class="chips">'+(pool.length?pool.filter(function(n){return mode!=='add'||c.passengers.indexOf(n)<0}).map(function(n){var on=S.draft.indexOf(n)>=0, other=mode==='full'&&!on&&rideOf(n)&&rideOf(n)!==c.driver?rideOf(n):'';
+            return '<button class="chip'+(on?' me':'')+'" data-act="pick" data-name="'+esc(n)+'" style="cursor:pointer">'+esc(n)+(other?'<span class="n">→ '+esc(other)+'</span>':'')+'</button>';}).join(''):'<span class="small muted">Свободных нет, все уже в машинах.</span>')+'</div>'+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" data-act="savecar" data-row="'+c.row+'"'+(S.busy?' disabled':'')+'>Сохранить</button><button class="btn ghost sm" data-act="cancelcar">Отмена</button></div></div>';
+      }
+      var load = c.load&&c.load.length ? '<div class="small" style="display:grid;gap:2px"><span class="muted">Не забудь положить в машину:</span>'+c.load.map(function(p){return '<span>• '+esc(p.item)+' <span class="muted">('+p.who.map(function(w){return w===S.me?'ты':esc(w)}).join(', ')+')</span></span>'}).join('')+'</div>' : '';
+      return '<div class="card car'+(inIt||isDrv?' me':'')+'">'+head+
+        '<div style="display:flex;align-items:center;gap:8px"><span class="pips" aria-label="занято '+c.passengers.length+' из '+c.seats+'">'+pips+'</span><span class="small muted">'+c.passengers.length+' из '+c.seats+'</span></div>'+
+        '<div class="chips">'+(c.passengers.length?c.passengers.map(function(p){return chip(p)}).join(''):'<span class="small muted">пока никого</span>')+'</div>'+load+
+        (c.edit==='full'||c.edit==='own'?'<button class="btn ghost sm" style="justify-self:start" data-act="editcar" data-row="'+c.row+'">Изменить состав и время</button>':
+         c.edit==='add'&&d.loose.length&&c.passengers.length<c.seats?'<button class="btn ghost sm" style="justify-self:start" data-act="editcar" data-row="'+c.row+'">Добавить из «Не в машине»</button>':'')+'</div>';
+    }).join('')+'</div>';
+}
+
+function vAdmin(){
+  var d=S.data; if(!d.access.admin) return '<p class="muted">Нужен доступ организатора.</p>';
+  var blocks=[]; d.duties.forEach(function(x){if(blocks.indexOf(x.block)<0) blocks.push(x.block)});
+  var tasksOf=function(b){var t=[]; d.duties.forEach(function(x){if(x.block===b&&t.indexOf(x.task)<0)t.push(x.task)}); return t;};
+  var cell=function(b,t,day){var x=d.duties.filter(function(y){return y.block===b&&y.task===t&&y.day===day})[0]; if(!x) return '<span class="muted">·</span>';
+    return (x.time?'<b>'+esc(x.time)+'</b> ':'')+(x.label?esc(x.label)+' <span class="muted">('+x.people.length+')</span>':x.people.length? x.people.map(function(p){return pn(p.name)+(p.note?' <span class="muted">('+esc(p.note)+')</span>':'')}).join(', ') : '<span class="note" style="padding:1px 8px">никого</span>')+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'');};
+  var g=d.gaps, gl=[];
+  if(g.emptyTasks.length) gl.push('<b>Без людей:</b> '+g.emptyTasks.map(esc).join('; '));
+  if(g.noCar.length) gl.push('<b>Без машины:</b> '+g.noCar.map(pnf).join(', '));
+  if(g.noRoom.length) gl.push('<b>Без комнаты:</b> '+g.noRoom.map(pnf).join(', '));
+  if(g.noSeat.length) gl.push('<b>Без места за столом:</b> '+g.noSeat.map(pnf).join(', '));
+  var guildName=function(b){return (d.guilds&&d.guilds[b]&&d.guilds[b].name)||b};
+  var A=d.answers||{pending:[],declined:[]}, ansRow=function(x){return '<div class="grow"><span>'+pn(x.name)+'</span><span class="small muted" style="text-align:right">'+esc(x.task)+' · '+esc(x.day)+(x.time?' '+esc(x.time):'')+'</span></div>'};
+  var answers=(A.pending.length||A.declined.length)?'<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Ответы на «?»</h3>'+
+    (A.declined.length?'<p class="small" style="margin-bottom:4px"><b>Отказались</b></p><div class="glist" style="margin-bottom:10px">'+A.declined.map(ansRow).join('')+'</div>':'')+
+    (A.pending.length?'<p class="small" style="margin-bottom:4px"><b>Ещё не ответили</b></p><div class="glist">'+A.pending.map(ansRow).join('')+'</div>':'<p class="small muted">Все ответили.</p>')+'</div>':'';
+  return '<h2>Штаб</h2><p class="small muted">Данные правятся в Google Таблице, страница подтянет их сама в течение минуты.</p>'+
+    (gl.length?'<div class="note" style="display:grid;gap:4px">'+gl.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div>':'<p class="small muted">Все распределены: машины, комнаты, места, задачи.</p>')+
+    answers+totalCard(true)+
+    ((d.hostsAdmin||[]).length?'<div class="card"><h3 style="font-size:18px;margin-bottom:4px">Ведущие</h3><p class="small muted" style="margin-bottom:8px">Чтобы освободить место, удали его строку на листе «Ведущие».</p><div class="glist">'+(d.hostsAdmin||[]).map(function(h){
+      return '<div class="grow"><span>Ведущий '+h.slot+'</span><span class="small'+(h.taken?'':' muted')+'" style="text-align:right">'+(h.taken?esc(h.nick)+(h.tg?' · '+esc(h.tg):h.linked?' · Telegram':' · без Telegram'):'свободно')+'</span></div>'; }).join('')+'</div></div>':'')+
+    '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Не придут</h3><div class="glist">'+(d.hidden.length?d.hidden.map(function(h){
+      return '<div class="grow"><div>'+avatar(h.name,'sm')+'<span>'+pn(h.name)+' <span class="muted small">'+esc(h.character)+'</span></span></div><button class="btn sm" data-act="status" data-name="'+esc(h.name)+'" data-status="придёт"'+(S.busy?' disabled':'')+'>Вернуть</button></div>';
+    }).join(''):'<p class="small muted">Никого.</p>')+'</div></div>'+
+    '<div class="card"><h3 style="font-size:18px;margin-bottom:4px">Все гости</h3><p class="small muted" style="margin-bottom:8px">«Глазами»: открыть страницу так, как её видит этот гость.</p><div class="glist">'+d.guests.map(function(x){
+      return '<div class="grow"><div>'+avatar(x.name,'sm')+'<span>'+pn(x.name)+(x.status==='нет в чате'?' <span class="chip">нет в чате</span>':'')+'</span></div><span style="display:flex;gap:6px"><button class="btn sm" data-act="viewas" data-name="'+esc(x.name)+'">Глазами</button><button class="btn ghost sm" data-act="status" data-name="'+esc(x.name)+'" data-status="не придёт"'+(S.busy?' disabled':'')+'>Скрыть</button></span></div>';
+    }).join('')+'</div></div>'+
+    [['what','Одолжено у Ксении'],['pickup','Забрать у Ксении']].map(function(k){ var L=(d.borrowed||[]).filter(function(b){return b[k[0]]}); return L.length?'<div class="card"><h3 style="font-size:18px;margin-bottom:8px">'+k[1]+'</h3><div class="glist">'+L.map(function(b){return '<div class="grow"><span>'+pn(b.name)+'</span><span class="small muted" style="text-align:right">'+esc(b[k[0]])+'</span></div>'}).join('')+'</div></div>':''}).join('')+
+    '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Кто что везёт</h3><div class="glist">'+(d.props||[]).map(function(p){return '<div class="grow"><span>'+esc(p.item)+'</span><span class="small muted">'+p.who.map(esc).join(', ')+'</span></div>'}).join('')+'</div></div>'+
+    '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Все задачи</h3><div class="grid-scroll"><table class="dt"><thead><tr><th>Гильдия</th><th>Задача</th><th>Пт</th><th>Сб</th><th>Вс</th></tr></thead><tbody>'+
+      blocks.map(function(b){var ts=tasksOf(b); return ts.map(function(t,i){return '<tr>'+(i===0?'<td class="blk" rowspan="'+ts.length+'">'+esc(guildName(b))+'</td>':'')+'<td>'+esc(t)+'</td><td>'+cell(b,t,'Пт')+'</td><td>'+cell(b,t,'Сб')+'</td><td>'+cell(b,t,'Вс')+'</td></tr>'}).join('')}).join('')+
+    '</tbody></table></div></div>'+
+    (d.tg?'':'<button class="link" data-act="logout">Выйти из режима организатора</button>');
+}
+
+function contactsHtml(){
+  var list=(S.data.contacts||[]).filter(function(c){return c.top});
+  if(!list.length) return '';
+  return '<div class="contacts" aria-label="Важные контакты">'+list.map(function(c){
+    return '<div class="ct">'+avatar(c.name,'sm')+'<div class="who"><b>'+pn(c.name)+'</b><span>'+esc(c.role)+'</span></div><div class="acts">'+
+      (c.tg?'<a class="ic tg" href="https://t.me/'+esc(c.tg)+'" data-tg="'+esc(c.tg)+'" target="_blank" rel="noopener" aria-label="Написать '+esc(c.name)+' в Telegram">'+icon('tg')+'</a>':'')+
+      (c.phone?'<button class="ic" data-act="phone" data-phone="'+esc(c.phone)+'" aria-label="Телефон '+esc(c.name)+'">'+icon('phone')+'</button>':'')+
+    '</div></div>';
+  }).join('')+'</div>';
+}
+
+function render(){
+  var d=S.data; if(!d) return;
+  if(!S.switching){ var sw=document.getElementById('switching'); if(sw) sw.remove(); }
+  if(!S.qzChecked&&S.me&&!d.viewAs){ S.qzChecked=true; setTimeout(quizRecover,0); }
+  var realMe=S.me; S.me=who();
+  var tabs=d.tabs.slice(); if(d.access.admin) tabs.push({id:'admin',name:'Штаб'});
+  var visitor=S.visitor&&!S.me&&!d.access.admin&&!d.host;
+  if(d.host){ tabs=[]; S.tab='host'; S.hostStep=''; }
+  else if(visitor){ tabs=tabs.filter(function(t){return t.id==='people'}); if(!tabs.length) tabs=[{id:'people',name:'Роли'}]; S.tab='people'; }
+  else if(!tabs.some(function(t){return t.id===S.tab})) S.tab=tabs[0]?tabs[0].id:'me';
+  S.locked=!d.host&&!visitor&&!S.me&&!d.access.admin; if(S.locked) S.tab='me';
+  var focusId=document.activeElement&&document.activeElement.id, selStart=document.activeElement&&document.activeElement.selectionStart;
+  var nm=tabName(S.tab), news=(d.host||visitor)?{top:'',rest:''}:newsFor(nm), body;
+  if(S.tab==='me') body=vMe(); else if(S.tab==='plan') body=vPlan(); else if(S.tab==='people') body=vPeople();
+  else if(S.tab==='home') body=vHome(); else if(S.tab==='road') body=vRoad(); else if(S.tab==='admin') body=vAdmin(); else if(S.tab==='host') body=vHost(); else body='';
+  var dd=d.dates, from=(dd['Пт']||'').slice(0,2).replace(/^0/,''), to=(dd['Вс']||'').slice(0,2).replace(/^0/,'');
+  var showAdminLogin=!d.access.admin&&!d.tg&&!d.host&&!S.hostStep&&S.tab==='me';
+  $app.innerHTML=(demoRaw?'<div class="demo">Демо на данных из таблиц. Код гостей «'+esc(demoRaw.settings['Кодовое слово гостей'])+'», организатора «'+esc(demoRaw.settings['Код организатора'])+'» (вход внизу вкладки «Я»).</div>':'')+
+    (visitor?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">Гостевой вход: роли и викторины<button class="btn sm" data-act="visitorout">Выйти</button></div>':'')+
+    (d.viewAs?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">'+(d.access.admin?'Ты смотришь как <b>'+esc(d.viewAs)+'</b>, только просмотр':'Ты в аккаунте <b>'+esc(d.viewAs)+'</b>')+'<button class="btn sm" data-act="viewas" data-name="">Вернуться к себе</button></div>':'')+
+    '<header class="top"><div class="in"><div><span class="eyebrow">'+esc(d.subtitle)+(from?' · '+from+'–'+to+' ноября':'')+'</span><h1>'+esc(d.title)+'</h1></div><div class="now">'+(S.syncing?'<span class="sync" title="обновляю"></span>':'')+nowLine()+'</div></div></header>'+
+    contactsHtml()+
+    '<main class="wrap"><div class="view">'+news.top+body+news.rest+
+      (showAdminLogin?'<div class="foot">'+(S.showAdminLogin?'<form class="codeform" data-form="admin" style="width:min(360px,100%)"><input type="password" id="admininput" placeholder="Код организатора" autocomplete="off" aria-label="Код организатора"><button class="btn" type="submit">Войти</button></form>':'<button class="link" data-act="adminlogin">Вход для организаторов</button>')+'</div>':'')+
+    (S.tab==='me'&&CONFIG.build?'<p class="small muted" style="text-align:center;opacity:.6">версия '+CONFIG.build.slice(6,8)+'.'+CONFIG.build.slice(4,6)+' '+CONFIG.build.slice(8,10)+':'+CONFIG.build.slice(10,12)+'</p>':'')+
+    '</div></main>'+
+    (tabs.length>1?'<nav class="tabbar" aria-label="Вкладки"><div class="in">'+tabs.map(function(t){
+      if(S.locked&&t.id!=='me') return '<a role="button" aria-disabled="true" class="off" data-act="locked"><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
+      return '<a href="#'+t.id+'" data-act="tab" data-tab="'+t.id+'" class="'+(t.id===S.tab?'on':'')+'"'+(t.id===S.tab?' aria-current="page"':'')+'><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
+    }).join('')+'</div></nav>':'');
+  if(focusId){var el=document.getElementById(focusId); if(el){el.focus(); try{if(selStart!=null) el.setSelectionRange(selStart,selStart)}catch(e){}}}
+  S.me=realMe;
+}
+function goTab(id,sub){ if(S.locked&&id!=='me'){ toast('Сначала выбери себя в списке'); return; } S.tab=id; if(sub) S.homeSeg=sub; LS.set('tab',id); try{history.replaceState(null,'','#'+id)}catch(e){} render(); window.scrollTo(0,0); }
+
+/* ---------- события ---------- */
+document.addEventListener('click',function(e){
+  var l=e.target.closest('a[target="_blank"]');
+  if(l&&TG){ e.preventDefault(); var tg=l.getAttribute('data-tg'); try{ tg?TG.openTelegramLink('https://t.me/'+tg):TG.openLink(l.href) }catch(x){ location.href=l.href } return; }
+  if(e.target.closest('#switching')) return;
+  var lb=e.target.closest('.lb');
+  if(lb){ lb.remove(); if(!e.target.closest('[data-act]')) return; }
+  else { var av=e.target.closest('.av'); if(av&&av.querySelector('.ph img')&&!av.closest('button')&&!av.closest('.qz')){ openLb(av.getAttribute('data-name')); return; } }
+  var t=e.target.closest('[data-act]'); if(!t) return;
+  var a=t.getAttribute('data-act');
+  if(a==='locked'){ toast('Сначала выбери себя в списке'); }
+  else if(a==='tab'){ e.preventDefault(); goTab(t.getAttribute('data-tab')); }
+  else if(a==='goto'){ var tb=t.getAttribute('data-tab'); if(tb==='feast') goTab('home','feast'); else if(tb==='home') goTab('home','rooms'); else goTab(tb); }
+  else if(a==='seg'){ S.homeSeg=t.getAttribute('data-seg'); render(); }
+  else if(a==='me'){ S.me=t.getAttribute('data-name'); LS.set('me',S.me); var c=null; try{c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null')}catch(x){} if(c&&!demoRaw){S.data=c} load(); window.scrollTo(0,0); }
+  else if(a==='link'){ act({type:'linkTg',name:t.getAttribute('data-name')},'Готово, это ты!'); }
+  else if(a==='room'){ S.selRoom=S.selRoom===t.getAttribute('data-id')?'':t.getAttribute('data-id'); render(); }
+  else if(a==='editcar'){ var c=S.data.cars.filter(function(x){return x.row===+t.getAttribute('data-row')})[0]; if(c){S.editCar=c.row; S.draft=c.passengers.slice(); S.draftWhen=c.when; render();} }
+  else if(a==='cancelcar'){ S.editCar=0; render(); }
+  else if(a==='pick'){ var n=t.getAttribute('data-name'), i=S.draft.indexOf(n), cc=S.data.cars.filter(function(x){return x.row===S.editCar})[0];
+    if(i>=0) S.draft.splice(i,1); else if(cc&&S.draft.length>=cc.seats) toast('Мест больше нет'); else S.draft.push(n);
+    var w=document.getElementById('when'+S.editCar); if(w) S.draftWhen=w.value; render(); }
+  else if(a==='savecar'){ var w2=document.getElementById('when'+S.editCar); if(w2) S.draftWhen=w2.value; var row=S.editCar;
+    act({type:'setCar',row:row,passengers:S.draft,when:S.draftWhen},'Сохранено'); S.editCar=0; }
+  else if(a==='status'){ act({type:'setStatus',name:t.getAttribute('data-name'),status:t.getAttribute('data-status')}, t.getAttribute('data-status')==='придёт'?'Вернули на страницу':'Скрыли со страницы'); }
+  else if(a==='phone'){ var ph=t.getAttribute('data-phone'); var done=function(){toast(fmtPhone(ph)+' скопирован')};
+    try{ navigator.clipboard.writeText(ph).then(done,function(){toast(fmtPhone(ph))}) }catch(x){ toast(fmtPhone(ph)) } }
+  else if(a==='adminlogin'){ S.showAdminLogin=true; render(); var i=document.getElementById('admininput'); if(i) i.focus(); }
+  else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
+  else if(a==='reload'){ location.reload(); }
+  else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
+  else if(a==='visitor'){ S.visitor=true; LS.set('visitor','1'); S.q=''; render(); window.scrollTo(0,0); }
+  else if(a==='visitorout'){ quizClose(true); S.visitor=false; LS.set('visitor',''); S.tab='me'; LS.set('tab','me'); try{history.replaceState(null,'','#me')}catch(x){} render(); window.scrollTo(0,0); }
+  else if(a==='hostpick'){ S.hostStep='pick'; render(); window.scrollTo(0,0); }
+  else if(a==='hostslot'){ S.hostStep=+t.getAttribute('data-slot'); render(); var hi=document.getElementById('hnickin')||document.getElementById('hkeyin'); if(hi) hi.focus(); }
+  else if(a==='hostback'){ S.hostStep=S.hostStep==='pick'?'':'pick'; render(); }
+  else if(a==='hostf'){ S.hostF=t.getAttribute('data-f'); render(); }
+  else if(a==='hostmark'){ var hn=t.getAttribute('data-name'), mk=t.getAttribute('data-mark'), cur=hostMine(hn).mark;
+    hostSend({type:'hostNote',name:hn,mark:cur.indexOf(mk)>=0?cur.replace(mk,''):cur+mk}); }
+  else if(a==='hostsave'){ var hn2=t.getAttribute('data-name'), tx=S.hostDraft[hn2]; if(tx==null) return;
+    hostSend({type:'hostNote',name:hn2,text:tx},'Заметка сохранена',function(){ delete S.hostDraft[hn2]; }); }
+  else if(a==='hostout'){ S.host=''; S.hostKey=''; LS.set('host',''); LS.set('hkey',''); S.hostStep=''; S.tab='me'; S.data=null; $app.innerHTML='<div class="loading">Выхожу…</div>'; load(); }
+  else if(a==='qzstart'){ quizStart(t.getAttribute('data-kind')); }
+  else if(a==='qzpick'){ quizPick(+t.getAttribute('data-k')); }
+  else if(a==='qznext'){ quizNext(); }
+  else if(a==='qzclose'){ quizClose(); }
+  else if(a==='qzgo'){ S.openQuiz=true; goTab('people'); }
+  else if(a==='mgplay'){ playMakar(); }
+  else if(a==='qzmakar'){ if(S.switching) return; var nm=sharedName(), wait=(Q&&Q.savePromise)||Promise.resolve();
+    S.prevViewAs=S.viewAs; S.switching=nm; quizClose(true); showSwitching();
+    wait.then(function(){ S.viewAs=nm; S.editCar=0; S.tab='me'; load().then(function(){ window.scrollTo(0,0); }); }); }
+  else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
+  else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
+  else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
+  else if(a==='viewas'){ if(S.switching) return; S.prevViewAs=S.viewAs; S.viewAs=t.getAttribute('data-name'); S.switching=S.viewAs||'self'; showSwitching(); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab=S.data&&S.data.access.admin?'admin':'me'; }
+    if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
+    load().then(function(){ window.scrollTo(0,0); }); }
+});
+document.addEventListener('toggle',function(e){ var t=e.target; if(!t.classList) return; if(t.classList.contains('day-tasks')&&t.getAttribute('data-day')) S.openDays[t.getAttribute('data-day')]=t.open; if(t.classList.contains('story')) S.openNews[t.getAttribute('data-news')]=t.open; },true);
+document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); }
+  else if(e.target.id==='hq'){ S.hostQ=e.target.value; render(); }
+  else if(e.target.classList&&e.target.classList.contains('hnote')){ var hn=e.target.getAttribute('data-name'); S.hostDraft[hn]=e.target.value;
+    var sb=document.querySelector('[data-act="hostsave"][data-name="'+CSS.escape(hn)+'"]'); if(sb) sb.disabled=S.busy||e.target.value===hostMine(hn).text; } else if(e.target.id==='when'+S.editCar){ S.draftWhen=e.target.value; } });
+document.addEventListener('submit',function(e){
+  var f=e.target.getAttribute('data-form'); if(!f) return; e.preventDefault();
+  if(f==='hostnew'||f==='hostlogin'){
+    var key=((document.getElementById('hkeyin')||{}).value||'').trim(), nick=((document.getElementById('hnickin')||{}).value||'').trim();
+    if(f==='hostnew'&&!nick){ toast('Напиши свой ник'); return; }
+    if(!key){ toast('Введи кодовое слово'); return; }
+    if(S.busy) return; var slot=S.hostStep; S.busy=true; S.host=String(slot); S.hostKey=key; render();
+    var fail=function(m){ S.host=''; S.hostKey=''; toast(m); };
+    (f==='hostnew'?api({type:'claimHost',slot:slot,nick:nick,hkey:key}):api()).then(function(d){
+      if(!d.host){ fail(f==='hostnew'?'Не получилось занять место':'Не то кодовое слово'); return; }
+      LS.set('host',S.host); LS.set('hkey',S.hostKey); accept(d); haptic('success'); toast('Добро пожаловать, '+d.host.nick);
+    }).catch(function(err){ fail(err.message); }).then(function(){ S.busy=false; render(); window.scrollTo(0,0); });
+    return;
+  }
+  var v=(document.getElementById(f==='code'?'codeinput':'admininput')||{}).value||'';
+  var prev=S.code; S.code=v.trim();
+  api().then(function(d){
+    var ok = f==='code'? d.access.guest : d.access.admin;
+    if(!ok){ S.code=prev; toast('Не то слово. Спроси в чате.'); return; }
+    LS.set('code',S.code); accept(d); S.showAdminLogin=false; if(f==='admin') goTab('admin'); else render(); toast(f==='code'?'Адрес открыт':'Добро пожаловать в штаб');
+  }).catch(function(err){S.code=prev; toast(err.message)});
+});
+window.addEventListener('hashchange',function(){ var h=(location.hash||'').slice(1); if(h&&h!==S.tab&&S.data){ S.tab=h; render(); } });
+setInterval(function(){ if(S.data && !S.busy && document.visibilityState==='visible' && !(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))) render(); },60000);
+document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'&&S.data&&!S.busy) load(); });
+
+// самообновление: если на GitHub лежит более новая версия страницы, перезагрузиться на неё
+if(!CONFIG.demo && CONFIG.build){
+  fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+    var m=t.match(/build:(\d+)/); if(!m||m[1]===CONFIG.build) return;
+    try{ if(sessionStorage.getItem('chembalo.reloaded')===m[1]) return; sessionStorage.setItem('chembalo.reloaded',m[1]); }catch(e){}
+    location.replace(location.pathname+'?v='+m[1]);
+  }).catch(function(){});
+}
+if(!CONFIG.demo && !CONFIG.api){ $app.innerHTML='<div class="loading">Страница ещё не подключена к таблице.</div>'; return; }
+// мгновенный показ: сначала то, что видели в прошлый раз, потом свежие данные
+if(!demoRaw){ try{ var cached=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(cached){ S.data=cached; if(cached.tg) S.me=cached.me; render(); } }catch(e){} }
+load();
+})();
+</script>
+</body>
+</html>
