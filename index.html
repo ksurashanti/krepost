@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610141923-->
+<!--build:202610160957-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -299,6 +299,18 @@ details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-ra
 .addr{display:grid;gap:8px}
 .addr b{font-size:20px}
 .codeform{display:flex;gap:8px}
+input.tx,textarea.hnote{width:100%;padding:11px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font:inherit;color:inherit}
+textarea.hnote{resize:vertical;min-height:62px;padding:9px 12px}
+.hostin{display:flex;justify-content:center;padding-top:6px}
+.hostin .btn svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+.hslots{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.hslot{cursor:pointer;display:grid;gap:4px;text-align:left;font:inherit;color:inherit}
+.hform{display:grid;gap:10px;max-width:420px}
+.hfilt{display:flex;flex-wrap:wrap;gap:6px}
+.hfilt .chip,.hmarks .chip{cursor:pointer;font:inherit;font-size:14px}
+.hfilt .chip:not(.me),.hmarks .chip:not(.me){color:var(--ink)}
+.hcard{display:grid;gap:10px}
+.hmarks{display:flex;gap:6px;flex-wrap:wrap}
 .codeform input{flex:1;min-width:0}
 .cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .car{display:grid;gap:10px;align-content:start}
@@ -337,7 +349,7 @@ var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610141923',
+  build: '202610160957',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -384,6 +396,20 @@ function access_(raw, code, tgMe) {
   return { admin: admin, guest: admin || !!tgMe || (!!c && c === norm_(s['Кодовое слово гостей'])) };
 }
 
+// Ведущие квеста: три места, каждое занимают ником и кодовым словом (и привязывают к Telegram)
+var HOSTS_N = 0; // пока выключено; включить: 3
+function hostSlots_(raw) {
+  var by = {};
+  (raw.hosts || []).forEach(function (h) { var n = Number(h.slot); if (n >= 1 && n <= HOSTS_N && !by[n] && (h.nick || h.key)) by[n] = h; });
+  return by;
+}
+function hostOf_(raw, slot, key, tg) {
+  var by = hostSlots_(raw), n;
+  if (tg) for (n in by) if (by[n].tgId && String(by[n].tgId) === String(tg.id)) return by[n];
+  var h = by[Number(slot)];
+  return h && key && norm_(h.key) === norm_(key) ? h : null;
+}
+
 function buildPayload(raw, opts) {
   opts = opts || {};
   var s = raw.settings, hidden = {};
@@ -392,6 +418,8 @@ function buildPayload(raw, opts) {
   if (tgG && hidden[tgG.name]) tgG = null;
   if (opts.tg) opts.me = tgG ? tgG.name : '';
   var acc = access_(raw, opts.code, tgG ? tgG.name : '');
+  var hostRow = tgG ? null : hostOf_(raw, opts.host, opts.hkey, opts.tg);
+  if (hostRow) opts.me = '';
   var vis = function (p) { return !hidden[p.name]; };
   var visGuests = raw.guests.filter(function (g) { return g.name && !hidden[g.name]; });
   var known = {}; visGuests.forEach(function (g) { known[g.name] = true; });
@@ -453,7 +481,7 @@ function buildPayload(raw, opts) {
   }
 
   var cars = (raw.cars || []).filter(shown_).filter(function (c) { return c.driver && !hidden[c.driver]; }).map(function (c) {
-    return { row: c._row, driver: c.driver, when: c.when, seats: Number(c.seats) || 4, passengers: parsePeople(c.passengers).filter(vis).map(function (p) { return p.name; }),
+    return { row: c._row, driver: c.driver, when: c.when, from: String(c.from || '').trim(), seats: Number(c.seats) || 4, passengers: parsePeople(c.passengers).filter(vis).map(function (p) { return p.name; }),
       edit: '' };
   });
   var isDriver = !!me && cars.some(function (c) { return c.driver === me; });
@@ -494,6 +522,18 @@ function buildPayload(raw, opts) {
     tg: opts.tg ? { linked: !!tgG } : null,
     viewAs: viewAs
   };
+  var slots = hostSlots_(raw);
+  out.hosts = [];
+  for (var hn = 1; hn <= HOSTS_N; hn++) out.hosts.push({ slot: hn, nick: slots[hn] ? String(slots[hn].nick || '') : '', taken: !!slots[hn] });
+  out.host = hostRow ? { slot: Number(hostRow.slot), nick: String(hostRow.nick || '') } : null;
+  if (hostRow) {
+    // заметки ведущих: у каждого свои, чужие видны для сведения
+    out.hostNotes = {};
+    (raw.hostNotes || []).forEach(function (r) {
+      var sl = Number(r.slot); if (!slots[sl] || !known[r.name] || (!r.text && !r.mark)) return;
+      (out.hostNotes[r.name] = out.hostNotes[r.name] || []).push({ slot: sl, nick: String(slots[sl].nick || ''), text: String(r.text || ''), mark: String(r.mark || ''), mine: sl === Number(hostRow.slot) });
+    });
+  }
   // Викторины: лучший результат каждого гостя, по убыванию баллов (при равенстве раньше выше)
   out.quiz = {}; out.quizMine = {}; out.quizReal = {}; out.quizPerfect = {};
   ['roles', 'history', 'makar'].forEach(function (k) {
@@ -526,6 +566,7 @@ function buildPayload(raw, opts) {
     out.props = allProps;
     out.borrowed = visGuests.filter(function (g) { return g.costume || g.pickup; }).map(function (g) { return { name: g.name, what: g.costume || '', pickup: g.pickup || '' }; });
     out.guilds = guilds;
+    out.hostsAdmin = out.hosts.map(function (h) { var r = slots[h.slot]; return { slot: h.slot, nick: h.nick, taken: h.taken, tg: r ? String(r.tg || '') : '', linked: !!(r && r.tgId) }; });
     out.hidden = raw.guests.filter(function (g) { return hidden[g.name]; }).map(function (g) { return { name: g.name, character: g.character || '' }; });
     var inCar = {}; cars.forEach(function (c) { inCar[c.driver] = 1; c.passengers.forEach(function (p) { inCar[p] = 1; }); });
     var seated = {}; out.seats.forEach(function (x) { if (x.name) seated[x.name] = 1; });
@@ -627,6 +668,34 @@ function applyAction(raw, a, code, tg) {
     var rec = { name: a.me, quiz: a.quiz, score: sc, total: tot, at: new Date().toISOString() };
     (raw.quiz = raw.quiz || []).push(rec);
     changes.push({ sheet: 'quiz', append: true, values: rec });
+  } else if (a.type === 'claimHost') {
+    var hs = Number(a.slot), byS = hostSlots_(raw);
+    if (!(hs >= 1 && hs <= HOSTS_N)) fail('Нет такого места ведущего.');
+    if (byS[hs]) fail('Это место уже занято. Если оно твоё, введи кодовое слово.');
+    var nick = String(a.nick || '').trim().slice(0, 30), hkey = String(a.hkey || '').trim();
+    if (!nick) fail('Напиши свой ник.');
+    if (hkey.length < 4) fail('Кодовое слово: хотя бы 4 символа.');
+    if (tgG) fail('Этот Telegram уже привязан к гостю «' + tgG.name + '».');
+    if (tg && hostOf_(raw, 0, '', tg)) fail('Этот Telegram уже привязан к другому ведущему.');
+    var hrec = { slot: hs, nick: nick, key: hkey, tgId: tg ? String(tg.id) : '', tg: tg && tg.username ? '@' + tg.username : '', at: new Date().toISOString() };
+    (raw.hosts = raw.hosts || []).push(hrec);
+    changes.push({ sheet: 'hosts', append: true, values: hrec });
+  } else if (a.type === 'hostNote') {
+    var hh = tgG ? null : hostOf_(raw, a.host, a.hkey, tg);
+    if (!hh) fail('Нужно войти как ведущий.');
+    if (!raw.guests.some(function (x) { return x.name === a.name; })) fail('Нет такого игрока.');
+    var nrow = (raw.hostNotes = raw.hostNotes || []).filter(function (r) { return Number(r.slot) === Number(hh.slot) && r.name === a.name; })[0];
+    var ntext = a.text == null ? null : String(a.text).slice(0, 1000), nmark = a.mark == null ? null : String(a.mark).replace(/[^★✓]/g, '');
+    var nat = new Date().toISOString();
+    if (nrow) {
+      if (ntext != null) { nrow.text = ntext; changes.push({ sheet: 'hostNotes', row: nrow._row, field: 'text', value: ntext }); }
+      if (nmark != null) { nrow.mark = nmark; changes.push({ sheet: 'hostNotes', row: nrow._row, field: 'mark', value: nmark }); }
+      changes.push({ sheet: 'hostNotes', row: nrow._row, field: 'at', value: nat });
+    } else {
+      var nrec = { slot: Number(hh.slot), nick: String(hh.nick || ''), name: a.name, text: ntext || '', mark: nmark || '', at: nat };
+      raw.hostNotes.push(nrec);
+      changes.push({ sheet: 'hostNotes', append: true, values: nrec });
+    }
   } else if (a.type === 'setStatus') {
     if (!acc.admin) fail('Нужен код организатора.');
     var g = raw.guests.filter(function (x) { return x.name === a.name; })[0];
@@ -652,7 +721,8 @@ if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();}
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
 var S={openNews:{},openDays:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
-       selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms'};
+       selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms',
+       host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
 var demoRaw=null;
 if(CONFIG.demo){ demoRaw=CONFIG.demo; try{var saved=localStorage.getItem('chembalo.demoRaw2'); if(saved) demoRaw=JSON.parse(saved);}catch(e){} }
 
@@ -664,18 +734,19 @@ function api(action){
   if(demoRaw){
     return new Promise(function(res,rej){
       try{
-        if(action){ applyAction(demoRaw,Object.assign({me:S.me,code:S.code},action),S.code); try{localStorage.setItem('chembalo.demoRaw2',JSON.stringify(demoRaw))}catch(e){} }
-        res(buildPayload(demoRaw,{me:S.me,code:S.code,as:S.viewAs}));
+        if(action){ applyAction(demoRaw,Object.assign({me:S.me,code:S.code,host:S.host,hkey:S.hostKey},action),S.code); try{localStorage.setItem('chembalo.demoRaw2',JSON.stringify(demoRaw))}catch(e){} }
+        res(buildPayload(demoRaw,{me:S.me,code:S.code,as:S.viewAs,host:S.host,hkey:S.hostKey}));
       }catch(e){rej(e)}
     });
   }
   var req = action
-    ? fetch(CONFIG.api,{method:'POST',body:JSON.stringify(Object.assign({me:S.me,code:S.code,tg:TG?TG.initData:''},action))})
-    : fetch(CONFIG.api+'?me='+encodeURIComponent(S.me)+'&code='+encodeURIComponent(S.code)+(S.viewAs?'&as='+encodeURIComponent(S.viewAs):'')+(TG?'&tg='+encodeURIComponent(TG.initData):''));
+    ? fetch(CONFIG.api,{method:'POST',body:JSON.stringify(Object.assign({me:S.me,code:S.code,host:S.host,hkey:S.hostKey,tg:TG?TG.initData:''},action))})
+    : fetch(CONFIG.api+'?me='+encodeURIComponent(S.me)+'&code='+encodeURIComponent(S.code)+(S.viewAs?'&as='+encodeURIComponent(S.viewAs):'')+(S.host?'&host='+encodeURIComponent(S.host)+'&hkey='+encodeURIComponent(S.hostKey):'')+(TG?'&tg='+encodeURIComponent(TG.initData):''));
   return req.then(function(r){return r.json()}).then(function(j){ if(!j.ok) throw new Error(j.error); return j.data; });
 }
-function cacheKey(){ return 'cache.'+(TG&&TG.initDataUnsafe&&TG.initDataUnsafe.user?TG.initDataUnsafe.user.id:(S.me||'anon')); }
+function cacheKey(){ return 'cache.'+(TG&&TG.initDataUnsafe&&TG.initDataUnsafe.user?TG.initDataUnsafe.user.id:(S.host?'host'+S.host:(S.me||'anon'))); }
 function accept(d){ S.data=d; if(d.viewAs) return;
+  if(S.host&&!d.host){ S.host=''; S.hostKey=''; LS.set('host',''); LS.set('hkey',''); }
   if(d.tg) S.me=d.me; else if(S.me && d.me!==S.me){S.me='';LS.set('me','')}
   if(!demoRaw){ try{ localStorage.setItem('chembalo.'+cacheKey(), JSON.stringify(d)) }catch(e){} } }
 function who(){ return S.data&&S.data.viewAs ? S.data.viewAs : S.me; }
@@ -900,9 +971,9 @@ function showSwitching(){
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
   d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
-    '<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
+    (S.data&&S.data.host?'':'<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
     (g.shared&&n!==S.me?'<button class="go" data-act="viewas" data-name="'+esc(n)+'">'+icon('me')+'Зайти в аккаунт</button>':'')+
-    (!g.shared&&g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>';
+    (!g.shared&&g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>');
   var im=d.querySelector('img'); if(im) im.removeAttribute('loading');
   document.body.appendChild(d);
 }
@@ -953,11 +1024,13 @@ function linkRoles(text, selfName){
     return '<button class="rl" data-act="lb" data-name="'+esc(n)+'">'+m+' ('+(n===S.me?'ты':esc(n))+')</button>';
   });
 }
+function whenFrom(c){ return esc(c.when)+(c.from?' · '+esc(c.from):''); }
 function tabName(id){var t=S.data.tabs.filter(function(x){return x.id===id})[0]; return t?t.name:id;}
 
 /* ---------- вкладки ---------- */
 function vMe(){
   var d=S.data;
+  if(!S.me&&S.hostStep) return vHostLogin();
   if(!S.me){
     var linkMode=!!d.tg;
     return '<div class="sub"><span class="eyebrow">добро пожаловать</span><h2 style="font-size:24px;font-weight:800">Кто ты в этой крепости?</h2><p class="muted">'+
@@ -966,7 +1039,8 @@ function vMe(){
         return linkMode
           ? '<button data-act="link" data-name="'+esc(g.name)+'"'+(g.linked||S.busy?' disabled':'')+'>'+avatar(g.name,'sm')+esc(g.name)+(g.linked?' <span class="small muted">уже вошёл</span>':'')+'</button>'
           : '<button data-act="me" data-name="'+esc(g.name)+'">'+avatar(g.name,'sm')+esc(g.name)+'</button>';
-      }).join('')+'</div>'+(linkMode?'<p class="small muted">Твоего имени нет или оно занято? Напиши Ксении.</p>':'');
+      }).join('')+'</div>'+(linkMode?'<p class="small muted">Твоего имени нет или оно занято? Напиши Ксении.</p>':'')+
+      ((d.hosts||[]).length?'<div class="hostin"><button class="btn ghost" data-act="hostpick">'+icon('people')+'Ведущий квеста</button></div>':'');
   }
   var g=guest(S.me), room=roomOf(S.me), seat=seatOf(S.me), car=carOf(S.me), drv=drives(S.me);
   var mine=d.myProps||[];
@@ -974,8 +1048,8 @@ function vMe(){
   if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(pnf).join(', '):''),'home']);}
   if(seat){ var nn=S.data.seats.length, sn=function(k){var x=S.data.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name?pn(x.name):'свободно'};
     f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>','место № '+seat.seat,'feast']); }
-  if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return esc(c.when)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
-  else if(car) f.push(['Машина','водитель: '+pn(car.driver),esc(car.when),'road']);
+  if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return whenFrom(c)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
+  else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(g.pickup) f.push(['Забрать у Ксении','<span style="font-size:16px">'+esc(g.pickup)+'</span>','забери до праздника',null,true]);
@@ -1009,6 +1083,48 @@ function vMe(){
     (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+
     '<div class="facts">'+facts+'</div>'+
     '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">Открой нужный день. Внутри твои задачи по времени и вся твоя команда.</p></div>'+tasks;
+}
+
+/* ---------- ведущие квеста ---------- */
+function vHostLogin(){
+  var d=S.data, hs=d.hosts||[], st=S.hostStep, back='<button class="link" data-act="hostback">Назад</button>';
+  if(st==='pick') return '<div class="sub"><span class="eyebrow">ведущие квеста</span><h2 style="font-size:24px;font-weight:800">Вход для ведущих</h2><p class="muted">Выбери своё место. Свободное займи, придумав ник и кодовое слово. Если место уже твоё, войди по кодовому слову.</p></div>'+
+    '<div class="hslots">'+hs.map(function(h){ return '<button class="card hslot" data-act="hostslot" data-slot="'+h.slot+'"><b>Ведущий '+h.slot+'</b><span class="small '+(h.taken?'':'muted')+'">'+(h.taken?esc(h.nick):'свободно')+'</span></button>'; }).join('')+'</div>'+back;
+  var h=hs.filter(function(x){return x.slot===st})[0]; if(!h){ S.hostStep='pick'; return vHostLogin(); }
+  if(h.taken) return '<div class="sub"><span class="eyebrow">ведущий '+h.slot+'</span><h2 style="font-size:24px;font-weight:800">'+esc(h.nick)+'</h2><p class="muted">Это место занято. Если оно твоё, введи кодовое слово.</p></div>'+
+    '<form class="codeform" data-form="hostlogin"><input type="password" id="hkeyin" placeholder="Кодовое слово" autocomplete="off" aria-label="Кодовое слово"><button class="btn" type="submit"'+(S.busy?' disabled':'')+'>Войти</button></form>'+back;
+  return '<div class="sub"><span class="eyebrow">ведущий '+h.slot+'</span><h2 style="font-size:24px;font-weight:800">Займи место ведущего</h2></div>'+
+    '<form class="hform" data-form="hostnew"><input type="text" class="tx" id="hnickin" maxlength="30" placeholder="Твой ник" autocomplete="off" aria-label="Ник">'+
+    '<input type="text" class="tx" id="hkeyin" placeholder="Придумай кодовое слово" autocomplete="off" aria-label="Кодовое слово">'+
+    '<p class="note">'+(d.tg?'Место привяжется к твоему аккаунту в Telegram: приложение будет сразу узнавать тебя как ведущего, а выбрать себя среди гостей с этого аккаунта уже не получится. Кодовое слово запомни, по нему можно войти с другого устройства.':'Кодовое слово запомни: по нему ты будешь входить как ведущий.')+'</p>'+
+    '<button class="btn" type="submit"'+(S.busy?' disabled':'')+'>Стать ведущим</button></form>'+back;
+}
+function hostMine(n){ return ((S.data.hostNotes||{})[n]||[]).filter(function(x){return x.mine})[0]||{text:'',mark:''}; }
+function vHost(){
+  var d=S.data, h=d.host, q=(S.hostQ||'').trim().toLowerCase(), F=S.hostF||'';
+  var list=d.guests.filter(function(g){return g.character}).sort(function(a,b){return a.character.localeCompare(b.character,'ru')});
+  var star=function(g){return hostMine(g.name).mark.indexOf('★')>=0}, done=function(g){return hostMine(g.name).mark.indexOf('✓')>=0};
+  var shown=list.filter(function(g){return !q||(g.name+' '+g.character).toLowerCase().indexOf(q)>=0})
+    .filter(function(g){return F==='star'?star(g):F==='todo'?!done(g):true});
+  var flt=[['','Все',list.length],['star','★ Важные',list.filter(star).length],['todo','Без ✓',list.filter(function(g){return !done(g)}).length]];
+  return '<div class="sub"><span class="eyebrow">ведущий '+h.slot+'</span><h2 style="font-size:24px;font-weight:800">'+esc(h.nick)+'</h2><p class="small muted">Все игроки и их роли. Заметки и метки видят только ведущие, у каждого свои.</p></div>'+
+    '<input type="search" id="hq" placeholder="Имя или роль" value="'+esc(S.hostQ||'')+'" aria-label="Поиск по игрокам">'+
+    '<div class="hfilt">'+flt.map(function(f){return '<button class="chip'+(F===f[0]?' me':'')+'" data-act="hostf" data-f="'+f[0]+'" aria-pressed="'+(F===f[0])+'">'+f[1]+' <span class="n">'+f[2]+'</span></button>'}).join('')+'</div>'+
+    '<div class="chars">'+(shown.length?shown.map(function(g){
+      var n=g.name, m=hostMine(n), dr=S.hostDraft[n], val=dr!=null?dr:m.text, others=((d.hostNotes||{})[n]||[]).filter(function(x){return !x.mine});
+      return '<article class="card hcard"><div class="char">'+avatar(n)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(n)+'">'+esc(g.character)+'</button></h3><div class="small"><span class="muted">играет</span> <b>'+esc(n)+'</b></div>'+(g.about?'<p class="about small">'+esc(g.about)+'</p>':'')+'</div></div>'+
+        '<div class="hmarks">'+[['★','★ важно'],['✓','✓ отработан']].map(function(k){var on=m.mark.indexOf(k[0])>=0; return '<button class="chip'+(on?' me':'')+'" data-act="hostmark" data-name="'+esc(n)+'" data-mark="'+k[0]+'" aria-pressed="'+on+'"'+(S.busy?' disabled':'')+'>'+k[1]+'</button>'}).join('')+'</div>'+
+        '<textarea class="hnote" id="hn-'+esc(n)+'" data-name="'+esc(n)+'" rows="2" maxlength="1000" placeholder="Заметка" aria-label="Заметка про '+esc(n)+'">'+esc(val)+'</textarea>'+
+        '<div><button class="btn sm" data-act="hostsave" data-name="'+esc(n)+'"'+(val===m.text||S.busy?' disabled':'')+'>Сохранить</button></div>'+
+        others.map(function(o){return '<p class="small"><b>'+esc(o.nick||('Ведущий '+o.slot))+':</b> '+(o.mark?esc(o.mark)+' ':'')+esc(o.text)+'</p>'}).join('')+
+      '</article>';
+    }).join(''):'<p class="muted">Никого не нашли.</p>')+'</div>'+
+    (d.tg?'':'<div class="foot"><button class="link" data-act="hostout">Выйти из режима ведущего</button></div>');
+}
+function hostSend(a,okMsg,done){
+  if(S.busy) return; S.busy=true; render();
+  api(a).then(function(d){ accept(d); if(done) done(); haptic('success'); if(okMsg) toast(okMsg); }).catch(function(e){ haptic('error'); toast(e.message); })
+    .then(function(){ S.busy=false; render(); });
 }
 
 function vPlan(){
@@ -1109,7 +1225,7 @@ function vRoad(){
     '<div class="cars">'+d.cars.map(function(c){
       var inIt=c.passengers.indexOf(S.me)>=0, isDrv=c.driver===S.me, editing=S.editCar===c.row;
       var pips=''; for(var i=0;i<c.seats;i++) pips+='<i class="'+(i<(editing?S.draft.length:c.passengers.length)?'f':'')+'"></i>';
-      var head='<div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':pn(c.driver))+'</b><div class="small muted">'+esc(c.when)+'</div></div></div>';
+      var head='<div class="drv">'+avatar(c.driver,'sm')+'<div><b>'+(isDrv?'Ты за рулём':pn(c.driver))+'</b><div class="small muted">'+whenFrom(c)+'</div></div></div>';
       if(editing){
         var mode=c.edit, pool, hint;
         if(mode==='full'){ pool=d.guests.filter(function(g){return g.name!==c.driver}).map(function(g){return g.name});
@@ -1156,6 +1272,8 @@ function vAdmin(){
   return '<h2>Штаб</h2><p class="small muted">Данные правятся в Google Таблице, страница подтянет их сама в течение минуты.</p>'+
     (gl.length?'<div class="note" style="display:grid;gap:4px">'+gl.map(function(x){return '<div>'+x+'</div>'}).join('')+'</div>':'<p class="small muted">Все распределены: машины, комнаты, места, задачи.</p>')+
     answers+totalCard(true)+
+    ((d.hostsAdmin||[]).length?'<div class="card"><h3 style="font-size:18px;margin-bottom:4px">Ведущие</h3><p class="small muted" style="margin-bottom:8px">Чтобы освободить место, удали его строку на листе «Ведущие».</p><div class="glist">'+(d.hostsAdmin||[]).map(function(h){
+      return '<div class="grow"><span>Ведущий '+h.slot+'</span><span class="small'+(h.taken?'':' muted')+'" style="text-align:right">'+(h.taken?esc(h.nick)+(h.tg?' · '+esc(h.tg):h.linked?' · Telegram':' · без Telegram'):'свободно')+'</span></div>'; }).join('')+'</div></div>':'')+
     '<div class="card"><h3 style="font-size:18px;margin-bottom:8px">Не придут</h3><div class="glist">'+(d.hidden.length?d.hidden.map(function(h){
       return '<div class="grow"><div>'+avatar(h.name,'sm')+'<span>'+pn(h.name)+' <span class="muted small">'+esc(h.character)+'</span></span></div><button class="btn sm" data-act="status" data-name="'+esc(h.name)+'" data-status="придёт"'+(S.busy?' disabled':'')+'>Вернуть</button></div>';
     }).join(''):'<p class="small muted">Никого.</p>')+'</div></div>'+
@@ -1187,14 +1305,15 @@ function render(){
   if(!S.qzChecked&&S.me&&!d.viewAs){ S.qzChecked=true; setTimeout(quizRecover,0); }
   var realMe=S.me; S.me=who();
   var tabs=d.tabs.slice(); if(d.access.admin) tabs.push({id:'admin',name:'Штаб'});
-  if(!tabs.some(function(t){return t.id===S.tab})) S.tab=tabs[0]?tabs[0].id:'me';
-  S.locked=!S.me&&!d.access.admin; if(S.locked) S.tab='me';
+  if(d.host){ tabs=[]; S.tab='host'; S.hostStep=''; }
+  else if(!tabs.some(function(t){return t.id===S.tab})) S.tab=tabs[0]?tabs[0].id:'me';
+  S.locked=!d.host&&!S.me&&!d.access.admin; if(S.locked) S.tab='me';
   var focusId=document.activeElement&&document.activeElement.id, selStart=document.activeElement&&document.activeElement.selectionStart;
-  var nm=tabName(S.tab), news=newsFor(nm), body;
+  var nm=tabName(S.tab), news=d.host?{top:'',rest:''}:newsFor(nm), body;
   if(S.tab==='me') body=vMe(); else if(S.tab==='plan') body=vPlan(); else if(S.tab==='people') body=vPeople();
-  else if(S.tab==='home') body=vHome(); else if(S.tab==='road') body=vRoad(); else if(S.tab==='admin') body=vAdmin(); else body='';
+  else if(S.tab==='home') body=vHome(); else if(S.tab==='road') body=vRoad(); else if(S.tab==='admin') body=vAdmin(); else if(S.tab==='host') body=vHost(); else body='';
   var dd=d.dates, from=(dd['Пт']||'').slice(0,2).replace(/^0/,''), to=(dd['Вс']||'').slice(0,2).replace(/^0/,'');
-  var showAdminLogin=!d.access.admin&&!d.tg&&S.tab==='me';
+  var showAdminLogin=!d.access.admin&&!d.tg&&!d.host&&!S.hostStep&&S.tab==='me';
   $app.innerHTML=(demoRaw?'<div class="demo">Демо на данных из таблиц. Код гостей «'+esc(demoRaw.settings['Кодовое слово гостей'])+'», организатора «'+esc(demoRaw.settings['Код организатора'])+'» (вход внизу вкладки «Я»).</div>':'')+
     (d.viewAs?'<div class="demo" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">'+(d.access.admin?'Ты смотришь как <b>'+esc(d.viewAs)+'</b>, только просмотр':'Ты в аккаунте <b>'+esc(d.viewAs)+'</b>')+'<button class="btn sm" data-act="viewas" data-name="">Вернуться к себе</button></div>':'')+
     '<header class="top"><div class="in"><div><span class="eyebrow">'+esc(d.subtitle)+(from?' · '+from+'–'+to+' ноября':'')+'</span><h1>'+esc(d.title)+'</h1></div><div class="now">'+(S.syncing?'<span class="sync" title="обновляю"></span>':'')+nowLine()+'</div></div></header>'+
@@ -1203,10 +1322,10 @@ function render(){
       (showAdminLogin?'<div class="foot">'+(S.showAdminLogin?'<form class="codeform" data-form="admin" style="width:min(360px,100%)"><input type="password" id="admininput" placeholder="Код организатора" autocomplete="off" aria-label="Код организатора"><button class="btn" type="submit">Войти</button></form>':'<button class="link" data-act="adminlogin">Вход для организаторов</button>')+'</div>':'')+
     (S.tab==='me'&&CONFIG.build?'<p class="small muted" style="text-align:center;opacity:.6">версия '+CONFIG.build.slice(6,8)+'.'+CONFIG.build.slice(4,6)+' '+CONFIG.build.slice(8,10)+':'+CONFIG.build.slice(10,12)+'</p>':'')+
     '</div></main>'+
-    '<nav class="tabbar" aria-label="Вкладки"><div class="in">'+tabs.map(function(t){
+    (tabs.length?'<nav class="tabbar" aria-label="Вкладки"><div class="in">'+tabs.map(function(t){
       if(S.locked&&t.id!=='me') return '<a role="button" aria-disabled="true" class="off" data-act="locked"><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
       return '<a href="#'+t.id+'" data-act="tab" data-tab="'+t.id+'" class="'+(t.id===S.tab?'on':'')+'"'+(t.id===S.tab?' aria-current="page"':'')+'><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
-    }).join('')+'</div></nav>';
+    }).join('')+'</div></nav>':'');
   if(focusId){var el=document.getElementById(focusId); if(el){el.focus(); try{if(selStart!=null) el.setSelectionRange(selStart,selStart)}catch(e){}}}
   S.me=realMe;
 }
@@ -1243,6 +1362,15 @@ document.addEventListener('click',function(e){
   else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
   else if(a==='reload'){ location.reload(); }
   else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
+  else if(a==='hostpick'){ S.hostStep='pick'; render(); window.scrollTo(0,0); }
+  else if(a==='hostslot'){ S.hostStep=+t.getAttribute('data-slot'); render(); var hi=document.getElementById('hnickin')||document.getElementById('hkeyin'); if(hi) hi.focus(); }
+  else if(a==='hostback'){ S.hostStep=S.hostStep==='pick'?'':'pick'; render(); }
+  else if(a==='hostf'){ S.hostF=t.getAttribute('data-f'); render(); }
+  else if(a==='hostmark'){ var hn=t.getAttribute('data-name'), mk=t.getAttribute('data-mark'), cur=hostMine(hn).mark;
+    hostSend({type:'hostNote',name:hn,mark:cur.indexOf(mk)>=0?cur.replace(mk,''):cur+mk}); }
+  else if(a==='hostsave'){ var hn2=t.getAttribute('data-name'), tx=S.hostDraft[hn2]; if(tx==null) return;
+    hostSend({type:'hostNote',name:hn2,text:tx},'Заметка сохранена',function(){ delete S.hostDraft[hn2]; }); }
+  else if(a==='hostout'){ S.host=''; S.hostKey=''; LS.set('host',''); LS.set('hkey',''); S.hostStep=''; S.tab='me'; S.data=null; $app.innerHTML='<div class="loading">Выхожу…</div>'; load(); }
   else if(a==='qzstart'){ quizStart(t.getAttribute('data-kind')); }
   else if(a==='qzpick'){ quizPick(+t.getAttribute('data-k')); }
   else if(a==='qznext'){ quizNext(); }
@@ -1260,9 +1388,24 @@ document.addEventListener('click',function(e){
     load().then(function(){ window.scrollTo(0,0); }); }
 });
 document.addEventListener('toggle',function(e){ var t=e.target; if(!t.classList) return; if(t.classList.contains('day-tasks')&&t.getAttribute('data-day')) S.openDays[t.getAttribute('data-day')]=t.open; if(t.classList.contains('story')) S.openNews[t.getAttribute('data-news')]=t.open; },true);
-document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); } else if(e.target.id==='when'+S.editCar){ S.draftWhen=e.target.value; } });
+document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); }
+  else if(e.target.id==='hq'){ S.hostQ=e.target.value; render(); }
+  else if(e.target.classList&&e.target.classList.contains('hnote')){ var hn=e.target.getAttribute('data-name'); S.hostDraft[hn]=e.target.value;
+    var sb=document.querySelector('[data-act="hostsave"][data-name="'+CSS.escape(hn)+'"]'); if(sb) sb.disabled=S.busy||e.target.value===hostMine(hn).text; } else if(e.target.id==='when'+S.editCar){ S.draftWhen=e.target.value; } });
 document.addEventListener('submit',function(e){
   var f=e.target.getAttribute('data-form'); if(!f) return; e.preventDefault();
+  if(f==='hostnew'||f==='hostlogin'){
+    var key=((document.getElementById('hkeyin')||{}).value||'').trim(), nick=((document.getElementById('hnickin')||{}).value||'').trim();
+    if(f==='hostnew'&&!nick){ toast('Напиши свой ник'); return; }
+    if(!key){ toast('Введи кодовое слово'); return; }
+    if(S.busy) return; var slot=S.hostStep; S.busy=true; S.host=String(slot); S.hostKey=key; render();
+    var fail=function(m){ S.host=''; S.hostKey=''; toast(m); };
+    (f==='hostnew'?api({type:'claimHost',slot:slot,nick:nick,hkey:key}):api()).then(function(d){
+      if(!d.host){ fail(f==='hostnew'?'Не получилось занять место':'Не то кодовое слово'); return; }
+      LS.set('host',S.host); LS.set('hkey',S.hostKey); accept(d); haptic('success'); toast('Добро пожаловать, '+d.host.nick);
+    }).catch(function(err){ fail(err.message); }).then(function(){ S.busy=false; render(); window.scrollTo(0,0); });
+    return;
+  }
   var v=(document.getElementById(f==='code'?'codeinput':'admininput')||{}).value||'';
   var prev=S.code; S.code=v.trim();
   api().then(function(d){
@@ -1272,7 +1415,7 @@ document.addEventListener('submit',function(e){
   }).catch(function(err){S.code=prev; toast(err.message)});
 });
 window.addEventListener('hashchange',function(){ var h=(location.hash||'').slice(1); if(h&&h!==S.tab&&S.data){ S.tab=h; render(); } });
-setInterval(function(){ if(S.data && !S.busy && document.visibilityState==='visible' && !(document.activeElement&&document.activeElement.tagName==='INPUT')) render(); },60000);
+setInterval(function(){ if(S.data && !S.busy && document.visibilityState==='visible' && !(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))) render(); },60000);
 document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'&&S.data&&!S.busy) load(); });
 
 // самообновление: если на GitHub лежит более новая версия страницы, перезагрузиться на неё
