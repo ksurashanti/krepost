@@ -248,7 +248,13 @@ details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-ra
 .ev.now{background:var(--olive);color:var(--on-olive)}
 .ev.now .t,.ev.now .muted{color:var(--on-olive);opacity:.85}
 .day{padding:0;overflow:hidden}
-.slots{grid-column:1/-1;display:grid;gap:6px;min-width:0}
+.slots{display:grid;gap:6px;min-width:0;margin-top:10px}
+details.ev,details.ev:first-of-type{display:block;border-top:1px solid var(--line)}
+details.ev > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:start}
+details.ev > summary::-webkit-details-marker{display:none}
+details.ev > summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:5px 4px 0 0}
+details.ev[open] > summary::after{transform:rotate(-135deg);margin-top:9px}
+details.ev.now > summary::after{border-color:var(--on-olive)}
 details.slot{background:var(--paper);border-radius:10px}
 details.slot > summary{cursor:pointer;list-style:none;padding:8px 12px;display:flex;align-items:center;gap:10px;font-size:14.5px}
 details.slot > summary::-webkit-details-marker{display:none}
@@ -734,7 +740,7 @@ function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-
 if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
-var S={openNews:{},openDays:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
+var S={openNews:{},openDays:{},openEv:{},openSlot:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
        selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms',
        visitor:LS.get('visitor')==='1',host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
 var demoRaw=null;
@@ -1168,7 +1174,7 @@ function slotsHtml(sl){
   return '<div class="slots">'+sl.map(function(s){
     var mine=k&&s.people.some(function(p){return norm_(p)===k});
     var any=s.people.some(isGuest);
-    return '<details class="slot'+(mine?' mine':'')+(any?'':' empty')+'"'+(mine?' open':'')+'><summary><span class="st">'+esc(s.time)+'</span><span>'+esc(s.name)+'</span><span class="small muted cnt">'+(s.people.every(isGuest)?plural(s.people.length,['человек','человека','человек']):esc(s.people.join(', ')))+'</span></summary>'+
+    return '<details class="slot'+(mine?' mine':'')+(any?'':' empty')+'" data-slot="'+esc(s.time)+'"'+((s.time in S.openSlot?S.openSlot[s.time]:mine)?' open':'')+'><summary><span class="st">'+esc(s.time)+'</span><span>'+esc(s.name)+'</span><span class="small muted cnt">'+(s.people.every(isGuest)?plural(s.people.length,['человек','человека','человек']):esc(s.people.join(', ')))+'</span></summary>'+
       (s.people.some(isGuest)?'<div class="chips">'+s.people.map(function(p){return isGuest(p)?chip(guestName(p)):'<span class="small muted">'+esc(p)+'</span>'}).join('')+'</div>':'')+'</details>';
   }).join('')+'</div>';
 }
@@ -1181,6 +1187,8 @@ function vPlan(){
       by[day].map(function(e){
         var tm=e.start&&e.end? e.start+'–'+e.end : (e.start? 'с '+e.start : 'до '+e.end);
         var sl=slotsOf(e.note);
+        if(sl){ var my=S.me&&sl.filter(function(x){return x.people.some(function(p){return norm_(p)===norm_(S.me)})})[0], key=e.day+e.start+e.title;
+          return '<details class="ev'+(isNow(e)?' now':'')+'" data-ev="'+esc(key)+'"'+(S.openEv[key]?' open':'')+'><summary><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div><div class="small muted">'+(my?'твоя группа в '+esc(my.time)+' · ':'')+plural(sl.filter(function(x){return x.people.some(isGuest)}).length,['группа','группы','групп'])+'</div></div></summary>'+slotsHtml(sl)+'</details>'; }
         return '<div class="ev'+(isNow(e)?' now':'')+'"><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div>'+(!sl&&e.note?'<div class="small muted">'+esc(e.note)+'</div>':'')+'</div>'+(sl?slotsHtml(sl):'')+'</div>';
       }).join('')+'</div>';
   }).join('');
@@ -1440,7 +1448,7 @@ document.addEventListener('click',function(e){
     if(!S.viewAs){ try{var c=JSON.parse(localStorage.getItem('chembalo.'+cacheKey())||'null'); if(c) S.data=c;}catch(x){} }
     load().then(function(){ window.scrollTo(0,0); }); }
 });
-document.addEventListener('toggle',function(e){ var t=e.target; if(!t.classList) return; if(t.classList.contains('day-tasks')&&t.getAttribute('data-day')) S.openDays[t.getAttribute('data-day')]=t.open; if(t.classList.contains('story')) S.openNews[t.getAttribute('data-news')]=t.open; },true);
+document.addEventListener('toggle',function(e){ var t=e.target; if(!t.classList) return; if(t.classList.contains('day-tasks')&&t.getAttribute('data-day')) S.openDays[t.getAttribute('data-day')]=t.open; if(t.classList.contains('story')) S.openNews[t.getAttribute('data-news')]=t.open; if(t.getAttribute('data-ev')) S.openEv[t.getAttribute('data-ev')]=t.open; if(t.getAttribute('data-slot')) S.openSlot[t.getAttribute('data-slot')]=t.open; },true);
 document.addEventListener('input',function(e){ if(e.target.id==='q'){ S.q=e.target.value; render(); }
   else if(e.target.id==='hq'){ S.hostQ=e.target.value; render(); }
   else if(e.target.classList&&e.target.classList.contains('hnote')){ var hn=e.target.getAttribute('data-name'); S.hostDraft[hn]=e.target.value;
