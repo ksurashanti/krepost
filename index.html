@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610191200-->
+<!--build:202610191610-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -390,8 +390,9 @@ table.dt td.blk{font-weight:700;color:var(--olive)}
 var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
+  address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610191200',
+  build: '202610191610',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -602,7 +603,7 @@ function buildPayload(raw, opts) {
   out.quizGames = GAMES;
   out.quizTotal = Object.keys(tally).map(function (n) { return tally[n]; })
     .sort(function (a, b) { return b.pts - a.pts || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0); });
-  if (acc.guest) { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; out.addressNote = s['Подпись к адресу'] || ''; }
+  { out.address = s['Адрес'] || ''; out.mapUrl = s['Ссылка на карту'] || ''; out.addressNote = s['Подпись к адресу'] || ''; }
   if (acc.admin) {
     out.duties = duties;
     out.props = allProps;
@@ -848,6 +849,7 @@ var I={
 };
 function icon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">'+I[n]+'</svg>'}
 function sigil(n){ var k=window.SIGIL_OF&&SIGIL_OF[n], x=k&&SIGILS[k]; return x?'<span class="sig" role="img" aria-label="'+esc(x.t)+'"><svg viewBox="0 0 100 100" aria-hidden="true">'+x.svg+'</svg></span>':''; }
+var SIGIL_NOTE={"Кирилл": "крест — знак церкви, которой ты правишь", "Слава": "судья — единственная защита горожан от произвола коменданта", "Тина": "у отца-судьи щит, у дочери меч", "Женя": "крестом подписывали документы, а ты душеприказчица", "Айк": "Геракл ловил золоторогую лань — священное животное Дианы", "Ирина": "олень — священное животное Дианы-охотницы", "Регина": "знак по имени", "Олеся": "посланница ханского двора", "Даня": "сапог — Италия, родина твоих предков", "Катейник": "лилия — клеймо Миледи", "Люба": "кухарка с тридцатилетним стажем", "Яна": "стража несёт дозор на башнях"};
 function sigilName(n){ var k=window.SIGIL_OF&&SIGIL_OF[n]; return k&&SIGILS[k]?SIGILS[k].t:''; }
 function guest(n){return S.data.guests.filter(function(g){return g.name===n})[0]||{name:n}}
 function avatar(n,cls){
@@ -1098,7 +1100,7 @@ function vMe(){
   else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
   var vs=mySlot(); if(vs) f.push([esc(vs.ev.title),esc(vs.slot.time),'группа «'+esc(vs.slot.name)+'»','plan']);
-  if(sigilName(S.me)) f.push(['Твой герб',sigil(S.me)+'<span style="font-size:16px">'+esc(sigilName(S.me))+'</span>','']);
+  if(sigilName(S.me)) f.push(['Твой герб',sigil(S.me)+'<span style="font-size:16px">'+esc(sigilName(S.me))+'</span>',esc(SIGIL_NOTE[S.me]||'')]);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(g.pickup) f.push(['Забрать у Ксении','<span style="font-size:16px">'+esc(g.pickup)+'</span>','забери до праздника',null,true]);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
@@ -1513,6 +1515,8 @@ function vHome(){
 
 function vRoad(){
   var d=S.data, myCar=carOf(S.me), drv=drives(S.me);
+  if(d.address===undefined){ d.address=CONFIG.address; }
+  if(!d.mapUrl&&d.address) d.mapUrl='https://yandex.ru/maps/?text='+encodeURIComponent(d.address);
   var addr = d.address!==undefined
     ? '<div class="card addr"><span class="eyebrow">куда ехать</span><b>'+esc(d.address||'адрес пока не указан')+'</b>'+(d.mapUrl?'<a class="btn ghost sm" style="justify-self:start" href="'+esc(d.mapUrl)+'" target="_blank" rel="noopener">Открыть карту</a>':'')+(d.addressNote?'<span class="small muted">'+esc(d.addressNote)+'</span>':'')+'</div>'
     : '<form class="card addr" data-form="code"><span class="eyebrow">куда ехать</span><p>Адрес откроется после кодового слова из чата.</p><div class="codeform"><input type="password" id="codeinput" placeholder="Кодовое слово" autocomplete="off" aria-label="Кодовое слово"><button class="btn" type="submit">Открыть</button></div></form>';
