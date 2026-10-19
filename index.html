@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610191607-->
+<!--build:202610191612-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -164,10 +164,12 @@ nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-r
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
 .sig{display:inline-block;width:1em;height:1em;flex:none;color:var(--olive);--sig-gap:var(--surface);vertical-align:-.16em}
 .sig svg{display:block;width:100%;height:100%}
-.fact .v .sig{font-size:26px;margin-right:8px;vertical-align:-.3em}
-.char h3 .sig{font-size:22px;margin-left:6px;vertical-align:-.25em}
+.fact .crest{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:17px;line-height:1.25;margin-top:4px}
+.fact .crest>span:last-child{min-width:0}
+.fact .crest .sig{font-size:56px}
+.char h3 .sig{font-size:28px;margin-left:8px;vertical-align:-.3em}
 .lb .sg{display:inline-flex;align-items:center;gap:8px;color:var(--sage);font-size:15px}
-.lb .sig{font-size:30px;color:var(--sage);--sig-gap:#12160a}
+.lb .sig{font-size:40px;color:var(--sage);--sig-gap:#12160a}
 .chip{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;padding:3px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:14px;max-width:100%}
 .chip.me{background:var(--olive);border-color:var(--olive);color:var(--on-olive);font-weight:600}
 .chip .n{color:var(--muted);font-size:13px}
@@ -392,7 +394,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610191607',
+  build: '202610191612',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1100,7 +1102,7 @@ function vMe(){
   else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
   var vs=mySlot(); if(vs) f.push([esc(vs.ev.title),esc(vs.slot.time),'группа «'+esc(vs.slot.name)+'»','plan']);
-  if(sigilName(S.me)) f.push(['Твой герб',sigil(S.me)+'<span style="font-size:16px">'+esc(sigilName(S.me))+'</span>',esc(SIGIL_NOTE[S.me]||'')]);
+  if(sigilName(S.me)) f.push(['Твой герб','<span class="crest">'+sigil(S.me)+'<span>'+esc(sigilName(S.me))+'</span></span>',esc(SIGIL_NOTE[S.me]||''),null]);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(g.pickup) f.push(['Забрать у Ксении','<span style="font-size:16px">'+esc(g.pickup)+'</span>','забери до праздника',null,true]);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
