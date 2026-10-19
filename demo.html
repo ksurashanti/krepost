@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610161408-->
+<!--build:202610161817-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -162,6 +162,12 @@ nav.tabbar .pill{display:grid;place-items:center;width:52px;height:28px;border-r
 
 /* общие */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.sig{display:inline-block;width:1em;height:1em;flex:none;color:var(--olive);--sig-gap:var(--surface);vertical-align:-.16em}
+.sig svg{display:block;width:100%;height:100%}
+.fact .v .sig{font-size:26px;margin-right:8px;vertical-align:-.3em}
+.char h3 .sig{font-size:22px;margin-left:6px;vertical-align:-.25em}
+.lb .sg{display:inline-flex;align-items:center;gap:8px;color:var(--sage);font-size:15px}
+.lb .sig{font-size:30px;color:var(--sage);--sig-gap:#12160a}
 .chip{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;padding:3px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:14px;max-width:100%}
 .chip.me{background:var(--olive);border-color:var(--olive);color:var(--on-olive);font-weight:600}
 .chip .n{color:var(--muted);font-size:13px}
@@ -319,6 +325,21 @@ details.slot .chips{padding:0 12px 10px}
 .addr{display:grid;gap:8px}
 .addr b{font-size:20px}
 .codeform{display:flex;gap:8px}
+.fortune{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.fortune>div:first-child{display:grid;gap:2px;min-width:0}
+.fortune b{font-size:18px}
+.fortune .btn{flex:none}
+.fortune.open{display:grid;gap:10px;justify-content:stretch;border:1px solid var(--olive-2)}
+.fortune.open>.fseer{display:flex;align-items:center;gap:14px}
+.fortune .fseer>div{display:grid;gap:2px}
+.fortune .ffl{font-style:italic;color:var(--muted)}
+.fortune .ftx{font-size:19px;font-weight:700;line-height:1.35;color:var(--olive)}
+.fortune.anim{animation:ftIn .9s ease-out}
+.fortune.anim .ffl{animation:ftFade .9s .25s both}
+.fortune.anim .ftx{animation:ftFade .9s .7s both}
+@keyframes ftIn{from{clip-path:inset(0 0 100% 0);transform:translateY(-6px)}to{clip-path:inset(0 0 0 0);transform:none}}
+@keyframes ftFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fortune.anim,.fortune.anim .ffl,.fortune.anim .ftx{animation:none}}
 input.tx,textarea.hnote{width:100%;padding:11px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font:inherit;color:inherit}
 textarea.hnote{resize:vertical;min-height:62px;padding:9px 12px}
 .hostin{display:flex;justify-content:center;padding-top:6px}
@@ -363,13 +384,14 @@ table.dt td.blk{font-weight:700;color:var(--olive)}
 <body>
 <div id="app"><div class="loading">Открываем ворота крепости…</div></div>
 
+<script src="sigils.js?v=1"></script>
 <script>
 /* ↓↓↓ ЕДИНСТВЕННОЕ, ЧТО НУЖНО ПОМЕНЯТЬ: вставь между кавычками адрес веб-приложения Apps Script ↓↓↓ */
 var CONFIG = {
   api: 'https://script.google.com/macros/s/AKfycbxDbtwQAhfc8Trhf0kQ_w3tGImxi04YMi-20Qs2qppV_rZeW7wm8aKN86mS0BTiTFa2/exec',
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   demo: null,
-  build: '202610161408',
+  build: '202610161817',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -825,6 +847,8 @@ var I={
   phone:'<path d="M6.5 3.5l3 .5 1.5 4-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2 4 1.5.5 3c-.2 1.2-1.3 2-2.5 2C10.5 19.5 4.5 13.5 4.5 6c0-1.2.8-2.3 2-2.5z"/>'
 };
 function icon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">'+I[n]+'</svg>'}
+function sigil(n){ var k=window.SIGIL_OF&&SIGIL_OF[n], x=k&&SIGILS[k]; return x?'<span class="sig" role="img" aria-label="'+esc(x.t)+'"><svg viewBox="0 0 100 100" aria-hidden="true">'+x.svg+'</svg></span>':''; }
+function sigilName(n){ var k=window.SIGIL_OF&&SIGIL_OF[n]; return k&&SIGILS[k]?SIGILS[k].t:''; }
 function guest(n){return S.data.guests.filter(function(g){return g.name===n})[0]||{name:n}}
 function avatar(n,cls){
   var g=guest(n), src=g.avatar||(CONFIG.avatarDir?CONFIG.avatarDir+encodeURIComponent(n)+'.jpg'+(CONFIG.av&&CONFIG.av[n]?'?v='+CONFIG.av[n]:''):'');
@@ -947,6 +971,7 @@ function quizNext(){
 function quizCta(){
   var d=S.data;
   if(viewingShared()) return '<button class="qcta" data-act="mgplay"><span class="ic">🍗</span><span><b>Всем мешать!</b><span class="small">Мини-игра за Макара: ползи по столу и сбрасывай всё подряд, пока гости не поймали</span></span><span class="go">›</span></button>';
+  return ''; // плашка «Испытай себя» скрыта по просьбе Ксении (викторины остаются на вкладке «Роли»)
   if(!S.me||d.viewAs||!d.quizMine) return '';
   var left=['roles','history'].reduce(function(n,k){return n+quizLeft(k)},0); if(!left) return '';
   var fresh=left===QMAX*2;
@@ -990,7 +1015,7 @@ function showSwitching(){
 }
 function openLb(n){
   var g=guest(n), d=document.createElement('div'); d.className='lb'; d.setAttribute('role','dialog'); d.setAttribute('aria-label',n);
-  d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+
+  d.innerHTML=avatar(n,'')+'<b>'+esc(n)+'</b>'+(g.character?'<span class="r">'+esc(g.character)+'</span>':'')+(sigilName(n)?'<span class="sg">'+sigil(n)+esc(sigilName(n))+'</span>':'')+
     (S.data&&(S.data.host||(S.visitor&&!S.me))?'':'<div class="acts">'+(g.character&&g.about?'<button class="go" data-act="char" data-name="'+esc(n)+'">Описание роли</button>':'')+
     (g.shared&&n!==S.me?'<button class="go" data-act="viewas" data-name="'+esc(n)+'">'+icon('me')+'Зайти в аккаунт</button>':'')+
     (!g.shared&&g.tg&&/^[A-Za-z0-9_]{4,}$/.test(g.tg)&&n!==S.me?'<a class="go" href="https://t.me/'+esc(g.tg)+'" data-tg="'+esc(g.tg)+'" target="_blank" rel="noopener">'+icon('tg')+'Написать</a>':'')+'</div>');
@@ -1073,10 +1098,15 @@ function vMe(){
   else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
   var vs=mySlot(); if(vs) f.push([esc(vs.ev.title),esc(vs.slot.time),'группа «'+esc(vs.slot.name)+'»','plan']);
+  if(sigilName(S.me)) f.push(['Твой знак',sigil(S.me)+'<span style="font-size:16px">'+esc(sigilName(S.me))+'</span>','на стакане и на подвеске']);
   if(g.costume) f.push(['Одолжено у Ксении','<span style="font-size:16px">'+esc(g.costume)+'</span>','не забудь вернуть',null,true]);
   if(g.pickup) f.push(['Забрать у Ксении','<span style="font-size:16px">'+esc(g.pickup)+'</span>','забери до праздника',null,true]);
   if(mine.length) f.push(['Везёшь',mine.length+' '+(mine.length===1?'вещь':mine.length<5?'вещи':'вещей'),mine.map(function(p){return esc(p.item)}).join(', '),'road',true]);
-  var col=0, facts=f.map(function(x,i){var wide=x[4]||(col===0&&i===f.length-1); col=wide?0:(col+1)%2;
+  // ровная сетка: сначала узкие плашки парами (непарная растягивается на всю ширину), потом широкие
+  var narrow=f.filter(function(x){return !x[4]}), wideL=f.filter(function(x){return x[4]});
+  if(narrow.length%2) narrow[narrow.length-1]=narrow[narrow.length-1].slice(0,4).concat([true]);
+  f=narrow.concat(wideL);
+  var facts=f.map(function(x){var wide=!!x[4];
     return '<div class="fact'+(wide?' wide':'')+'"'+(x[3]?' data-act="goto" data-tab="'+x[3]+'" style="cursor:pointer"':'')+'><span class="k">'+x[0]+'</span><span class="v">'+x[1]+'</span>'+(x[2]?'<span class="s">'+x[2]+'</span>':'')+'</div>';}).join('');
 
   var tasks=d.myTasks.length? ['Пт','Сб','Вс'].map(function(day){
@@ -1102,7 +1132,7 @@ function vMe(){
 
   return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role"><button class="rl plain" data-act="lb" data-name="'+esc(S.me)+'">'+esc(g.character)+'</button></div>':'<div class="small muted">'+(g.shared?'тоже '+esc(S.me):'без роли в квесте')+'</div>')+
       (d.tg||d.viewAs?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+quizCta()+
-    (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+
+    (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+fortuneCard()+
     '<div class="facts">'+facts+'</div>'+
     '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">Открой нужный день. Внутри твои задачи по времени и вся твоя команда.</p></div>'+tasks;
 }
@@ -1134,7 +1164,7 @@ function vHost(){
     '<div class="hfilt">'+flt.map(function(f){return '<button class="chip'+(F===f[0]?' me':'')+'" data-act="hostf" data-f="'+f[0]+'" aria-pressed="'+(F===f[0])+'">'+f[1]+' <span class="n">'+f[2]+'</span></button>'}).join('')+'</div>'+
     '<div class="chars">'+(shown.length?shown.map(function(g){
       var n=g.name, m=hostMine(n), dr=S.hostDraft[n], val=dr!=null?dr:m.text, others=((d.hostNotes||{})[n]||[]).filter(function(x){return !x.mine});
-      return '<article class="card hcard"><div class="char">'+avatar(n)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(n)+'">'+esc(g.character)+'</button></h3><div class="small"><span class="muted">играет</span> <b>'+esc(n)+'</b></div>'+(g.about?'<p class="about small">'+esc(g.about)+'</p>':'')+'</div></div>'+
+      return '<article class="card hcard"><div class="char">'+avatar(n)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(n)+'">'+esc(g.character)+'</button>'+sigil(n)+'</h3><div class="small"><span class="muted">играет</span> <b>'+esc(n)+'</b></div>'+(g.about?'<p class="about small">'+esc(g.about)+'</p>':'')+'</div></div>'+
         '<div class="hmarks">'+[['★','★ важно'],['✓','✓ отработан']].map(function(k){var on=m.mark.indexOf(k[0])>=0; return '<button class="chip'+(on?' me':'')+'" data-act="hostmark" data-name="'+esc(n)+'" data-mark="'+k[0]+'" aria-pressed="'+on+'"'+(S.busy?' disabled':'')+'>'+k[1]+'</button>'}).join('')+'</div>'+
         '<textarea class="hnote" id="hn-'+esc(n)+'" data-name="'+esc(n)+'" rows="2" maxlength="1000" placeholder="Заметка" aria-label="Заметка про '+esc(n)+'">'+esc(val)+'</textarea>'+
         '<div><button class="btn sm" data-act="hostsave" data-name="'+esc(n)+'"'+(val===m.text||S.busy?' disabled':'')+'>Сохранить</button></div>'+
@@ -1200,8 +1230,8 @@ function vPeople(){
   var vis=S.visitor&&!S.me&&!S.data.access.admin;
   return '<h2>Роли</h2>'+(vis?'':quizCard())+'<input type="search" id="q" placeholder="Имя, роль или слово из описания" value="'+esc(S.q)+'" aria-label="Поиск по жителям">'+
     '<div class="chars">'+(list.length? list.map(function(g){
-      return '<article id="char-'+esc(g.name)+'" class="card char'+(g.name===S.me?' me':'')+'">'+avatar(g.name)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(g.name)+'">'+esc(g.character||g.name)+'</button></h3>'+(g.character?'<div class="small"><span class="muted">играет</span> <b>'+(g.name===S.me?'ты':esc(g.name))+'</b></div>':'')+'<p class="about small">'+linkRoles(g.about,g.name)+'</p>'+'</div></article>';
-    }).join('') : '<p class="muted">Никого не нашли.</p>')+'</div>'+(vis?'<div style="margin-top:8px">'+quizCard()+'</div>':'');
+      return '<article id="char-'+esc(g.name)+'" class="card char'+(g.name===S.me?' me':'')+'">'+avatar(g.name)+'<div style="min-width:0"><h3><button class="rl plain" data-act="lb" data-name="'+esc(g.name)+'">'+esc(g.character||g.name)+'</button>'+sigil(g.name)+'</h3>'+(g.character?'<div class="small"><span class="muted">играет</span> <b>'+(g.name===S.me?'ты':esc(g.name))+'</b></div>':'')+'<p class="about small">'+linkRoles(g.about,g.name)+'</p>'+'</div></article>';
+    }).join('') : '<p class="muted">Никого не нашли.</p>')+'</div>'+(vis?'<div style="margin-top:8px;display:grid;gap:12px">'+fortuneCard()+quizCard()+'</div>':'');
 }
 
 var PLAN={
@@ -1239,6 +1269,219 @@ function planSvg(fl){
   if(P.tower){var tw=P.rooms.tower; h+='<polygon class="room'+(myRoom&&myRoom.id==='tower'?' me':'')+(S.selRoom==='tower'&&!(myRoom&&myRoom.id==='tower')?' sel':'')+'" data-act="room" data-id="tower" points="'+P.tower+'"/><text text-anchor="middle" x="146" y="118">БАШНЯ</text>';}
   h+='<rect class="wall" x="'+o[0]+'" y="'+o[1]+'" width="'+o[2]+'" height="'+o[3]+'"/>';
   return '<svg class="plan" viewBox="'+P.vb+'" role="img" aria-label="План '+fl+'-го этажа">'+h+'</svg>';
+}
+
+/* ---------- билет судьбы: одно предсказание в день ---------- */
+var FT={
+  seers:[
+    {n:'Саша',fl:[
+      'Ганнибал икает, чешет ухо и вдруг смотрит на тебя совершенно трезво:',
+      'Ганнибал выливает остатки сидра на мостовую и читает по лужице:',
+      'Ганнибал считает голубей на стене, сбивается и шепчет:',
+      'Ганнибал надевает кружку на голову, как шлем, и вещает:',
+      'Ганнибал долго нюхает твой рукав, кивает и говорит:',
+      'Ганнибал ловит муху, отпускает её и объявляет:',
+      'Ганнибал поёт песню без слов, а потом добавляет уже словами:',
+      'Ганнибал рисует палкой в пыли круг, плюёт в середину и говорит:',
+      'Ганнибал просит монетку, прикусывает её и сообщает:',
+      'Ганнибал шепчется со своим левым сапогом. Сапог, видимо, отвечает:',
+      'Ганнибал вдруг перестаёт смеяться. Тишина. Потом:',
+      'Ганнибал загибает пальцы, пальцев не хватает, и он говорит:',
+      'Ганнибал залезает на бочку, падает с неё и, лёжа, изрекает:',
+      'Ганнибал смотрит на солнце, чихает трижды и говорит:']},
+    {n:'Регина',fl:[
+      'Роза бросает в огонь пучок полыни. Дым сворачивается в знак:',
+      'Роза долго держит твою ладонь и цокает языком:',
+      'Роза растирает в ступке корень мандрагоры и, не поднимая глаз, говорит:',
+      'Роза капает воск в чашу с водой. Воск застывает странной фигурой:',
+      'Роза раскладывает на столе сушёные травы. Одна лишняя. Роза хмурится:',
+      'Роза принюхивается к воздуху у твоего плеча, как будто ищет хворь, и говорит:',
+      'Роза подбрасывает горсть фасоли и смотрит, как она легла:',
+      'Роза зачерпывает из котелка что-то зелёное, пробует и морщится:',
+      'Роза снимает с шеи оберег, касается им твоего лба и шепчет:',
+      'Роза смотрит в котелок дольше, чем следовало бы:',
+      'Роза пересчитывает пиявок в банке. Одна смотрит прямо на тебя. Роза кивает:',
+      'Роза жжёт лавровый лист. Он трещит громко, к переменам:',
+      'Роза достаёт из мешочка косточку, вертит её в пальцах и говорит:']},
+    {n:'Ксения',fl:[
+      'Сестра Акулина откладывает счётную книгу епископа и шепчет:',
+      'Сестре Акулине было видение во время вечерни:',
+      'Сестра Акулина перебирает чётки, сбивается на тринадцатой бусине и говорит:',
+      'Сестра Акулина зажигает свечу. Пламя клонится к тебе:',
+      'Сестра Акулина закрывает молитвенник, а между страниц оказывается записка:',
+      'Сестра Акулина сверяется с церковным календарём и с подозрением смотрит на тебя:',
+      'Сестра Акулина звонит в колокольчик. Эхо отвечает ей словами:',
+      'Сестра Акулина вспоминает, что епископ сегодня не в духе, и всё же говорит:',
+      'Сестра Акулина ставит галочку в списке дел и вдруг поднимает глаза:',
+      'Сестре Акулине приснился ангел со счётами. Ангел велел передать:',
+      'Сестра Акулина, не отрываясь от бумаг, произносит:',
+      'Сестра Акулина кропит тебя святой водой. Немного попадает в глаз, зато видение ясное:']}
+  ],
+  common:[
+    'Сегодня удача любит тех, кто говорит последним.',
+    'Не одалживай ничего тому, кто улыбается слишком широко.',
+    'Твой день решит случайная встреча у колодца. Или у кофемашины.',
+    'Звёзды над Балаклавой благосклонны к смелым, но не к болтливым.',
+    'Сегодня лучше не спорить с поварами и котами.',
+    'Кто-то думает о тебе прямо сейчас. Возможно, с недоумением.',
+    'Береги левый сапог.',
+    'Сегодня найдётся то, что давно потерялось. Не обязательно твоё.',
+    'Не верь вестям, что приходят до полудня.',
+    'Вечер принесёт хорошую новость, а утро её подтвердит.',
+    'Сегодня твоё слово весит больше, чем кошелёк.',
+    'Звёзды советуют: ешь первым, пока стол полон.',
+    'Тайна раскроется сама, если перестать на неё смотреть.',
+    'Сегодня день для дерзких планов и осторожных шагов.',
+    'Не открывай дверь, за которой поют.',
+    'Ворон на стене знает о тебе больше, чем кажется. Угости его.',
+    'Сегодня будет три знака. Третий окажется смешным.',
+    'Главное сокровище дня лежит в соседнем кармане.',
+    'Остерегайся людей с перьями. Особенно с тремя.',
+    'Скоро кто-то попросит у тебя совета. Дай плохой, это к удаче.',
+    'Луна сегодня на твоей стороне, а вот солнце пока думает.',
+    'Чем меньше обещаешь, тем больше сбудется.',
+    'Сегодня можно всё, кроме того, что первым пришло в голову.',
+    'Отложи важное до заката. После заката отложи ещё раз.',
+    'Тебя ждёт подарок. Скорее всего, в виде поручения.',
+    'С башни видны генуэзские корабли. Значит, всё идёт по плану.',
+    'Сегодня ветер с моря. Он принесёт либо новости, либо насморк.',
+    'Не считай монеты на людях: звёзды тоже считают.',
+    'Кто рано встаёт, тому знахарь не нужен.',
+    'Сегодня улыбка откроет тебе больше дверей, чем ключ коменданта.',
+    'Под камнем, на который ты смотришь, ничего нет. Но смотреть приятно.',
+    'Скоро тебе приснится сидр. Сон будет вещим.',
+    'Будь осторожнее с лестницами и с обещаниями.',
+    'Сегодня вода в колодце особенно честная. Пей и говори правду.',
+    'Кто-то в крепости прячет твой будущий трофей.',
+    'Звезда, что упала прошлой ночью, загадала тебя.',
+    'Сегодня карманы держи застёгнутыми, а сердце открытым.',
+    'Самое важное сегодня случится между двумя чашками.',
+    'Сегодня ты станешь причиной чьего-то смеха. Смейся вместе.',
+    'Хорошая весть придёт оттуда, откуда обычно приходят счета.',
+    'Сегодня не день для подвигов. Завтра посмотрим.',
+    'Тень от башни укажет тебе путь. Если будет солнце.',
+    'Ни в коем случае не наступай на третью ступеньку.',
+    'Этой ночью кто-то назовёт тебя мудрецом. Не спорь.',
+    'Не жалей хлеба и береги секреты.',
+    'Фортуна сегодня в хорошем настроении, но с причудами.',
+    'Слушай, что говорят у кухни. Там всегда правда.',
+    'Тебе выпадет шанс. Он будет выглядеть как неудобство.',
+    'Звёзды настаивают на десерте.',
+    'В зеркале сегодня будет кто-то очень знакомый и очень довольный.',
+    'Не ищи врагов там, где просто плохо заварили чай.',
+    'Скоро тебя позовут. Иди, не раздумывая.',
+    'Кот перейдёт тебе дорогу. Это его дорога, будь вежливее.',
+    'Сегодня всё получится со второго раза. Первый не считается.',
+    'Тебе выпала карта Шута. Это хорошая карта.',
+    'Скоро о себе напомнит старый друг. Возможно, долгом.',
+    'В твоих руках больше, чем кажется. Пересчитай.',
+    'Дождь сегодня смоет только плохое.',
+    'Песня, что прицепится к тебе утром, и есть ответ.',
+    'Береги голос, впереди тосты.',
+    'День будет длинным, но вечер всё искупит.',
+    'Не всякая закрытая дверь заперта. Подёргай.',
+    'Кто-то смотрит на тебя с восхищением. Обернись медленно.',
+    'Сегодня можно немного схитрить. Совсем немного.',
+    'Звёзды молчат. Это добрый знак: им нечего добавить.',
+    'Твоё число сегодня семь. Распорядись им мудро.',
+    'Беги от скуки, как от чумы.',
+    'Подарок судьбы уже в пути, но едет на телеге.',
+    'Сегодня всё, что пролито, к счастью. Кроме чернил.',
+    'Не доверяй тому, кто знает все ответы. Особенно себе после полуночи.'
+  ]
+};
+var FT_GEN={"Монашка Акулина": "Монашки Акулины", "Геракл Майкон": "Геракла Майкона", "Диана Йеремия": "Дианы Йеремии", "Аделина": "Аделины", "Родриго Сакки": "Родриго Сакки", "Август Конигула": "Августа Конигулы", "Ганнибал Вектор": "Ганнибала Вектора", "Матильда Вольтер": "Матильды Вольтер", "Аким Ким": "Акима Кима", "Абрам Херес": "Абрама Хереса", "Роза Грубер": "Розы Грубер", "Марла Зингер": "Марлы Зингер", "Хамон Херес": "Хамона Хереса", "Сулейман Бакарра": "Сулеймана Бакарры", "Джулия Грубер": "Джулии Грубер", "Фредерик Вольтер": "Фредерика Вольтера", "Епископ Антуан": "Епископа Антуана", "Далила Тони": "Далилы Тони", "Гаянэ Исхаки": "Гаянэ Исхаки", "Персей Майкон": "Персея Майкона", "Динара Карагунис": "Динары Карагунис", "Чезаре Пранделли": "Чезаре Пранделли", "Миледи Айя": "Миледи Айи", "Галатея Руссо": "Галатеи Руссо", "Отшельница Хани": "Отшельницы Хани"};
+function ftHash(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function ftPick(arr,seed){ return arr.length?arr[ftHash(seed)%arr.length]:null; }
+function ftToday(){
+  var q=(location.search.match(/[?&]fdate=(\d{4}-\d{2}-\d{2})/)||[])[1]; if(q) return q;
+  var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+}
+function ftPhase(today){
+  var p=String((S.data.dates||{})['Пт']||'06.11.2026').split('.'), fri=new Date(+p[2],+p[1]-1,+p[0]);
+  var iso=function(dd){ return dd.getFullYear()+'-'+('0'+(dd.getMonth()+1)).slice(-2)+'-'+('0'+dd.getDate()).slice(-2); };
+  var off=function(n){ var x=new Date(fri); x.setDate(x.getDate()+n); return iso(x); };
+  return today===off(-1)?'eve':today===off(0)?'fri':today===off(1)?'sat':today===off(2)?'sun':'';
+}
+function ftList(arr){ return arr.length<2?arr.join(''):arr.slice(0,-1).join(', ')+' и '+arr[arr.length-1]; }
+function ftPersonal(me,phase,seed){
+  var d=S.data, g=guest(me), room=roomOf(me), seat=seatOf(me), car=carOf(me), drv=drives(me), out=[];
+  var mates=room?room.people.filter(function(p){return p!==me}):[];
+  var nn=d.seats.length, at=function(k){ var x=d.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name&&x.name!==me?x.name:''; };
+  var left=seat?at(seat.seat+1):'', right=seat?at(seat.seat-1):'';
+  var tasks=function(day){ return (d.myTasks||[]).filter(function(t){return !day||t.day===day}); };
+  var others=d.guests.filter(function(x){return x.character&&x.name!==me&&!x.shared});
+  var other=ftPick(others,seed+'|o'), mate=ftPick(mates,seed+'|m'), task=function(day){ return ftPick(tasks(day),seed+'|t'+day); };
+  var prop=ftPick(d.myProps||[],seed+'|p'), pas=drv.length?drv[0].passengers:[];
+  var add=function(ok,txt){ if(ok) out.push(txt); };
+  var R=g.character, rn=room&&room.name, dr=car&&car.driver, tk, P=prop&&prop.item;
+  var o1=other&&other.character, o2=(ftPick(others.filter(function(x){return x!==other}),seed+'|o2')||{}).character;
+  var G=function(r){ return FT_GEN[r]||('персоны по имени '+r); };
+  if(phase==='eve'){
+    add(o1,'Бойся '+G(o1)+'.');
+    add(o1,'Завтра сапоги '+G(o1)+' будут блестеть ярче твоих.');
+    add(o1,'Улыбка '+G(o1)+' обманчива. Проверь завтра.');
+    add(o1,'Тайна '+G(o1)+' раскроется в эти выходные.');
+    add(o1&&o2,o1+' и '+o2+' что-то замышляют. Держись между ними.');
+    add(dr,'Не спорь с водителем ('+dr+') о музыке. Проиграешь.');
+    add(pas.length,'Кто-то из твоих пассажиров попросит остановиться. Дважды.');
+    add(mate,mate+' будет храпеть. Или ты. Звёзды пока не договорились.');
+    add(P,'Не забудь „'+P+'“.');
+    out.push('Возьми запасные носки.');
+  } else if(phase==='fri'){
+    add(mate,mate+' этой ночью будет храпеть. Или ты. Звёзды пока не договорились.');
+    add(o1,'Бойся '+G(o1)+' у мангала.');
+    add(o1,'Кубок '+G(o1)+' сегодня полнее твоего. Это поправимо.');
+    add(o1,'Сегодня '+o1+' спросит у тебя совета. Не давай.');
+    add(dr,'Водитель ('+dr+') знает короткую дорогу. Не верь.');
+    add(rn,'Ключ от „'+rn+'“ потеряется. Ненадолго.');
+    tk=task('Пт'); add(tk,'Сегодня твой пост: „'+(tk&&tk.task)+'“. Не сбегай.');
+    out.push('Первый кубок за дорогу. Остальные по ситуации.');
+  } else if(phase==='sat'){
+    add(right,'Тот, кто сидит справа ('+right+'), сегодня утащит что-то с твоей тарелки. Защищай самое вкусное.');
+    add(left,'Тот, кто сидит слева ('+left+'), сегодня выпьет твой сидр. Следи за кубком.');
+    add(o1,'Бойся '+G(o1)+' на пиру.');
+    add(o1,'Сапоги '+G(o1)+' сегодня будут блестеть. Это знак.');
+    add(o1,'Сегодня '+o1+' выдаст чужую тайну. Возможно, твою.');
+    add(o1,o1+' сегодня врёт. Не во всём.');
+    add(mate,mate+' этой ночью будет храпеть. Или ты. Звёзды пока не договорились.');
+    tk=task('Сб'); add(tk,(tk&&tk.time?'В '+tk.time+' ':'Сегодня ')+'тебя ждут на посту „'+(tk&&tk.task)+'“. Не опаздывай.');
+    out.push('Не верь никому, кто трезв после полуночи.');
+  } else if(phase==='sun'){
+    // игра закончилась: дальше настоящие имена и разъезд
+    var ppl=d.guests.filter(function(x){return x.name!==me&&!x.shared}).map(function(x){return x.name});
+    var F=['Ксения','Ирина','Оля','Маня','Тина','Регина','Люба','Маша','Женя','Олеся','Яна','Катейник','Юля','Кристи'], fem=function(x){return F.indexOf(x)>=0};
+    var n1=ftPick(ppl,seed+'|n1'), n2=ftPick(ppl.filter(function(x){return x!==n1&&fem(x)===fem(n1)}),seed+'|n2');
+    add(n1,n1+' сегодня найдёт чужой носок. Возможно, твой.');
+    add(n1,n1+' знает, кто вчера доел торт. Спроси.');
+    add(n1,'Сегодня '+n1+' скажет „давайте ещё раз так соберёмся“. Соглашайся.');
+    add(n1,'Прощаясь, '+n1+' обнимет тебя дважды. Второй раз за вчерашнее.');
+    add(n1&&n2,n1+' и '+n2+' уедут последними. Не мешай им прощаться.');
+    add(n1,'Твоя зарядка уехала в чужой сумке. Главный подозреваемый: '+n1+'.');
+    add(mate,mate+' разбудит тебя раньше, чем хотелось бы. Или ты. Звёзды пока не договорились.');
+    tk=task('Вс'); add(tk,'Последний подвиг: „'+(tk&&tk.task)+'“. Потом можно домой.');
+    add(g.costume,'Не уезжай, не вернув Ксении то, что одолжено: '+g.costume+'.');
+    out.push('Домой уедет больше вещей, чем приехало. Проверь, что все они твои.');
+    out.push('Лучшее фото с праздника будет с закрытыми глазами. Твоими.');
+    out.push('Крепость отпускает тебя. Ненадолго.');
+  }
+  return ftPick(out,seed+'|x');
+}
+function fortune(me){
+  var today=ftToday(), who=me;
+  if(!who){ who=LS.get('vid'); if(!who){ who='v'+Math.random().toString(36).slice(2,8); LS.set('vid',who); } }
+  var seed=who+'|'+today, phase=me?ftPhase(today):'';
+  var seers=FT.seers.filter(function(s){return s.n!==me});
+  var sr=seers[ftHash(seed+'|s')%seers.length], sg=guest(sr.n);
+  var text=(phase&&ftPersonal(me,phase,seed))||ftPick(FT.common,seed+'|c');
+  return {key:seed, seer:sr.n, role:sg.character||sr.n, flavor:ftPick(sr.fl,seed+'|f'), text:text};
+}
+function fortuneCard(){
+  if(!S.data||!S.data.guests) return '';
+  var f=fortune(S.me), open=LS.get('fortune')===f.key;
+  if(!open) return '<div class="card fortune"><div><b>Предсказание на сегодня</b><span class="small muted">Одно предсказание в день. Кто сегодня гадает, узнаешь, когда вытянешь.</span></div><button class="btn" data-act="fortune">Вытянуть</button></div>';
+  return '<div class="card fortune open'+(S.ftAnim?' anim':'')+'"><div class="fseer">'+avatar(f.seer)+'<div><span class="eyebrow">предсказание на сегодня</span><b><button class="rl plain" data-act="lb" data-name="'+esc(f.seer)+'">'+esc(f.role)+'</button> <span class="muted" style="font-weight:500">('+esc(f.seer)+')</span></b></div></div>'+
+    '<p class="ffl">'+esc(f.flavor)+'</p><p class="ftx">«'+esc(f.text)+'»</p><p class="small muted">Новое предсказание завтра.</p></div>';
 }
 
 
@@ -1345,7 +1588,8 @@ function vAdmin(){
 }
 
 function contactsHtml(){
-  var list=(S.data.contacts||[]).filter(function(c){return c.top});
+  var vis=S.visitor&&!S.me&&!S.data.access.admin&&!S.data.host;
+  var list=(S.data.contacts||[]).filter(function(c){return c.top&&(!vis||c.name==='Ксения'||c.name==='Айк')});
   if(!list.length) return '';
   return '<div class="contacts" aria-label="Важные контакты">'+list.map(function(c){
     return '<div class="ct">'+avatar(c.name,'sm')+'<div class="who"><b>'+pn(c.name)+'</b><span>'+esc(c.role)+'</span></div><div class="acts">'+
@@ -1421,6 +1665,7 @@ document.addEventListener('click',function(e){
   else if(a==='logout'){ S.code=''; LS.set('code',''); goTab('me'); load(); }
   else if(a==='reload'){ location.reload(); }
   else if(a==='lb'){ openLb(t.getAttribute('data-name')); }
+  else if(a==='fortune'){ LS.set('fortune',fortune(who()).key); S.ftAnim=true; haptic('success'); render(); setTimeout(function(){S.ftAnim=false},1200); }
   else if(a==='visitor'){ S.visitor=true; LS.set('visitor','1'); S.q=''; render(); window.scrollTo(0,0); }
   else if(a==='visitorout'){ quizClose(true); S.visitor=false; LS.set('visitor',''); S.tab='me'; LS.set('tab','me'); try{history.replaceState(null,'','#me')}catch(x){} render(); window.scrollTo(0,0); }
   else if(a==='hostpick'){ S.hostStep='pick'; render(); window.scrollTo(0,0); }
