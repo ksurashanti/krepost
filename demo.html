@@ -441,7 +441,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610222252',
+  build: '202610222259',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1163,6 +1163,7 @@ function guildCards(d){
         if(/\?\s*$/.test(p.note)&&p.name===S.me){ P.ask=true; P.row=k.row; }
       });
     });
+    tasks.sort(function(x,y){ var mx=Math.min.apply(null,x.rows.map(function(k){return k.row||1e9})), my=Math.min.apply(null,y.rows.map(function(k){return k.row||1e9})); return mx-my; });
     tasks.forEach(function(T){ T.days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)}); T.crowd=T.people.length; var tms={}; T.rows.forEach(function(k){ tms[rangeOf_(k)]=1; }); T.split=Object.keys(tms).length>1&&T.crowd>8; });
     var mine=d.myTasks.filter(function(t){return t.block===b&&(!day||t.day===day)});
     return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine,days:days,day:day};
