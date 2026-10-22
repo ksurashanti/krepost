@@ -408,7 +408,7 @@ table.dt td.blk{font-weight:700;color:var(--olive)}
 .gc-own{margin-top:8px;background:var(--paper);border-radius:10px;padding:9px 12px;display:grid;gap:3px}
 .gc-own span{font-size:12.5px;color:var(--muted);font-weight:600}
 .gc-own p{font-size:14px;white-space:pre-line}
-.gc-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:2px}
+.gc-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:-4px}
 .gc-dots button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:4px 11px;font-size:13px;font-weight:600;cursor:pointer}
 .gc-dots button.on{background:var(--olive);border-color:var(--olive);color:var(--on-olive)}
 .glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));column-gap:24px}
@@ -431,7 +431,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610222233',
+  build: '202610222239',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1147,7 +1147,7 @@ function guildCards(d){
         if(/\?\s*$/.test(p.note)&&p.name===S.me){ P.ask=true; P.row=k.row; }
       });
     });
-    tasks.forEach(function(T){ T.days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)}); T.crowd=T.people.length; T.split=T.rows.length>1&&T.rows.every(function(k){return T.rows[0].day===k.day})&&T.crowd>8; });
+    tasks.forEach(function(T){ T.days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)}); T.crowd=T.people.length; var tms={}; T.rows.forEach(function(k){ tms[rangeOf_(k)]=1; }); T.split=Object.keys(tms).length>1&&T.crowd>8; });
     var mine=d.myTasks.filter(function(t){return t.block===b});
     return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine};
   });
@@ -1155,13 +1155,14 @@ function guildCards(d){
 function guildCarousel(d){
   var cards=guildCards(d); if(!cards.length) return '';
   var cur=Math.min(S.gIdx||0,cards.length-1);
-  return '<div class="gcar" id="gcar">'+cards.map(function(c,i){
+  var dots=cards.length>1?'<div class="gc-dots" role="tablist">'+cards.map(function(c,i){return '<button class="'+(i===cur?'on':'')+'" data-act="gcgo" data-i="'+i+'" aria-label="'+esc(c.guild)+'"><span>'+esc(c.guild)+'</span></button>'}).join('')+'</div>':'';
+  return dots+'<div class="gcar" id="gcar">'+cards.map(function(c,i){
     var tasksHtml=c.tasks.map(function(T){
       var when=T.days.map(function(day){ return day.toLowerCase()+(T.times[day]&&!T.split?' <b>'+esc(T.times[day])+'</b>':''); }).join(' · ');
       var body;
       if(T.split){
         var my=c.mine.filter(function(t){return t.task===T.name})[0];
-        body='<p class="gc-txt">У каждого своё время.'+(my?' <b class="gc-me-t">Твоё — '+esc(rangeOf_(my))+'</b>':'')+'</p>';
+        body='<p class="gc-txt">У каждого своё время.'+(my&&rangeOf_(my)?' <b class="gc-me-t">Твоё — '+esc(rangeOf_(my))+'</b>':'')+'</p>';
       } else if(T.label) body='<p class="gc-txt">'+esc(T.label.charAt(0).toUpperCase()+T.label.slice(1))+'</p>';
       else body='<div class="gc-ppl">'+T.people.map(function(P){
         var me=P.name===S.me, extra=P.days.length<T.days.length?daysTxt_(P.days):'';
@@ -1178,8 +1179,7 @@ function guildCarousel(d){
       (c.lead?'<p>'+(c.lead===S.me?'главный — ты':'главный — '+pn(c.lead))+'</p>':c.about?'<p>'+esc(c.about)+'</p>':'')+'</header>'+
       tasksHtml+(own?'<details class="more gc-more"><summary>Что именно делать</summary>'+own+'</details>':'')+
     '</div></article>';
-  }).join('')+'</div>'+
-  (cards.length>1?'<div class="gc-dots" role="tablist">'+cards.map(function(c,i){return '<button class="'+(i===cur?'on':'')+'" data-act="gcgo" data-i="'+i+'" aria-label="'+esc(c.guild)+'"><span>'+esc(c.guild)+'</span></button>'}).join('')+'</div>':'');
+  }).join('')+'</div>';
 }
 function gcarSync(){
   var el=document.getElementById('gcar'); if(!el) return;
