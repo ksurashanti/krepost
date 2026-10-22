@@ -392,6 +392,9 @@ table.dt td.blk{font-weight:700;color:var(--olive)}
 .gc-lead small{font-size:12px;color:var(--olive-2)}
 .gc-lead.me{background:color-mix(in srgb,var(--olive) 14%,transparent);box-shadow:inset 0 0 0 1.5px var(--olive)}
 .gc-lead.me b{color:var(--olive)}
+.gc-days{display:flex;justify-content:center;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;justify-self:center}
+.gc-days button{border:0;background:transparent;border-radius:999px;padding:5px 12px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.gc-days button.on{background:var(--olive);color:var(--on-olive)}
 .gc-t{display:grid;gap:9px}
 .gc-t header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:5px}
 .gc-t header b{font-size:16px;font-weight:700}
@@ -438,7 +441,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610222245',
+  build: '202610222251',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1140,8 +1143,14 @@ function guildCards(d){
     tm.tasks.forEach(function(k){ by[tm.block].rows.push(k); });
   });
   return order.map(function(b){
-    var G=by[b], tasks=[], tby={};
-    G.rows.forEach(function(k){
+    var G=by[b], days=[];
+    G.rows.forEach(function(k){ if(days.indexOf(k.day)<0) days.push(k.day); });
+    days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)});
+    var def=days.filter(function(x){return isToday(x)})[0]||'';
+    var day=S.gDay&&(b in S.gDay)?S.gDay[b]:def; if(day&&days.indexOf(day)<0) day='';
+    var rows=G.rows.filter(function(k){return !day||k.day===day});
+    var tasks=[], tby={};
+    rows.forEach(function(k){
       var T=tby[k.task]; if(!T){ T=tby[k.task]={name:k.task,days:[],times:{},people:[],pm:{},crowd:0,label:'',rows:[]}; tasks.push(T); }
       T.rows.push(k); if(T.days.indexOf(k.day)<0) T.days.push(k.day);
       var tt=rangeOf_(k); if(tt) T.times[k.day]=tt;
@@ -1155,8 +1164,8 @@ function guildCards(d){
       });
     });
     tasks.forEach(function(T){ T.days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)}); T.crowd=T.people.length; var tms={}; T.rows.forEach(function(k){ tms[rangeOf_(k)]=1; }); T.split=Object.keys(tms).length>1&&T.crowd>8; });
-    var mine=d.myTasks.filter(function(t){return t.block===b});
-    return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine};
+    var mine=d.myTasks.filter(function(t){return t.block===b&&(!day||t.day===day)});
+    return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine,days:days,day:day};
   });
 }
 function guildCarousel(d){
@@ -1180,10 +1189,15 @@ function guildCarousel(d){
       }).join('')+'</div>';
       return '<section class="gc-t"><header><b>'+esc(T.name)+'</b><span>'+when+'</span></header>'+body+'</section>';
     }).join('');
-    var own=c.mine.map(function(t){ var det=myDetails(t); return det?'<div class="gc-own"><span>'+esc(DN[t.day]||t.day)+(rangeOf_(t)?', '+esc(rangeOf_(t)):'')+' · '+esc(t.task.charAt(0).toLowerCase()+t.task.slice(1))+'</span><p>'+esc(det)+'</p></div>':''; }).join('');
+    var og=[], ok={};
+    c.mine.forEach(function(t){ var det=myDetails(t); if(!det) return; var key=t.task+'|'+det;
+      if(!ok[key]){ ok[key]={task:t.task,det:det,days:[]}; og.push(ok[key]); }
+      ok[key].days.push(t.day+(rangeOf_(t)?' '+rangeOf_(t):'')); });
+    var own=og.map(function(g){ return '<div class="gc-own"><span>'+esc(g.days.join(', '))+' · '+esc(g.task.charAt(0).toLowerCase()+g.task.slice(1))+'</span><p>'+esc(g.det)+'</p></div>'; }).join('');
     return '<article class="gc" data-i="'+i+'"><div class="gc-in">'+
       '<header class="gc-h"><h3>'+esc(c.guild)+'</h3><div class="gc-orn" aria-hidden="true"><i></i><svg viewBox="0 0 44 50"><path d="M3 3H41V21C41 35 31 43.5 22 47.5C13 43.5 3 35 3 21Z"/></svg><i></i></div>'+
       (c.lead?'<div class="gc-lead'+(c.lead===S.me?' me':'')+'" role="button" tabindex="0" data-act="lb" data-name="'+esc(c.lead)+'">'+avatar(c.lead)+'<span><b>'+(c.lead===S.me?'Ты':esc(c.lead))+'</b><small>во главе гильдии</small></span></div>':c.about?'<p>'+esc(c.about)+'</p>':'')+'</header>'+
+      (c.days.length>1?'<div class="gc-days" role="tablist">'+[''].concat(c.days).map(function(x){return '<button class="'+(x===c.day?'on':'')+'" data-act="gcday" data-b="'+esc(c.block)+'" data-day="'+x+'" aria-pressed="'+(x===c.day)+'">'+(x?esc(x):'Все дни')+'</button>'}).join('')+'</div>':'')+
       tasksHtml+(own?'<details class="more gc-more"><summary>Что именно делать</summary>'+own+'</details>':'')+
     '</div></article>';
   }).join('')+'</div>';
@@ -1792,6 +1806,7 @@ document.addEventListener('click',function(e){
     S.prevViewAs=S.viewAs; S.switching=nm; quizClose(true); showSwitching();
     wait.then(function(){ S.viewAs=nm; S.editCar=0; S.tab='me'; load().then(function(){ window.scrollTo(0,0); }); }); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
+  else if(a==='gcday'){ S.gDay=S.gDay||{}; S.gDay[t.getAttribute('data-b')]=t.getAttribute('data-day'); render(); }
   else if(a==='gcgo'){ var el=document.getElementById('gcar'), c=el&&el.children[+t.getAttribute('data-i')]; if(c) el.scrollTo({left:(+t.getAttribute('data-i'))*(c.offsetWidth+10),behavior:'smooth'}); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
