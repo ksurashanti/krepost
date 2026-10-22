@@ -443,7 +443,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610222359',
+  build: '202610230010',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1239,7 +1239,7 @@ function vMe(){
   var f=[];
   if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(pnf).join(', '):''),'home']);}
   if(seat){ var nn=S.data.seats.length, sn=function(k){var x=S.data.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name?pn(x.name):'свободно'};
-    f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>',(sigilName(S.me)?'ищи свой герб: '+esc(sigilName(S.me)).toLowerCase():''),'feast']); }
+    f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>','','feast']); }
   if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return whenFrom(c)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
   else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
