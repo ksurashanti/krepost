@@ -373,6 +373,44 @@ table.dt{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
 table.dt th,table.dt td{border-top:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
 table.dt th{font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 table.dt td.blk{font-weight:700;color:var(--olive)}
+/* мои гильдии: карусель */
+.gcar{display:flex;align-items:flex-start;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none;overscroll-behavior-x:contain}
+.gcar::-webkit-scrollbar{display:none}
+.gc{flex:0 0 calc(100% - 22px);scroll-snap-align:center;background:var(--surface);border:1.5px solid var(--olive);border-radius:var(--r);padding:5px}
+.gcar .gc:only-child{flex-basis:100%}
+.gc-in{border:1px solid var(--sage);border-radius:10px;padding:18px 14px 14px;display:grid;gap:16px;height:100%;align-content:start}
+.gc-h{text-align:center;display:grid;gap:4px}
+.gc-h h3{font-size:25px;font-weight:800;letter-spacing:-.01em}
+.gc-h p{font-size:14.5px;color:var(--olive);font-weight:500}
+.gc-orn{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0}
+.gc-orn i{width:56px;height:1px;background:var(--sage)}
+.gc-orn svg{width:13px;height:15px;fill:var(--olive)}
+.gc-t{display:grid;gap:9px}
+.gc-t header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:5px}
+.gc-t header b{font-size:16px;font-weight:700}
+.gc-t header span{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--olive-2);white-space:nowrap;text-align:right}
+.gc-t header span b{font-size:12.5px;letter-spacing:.02em;color:var(--olive);font-weight:700}
+.gc-ppl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px}
+.gc-p{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 8px 4px 4px;border-radius:22px;cursor:pointer}
+.gc-p.me{grid-column:1/-1;background:color-mix(in srgb,var(--olive) 14%,transparent);box-shadow:inset 0 0 0 1.5px var(--olive)}
+.gc-av{position:relative;flex:none;display:grid}
+.gc-n{display:grid;min-width:0;line-height:1.2}
+.gc-n b{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gc-p.me .gc-n b{color:var(--olive);font-weight:800}
+.gc-n small{font-size:12px;color:var(--muted);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gc-n small.gc-ask{color:var(--warn);font-weight:600}
+.gc-q{position:absolute;right:-5px;top:-5px;width:18px;height:18px;border-radius:50%;background:var(--warn);color:var(--warn-bg);font-style:normal;font-weight:800;font-size:12px;display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface);animation:gcq 1.6s ease-in-out infinite}
+@keyframes gcq{0%,100%{transform:scale(1);box-shadow:0 0 0 2px var(--surface),0 0 0 2px color-mix(in srgb,var(--warn) 45%,transparent)}50%{transform:scale(1.12);box-shadow:0 0 0 2px var(--surface),0 0 0 7px transparent}}
+@media (prefers-reduced-motion:reduce){.gc-q{animation:none}}
+.gc-txt{font-size:14px;color:var(--muted)}
+.gc-me-t{color:var(--olive);font-weight:700;white-space:nowrap}
+.gc-more summary{justify-self:center}
+.gc-own{margin-top:8px;background:var(--paper);border-radius:10px;padding:9px 12px;display:grid;gap:3px}
+.gc-own span{font-size:12.5px;color:var(--muted);font-weight:600}
+.gc-own p{font-size:14px;white-space:pre-line}
+.gc-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:2px}
+.gc-dots button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:4px 11px;font-size:13px;font-weight:600;cursor:pointer}
+.gc-dots button.on{background:var(--olive);border-color:var(--olive);color:var(--on-olive)}
 .glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));column-gap:24px}
 .grow{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
 .grow > div{display:flex;align-items:center;gap:10px;min-width:0}
@@ -393,7 +431,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610222224',
+  build: '202610222229',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -764,7 +802,7 @@ function tgTheme(){ if(!TG) return; document.documentElement.setAttribute('data-
 if(TG){ tgTheme(); try{TG.onEvent('themeChanged',function(){tgTheme();render();})}catch(e){} }
 function haptic(kind){ try{ TG&&TG.HapticFeedback.notificationOccurred(kind) }catch(e){} }
 
-var S={openNews:{},openDays:{},openEv:{},openSlot:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
+var S={gIdx:0,openNews:{},openDays:{},openEv:{},openSlot:{},viewAs:'',editCar:0,draft:[],draftWhen:'',data:null,me:TG?'':LS.get('me'),code:LS.get('code'),tab:(location.hash||'').slice(1)||LS.get('tab')||'me',
        selRoom:'',q:'',busy:false,syncing:false,showAdminLogin:false,homeSeg:'rooms',
        visitor:LS.get('visitor')==='1',host:LS.get('host'),hostKey:LS.get('hkey'),hostStep:'',hostDraft:{},hostQ:'',hostF:''};
 var demoRaw=null;
@@ -1084,6 +1122,71 @@ function myDetails(t){
     return norm_(t.myNote).indexOf(k)>=0;
   }).map(function(line){ var m=line.match(/^\s*([^:]{2,40}):\s*(.+)$/); return m&&notes.some(function(n){return n.indexOf(norm_(m[1]))>=0})?m[2]:line; }).join('\n').trim();
 }
+/* ---------- мои гильдии: карусель карточек ---------- */
+function rangeOf_(t){ var n=String(t.note||'').trim(); return /^\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}$/.test(n)?n.replace(/\s*[–-]\s*/,'–'):(t.time||''); }
+function roleOf_(note){ return String(note||'').replace(/\s*\?+\s*$/,'').replace(/,?\s*кроме\s.*$/i,'').trim(); }
+function daysTxt_(days){ return days.map(function(x){return x.toLowerCase()}).join(' · '); }
+function guildCards(d){
+  var order=[], by={};
+  d.myTeams.forEach(function(tm){
+    if(!by[tm.block]){ by[tm.block]={block:tm.block,guild:tm.guild,lead:tm.lead,about:tm.about,rows:[]}; order.push(tm.block); }
+    tm.tasks.forEach(function(k){ by[tm.block].rows.push(k); });
+  });
+  return order.map(function(b){
+    var G=by[b], tasks=[], tby={};
+    G.rows.forEach(function(k){
+      var T=tby[k.task]; if(!T){ T=tby[k.task]={name:k.task,days:[],times:{},people:[],pm:{},crowd:0,label:'',rows:[]}; tasks.push(T); }
+      T.rows.push(k); if(T.days.indexOf(k.day)<0) T.days.push(k.day);
+      var tt=rangeOf_(k); if(tt) T.times[k.day]=tt;
+      if(k.label&&k.people.length>8){ T.label=k.label; return; }
+      k.people.forEach(function(p){
+        var P=T.pm[p.name]; if(!P){ P=T.pm[p.name]={name:p.name,days:[],roles:[],ask:false,row:0}; T.people.push(P); }
+        if(P.days.indexOf(k.day)<0) P.days.push(k.day);
+        var r=roleOf_(p.note); if(r&&!/^главн/i.test(r)&&P.roles.indexOf(r)<0) P.roles.push(r);
+        if(/^главн/i.test(r)&&P.roles.indexOf(r)<0) P.roles.unshift(r);
+        if(/\?\s*$/.test(p.note)&&p.name===S.me){ P.ask=true; P.row=k.row; }
+      });
+    });
+    tasks.forEach(function(T){ T.days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)}); T.crowd=T.people.length; T.split=T.rows.length>1&&T.rows.every(function(k){return T.rows[0].day===k.day})&&T.crowd>8; });
+    var mine=d.myTasks.filter(function(t){return t.block===b});
+    return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine};
+  });
+}
+function guildCarousel(d){
+  var cards=guildCards(d); if(!cards.length) return '';
+  var cur=Math.min(S.gIdx||0,cards.length-1);
+  return '<div class="gcar" id="gcar">'+cards.map(function(c,i){
+    var tasksHtml=c.tasks.map(function(T){
+      var when=T.days.map(function(day){ return day.toLowerCase()+(T.times[day]&&!T.split?' <b>'+esc(T.times[day])+'</b>':''); }).join(' · ');
+      var body;
+      if(T.split){
+        var my=c.mine.filter(function(t){return t.task===T.name})[0];
+        body='<p class="gc-txt">У каждого своё время.'+(my?' <b class="gc-me-t">Твоё — '+esc(rangeOf_(my))+'</b>':'')+'</p>';
+      } else if(T.label) body='<p class="gc-txt">'+esc(T.label.charAt(0).toUpperCase()+T.label.slice(1))+'</p>';
+      else body='<div class="gc-ppl">'+T.people.map(function(P){
+        var me=P.name===S.me, extra=P.days.length<T.days.length?daysTxt_(P.days):'';
+        var sub=P.roles.concat(extra?[extra]:[]).join(' · ');
+        return '<div class="gc-p'+(me?' me':'')+'"'+(P.ask?' role="button" tabindex="0" data-act="ask" data-row="'+P.row+'" aria-label="Подтвердить участие"':' role="button" tabindex="0" data-act="lb" data-name="'+esc(P.name)+'"')+'>'+
+          '<span class="gc-av">'+avatar(P.name,'sm')+(P.ask?'<i class="gc-q" aria-hidden="true">?</i>':'')+'</span>'+
+          '<span class="gc-n"><b>'+(me?'Ты':esc(P.name))+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+(P.ask?'<small class="gc-ask">нажми, чтобы подтвердить</small>':'')+'</span></div>';
+      }).join('')+'</div>';
+      return '<section class="gc-t"><header><b>'+esc(T.name)+'</b><span>'+when+'</span></header>'+body+'</section>';
+    }).join('');
+    var own=c.mine.map(function(t){ var det=myDetails(t); return det?'<div class="gc-own"><span>'+esc(DN[t.day]||t.day)+(rangeOf_(t)?', '+esc(rangeOf_(t)):'')+' · '+esc(t.task.charAt(0).toLowerCase()+t.task.slice(1))+'</span><p>'+esc(det)+'</p></div>':''; }).join('');
+    return '<article class="gc" data-i="'+i+'"><div class="gc-in">'+
+      '<header class="gc-h"><h3>'+esc(c.guild)+'</h3><div class="gc-orn" aria-hidden="true"><i></i><svg viewBox="0 0 44 50"><path d="M3 3H41V21C41 35 31 43.5 22 47.5C13 43.5 3 35 3 21Z"/></svg><i></i></div>'+
+      (c.lead?'<p>'+(c.lead===S.me?'главный — ты':'главный — '+pn(c.lead))+'</p>':c.about?'<p>'+esc(c.about)+'</p>':'')+'</header>'+
+      tasksHtml+(own?'<details class="more gc-more"><summary>Что именно делать</summary>'+own+'</details>':'')+
+    '</div></article>';
+  }).join('')+'</div>'+
+  (cards.length>1?'<div class="gc-dots" role="tablist">'+cards.map(function(c,i){return '<button class="'+(i===cur?'on':'')+'" data-act="gcgo" data-i="'+i+'" aria-label="'+esc(c.guild)+'"><span>'+esc(c.guild)+'</span></button>'}).join('')+'</div>':'');
+}
+function gcarSync(){
+  var el=document.getElementById('gcar'); if(!el) return;
+  if(S.gIdx){ var c=el.children[S.gIdx]; if(c) el.scrollLeft=S.gIdx*(c.offsetWidth+10); }
+  el.onscroll=function(){ var st=(el.children[0]?el.children[0].offsetWidth:el.clientWidth)+10, i=Math.round(el.scrollLeft/st); if(i!==S.gIdx){ S.gIdx=i; document.querySelectorAll('.gc-dots button').forEach(function(b,j){b.classList.toggle('on',j===i)}); } };
+}
+
 function vMe(){
   var d=S.data;
   if(!S.me&&S.hostStep) return vHostLogin();
@@ -1120,32 +1223,13 @@ function vMe(){
   var facts=f.map(function(x){var wide=!!x[4];
     return '<div class="fact'+(wide?' wide':'')+'"'+(x[3]?' data-act="goto" data-tab="'+x[3]+'" style="cursor:pointer"':'')+'><span class="k">'+x[0]+'</span><span class="v">'+x[1]+'</span>'+(x[2]?'<span class="s">'+x[2]+'</span>':'')+'</div>';}).join('');
 
-  var tasks=d.myTasks.length? ['Пт','Сб','Вс'].map(function(day){
-    var ts=d.myTasks.filter(function(t){return t.day===day}); if(!ts.length) return '';
-    var teams=d.myTeams.filter(function(t){return t.day===day});
-    var open = day in S.openDays ? S.openDays[day] : isToday(day);
-    return '<details class="day-tasks" data-day="'+day+'"'+(open?' open':'')+'><summary><span class="dayhead" style="margin:0"><i style="background:'+DC[day]+'"></i>'+DN[day]+' <span>'+esc((d.dates[day]||'').slice(0,5))+'</span></span><span class="small muted">'+plural(ts.length,['задача','задачи','задач'])+'</span></summary><div class="day-body">'+
-      ts.map(function(t){
-        return '<div class="card task"><div class="hd"><h4>'+esc(t.guild)+'</h4>'+(t.time?'<span class="tm">'+esc(t.time)+'</span>':'')+'</div><div class="tk">'+esc(t.task)+'</div>'+
-          (t.myNote?(/\?\s*$/.test(t.myNote)?(t.myNote.replace(/\s*\?+\s*$/,'')?'<div class="mn">Твоё: '+esc(t.myNote.replace(/\s*\?+\s*$/,''))+'</div>':'')+'<button class="ask" data-act="ask" data-row="'+t.row+'"><b>?</b><span>Пока под вопросом. Нажми, чтобы ответить</span></button>':/^главн/i.test(t.myNote)?'<div class="mn"><b>Ты '+esc(t.myNote)+'</b></div>':'<div class="mn">Твоё: '+esc(t.myNote)+'</div>'):'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+
-          (myDetails(t)?'<details class="more"><summary>Подробнее</summary><p>'+esc(myDetails(t))+'</p></details>':'')+
-          (t.label&&t.crowd<=8?'<div class="small muted">вместе с: '+esc(t.label)+'</div>':t.crowd>8?'':t.with.length?'<div class="chips"><span class="small muted" style="align-self:center">вместе с</span>'+t.with.map(function(p){return chip(p.name,p.note)}).join('')+'</div>':'')+
-        '</div>';
-      }).join('')+
-      teams.filter(function(t){return t.tasks.length>1}).map(function(t){
-        var n={}; t.tasks.forEach(function(k){ if(k.people.length<=8) k.people.forEach(function(p){n[p.name]=1})});
-        return '<details class="team"><summary><b>'+esc(t.guild)+'</b><span class="small muted">'+plural(Object.keys(n).length,['человек','человека','человек'])+'</span></summary><div class="team-body">'+
-          (t.lead?(t.lead===S.me?'<div class="small"><b>Ты главный.</b></div>':'<div class="small">Главный: <b>'+pn(t.lead)+'</b>. С вопросами к нему.</div>'):'')+
-          t.tasks.map(function(k){return '<div class="row"><span class="t">'+esc(k.task)+(k.time?' · '+esc(k.time):'')+(k.note?' · '+esc(k.note):'')+'</span><div class="chips">'+(k.label&&k.people.length<=8?'<span class="small muted">'+esc(k.label)+'</span>':people(k.people))+'</div>'+'</div>'}).join('')+
-        '</div></details>';
-      }).join('')+'</div></details>';
-  }).join('') : '<p class="muted">Задач нет, отдыхай и празднуй.</p>';
+  var tasks=d.myTasks.length? guildCarousel(d) : '<p class="muted">Задач нет, отдыхай и празднуй.</p>';
 
   return '<div class="hero">'+avatar(S.me,'xl')+'<div style="min-width:0"><h2>'+esc(S.me)+'</h2>'+(g.character?'<div class="role"><button class="rl plain" data-act="lb" data-name="'+esc(S.me)+'">'+esc(g.character)+'</button></div>':'<div class="small muted">'+(g.shared?'тоже '+esc(S.me):'без роли в квесте')+'</div>')+
       (d.tg||d.viewAs?'':'<button class="link" data-act="me" data-name="" style="margin-top:6px">это не я</button>')+'</div></div>'+quizCta()+
     (g.about?'<p class="about">'+linkRoles(g.about,g.name)+'</p>':'')+fortuneCard()+
     '<div class="facts">'+facts+'</div>'+
-    '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои задачи</h2><p class="small muted">Открой нужный день. Внутри твои задачи по времени и вся твоя команда.</p></div>'+tasks;
+    '<div class="sub" style="margin-top:8px"><h2 style="font-size:24px;font-weight:800">Мои гильдии</h2><p class="small muted">Ты подсвечен. Листай вбок, если гильдий несколько.</p></div>'+tasks;
 }
 
 /* ---------- ведущие квеста ---------- */
@@ -1642,6 +1726,7 @@ function render(){
       if(S.locked&&t.id!=='me') return '<a role="button" aria-disabled="true" class="off" data-act="locked"><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
       return '<a href="#'+t.id+'" data-act="tab" data-tab="'+t.id+'" class="'+(t.id===S.tab?'on':'')+'"'+(t.id===S.tab?' aria-current="page"':'')+'><span class="pill">'+icon(I[t.id]?t.id:'plan')+'</span>'+esc(t.name)+'</a>';
     }).join('')+'</div></nav>':'');
+  gcarSync();
   if(focusId){var el=document.getElementById(focusId); if(el){el.focus(); try{if(selStart!=null) el.setSelectionRange(selStart,selStart)}catch(e){}}}
   S.me=realMe;
 }
@@ -1700,6 +1785,7 @@ document.addEventListener('click',function(e){
     S.prevViewAs=S.viewAs; S.switching=nm; quizClose(true); showSwitching();
     wait.then(function(){ S.viewAs=nm; S.editCar=0; S.tab='me'; load().then(function(){ window.scrollTo(0,0); }); }); }
   else if(a==='ask'){ askLb(+t.getAttribute('data-row')); }
+  else if(a==='gcgo'){ var el=document.getElementById('gcar'), c=el&&el.children[+t.getAttribute('data-i')]; if(c) el.scrollTo({left:(+t.getAttribute('data-i'))*(c.offsetWidth+10),behavior:'smooth'}); }
   else if(a==='answer'){ var yes=t.getAttribute('data-ans')==='yes'; act({type:'answerTask',row:+t.getAttribute('data-row'),answer:yes?'yes':'no'}, yes?'Спасибо, записали!':'Хорошо, сняли тебя с этой задачи'); }
   else if(a==='char'){ var nm=t.getAttribute('data-name'); S.q=''; goTab('people'); setTimeout(function(){ var el=document.getElementById('char-'+nm); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1600);} },30); }
   else if(a==='viewas'){ if(S.switching) return; S.prevViewAs=S.viewAs; S.viewAs=t.getAttribute('data-name'); S.switching=S.viewAs||'self'; showSwitching(); S.editCar=0; if(S.viewAs){ S.tab='me'; } else { S.tab=S.data&&S.data.access.admin?'admin':'me'; }
