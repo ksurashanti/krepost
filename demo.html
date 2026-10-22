@@ -311,10 +311,10 @@ details.slot .chips{padding:0 12px 10px}
 .feast .table{grid-column:2;grid-row:2;background:var(--olive);border-radius:8px;box-shadow:inset 0 0 0 4px var(--olive),inset 0 0 0 5px var(--sage);display:grid;place-items:center;color:var(--on-olive);padding:14px 0}
 .feast .table b{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;font-size:17px;letter-spacing:.12em;text-transform:uppercase}
 .feast .col{display:grid;gap:6px}
-.feast .end{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;max-width:240px;width:100%;justify-self:center}
+.feast .end{grid-column:1/-1;display:flex;justify-content:center;gap:8px}
 .seat{display:flex;align-items:center;gap:6px;min-width:0}
 .col.left .seat{flex-direction:row-reverse;text-align:right}
-.end .seat{flex-direction:column;gap:3px;font-size:13px;text-align:center}
+.end .seat{flex-direction:column;gap:3px;font-size:13px;text-align:center;width:72px}
 .end .seat .nm{max-width:100%}
 .seat .num{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--shield);box-shadow:inset 0 0 0 2px var(--olive);color:var(--olive)}
 .seat .num .sig{font-size:19px;--sig-gap:var(--shield)}
@@ -451,7 +451,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610222216',
+  build: '202610222219',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
