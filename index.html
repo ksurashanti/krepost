@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610191612-->
+<!--build:202610281140-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -443,7 +443,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610230010',
+  build: '202610281140',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1127,17 +1127,24 @@ function tabName(id){var t=S.data.tabs.filter(function(x){return x.id===id})[0];
 
 /* ---------- вкладки ---------- */
 function myDetails(t){
-  var notes=[norm_(t.myNote)].concat((t.with||[]).map(function(p){return norm_(p.note)}));
-  return String(t.details||'').split(/\n+/).filter(function(line){
-    var m=line.match(/^\s*([^:]{2,40}):\s*(.+)$/); if(!m) return true;
-    var k=norm_(m[1]); if(!notes.some(function(n){return n.indexOf(k)>=0})) return true;
-    return norm_(t.myNote).indexOf(k)>=0;
-  }).map(function(line){ var m=line.match(/^\s*([^:]{2,40}):\s*(.+)$/); return m&&notes.some(function(n){return n.indexOf(norm_(m[1]))>=0})?m[2]:line; }).join('\n').trim();
+  // строки «роль: текст» видит только тот, у кого эта роль; «остальные: текст» видят все, у кого нет ни одной роли из подсказок
+  var notes=[norm_(t.myNote)].concat((t.with||[]).map(function(p){return norm_(p.note)})), mineN=norm_(t.myNote), RX=/^\s*([^:]{2,40}):\s*(.+)$/;
+  var lines=String(t.details||'').split(/\n+/);
+  var mineHas=lines.some(function(l){ var m=l.match(RX); if(!m) return false; var k=norm_(m[1]); return k!=='остальные'&&mineN.indexOf(k)>=0; });
+  return lines.map(function(line){
+    var m=line.match(RX); if(!m) return line;
+    var k=norm_(m[1]);
+    if(k==='остальные') return mineHas?null:m[2];
+    if(!notes.some(function(n){return n.indexOf(k)>=0})) return line;
+    return mineN.indexOf(k)>=0?m[2]:null;
+  }).filter(function(x){return x!=null}).join('\n').trim();
 }
 /* ---------- мои гильдии: карусель карточек ---------- */
 function rangeOf_(t){ var n=String(t.note||'').trim(); return /^\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}$/.test(n)?n.replace(/\s*[–-]\s*/,'–'):(t.time||''); }
 function roleOf_(note){ return String(note||'').replace(/\s*\?+\s*$/,'').replace(/,?\s*кроме\s.*$/i,'').trim(); }
 function daysTxt_(days){ return days.map(function(x){return x.toLowerCase()}).join(' · '); }
+// в этих гильдиях гость видит только свои строки (например, свою команду на ужине)
+var PRIVATE_BLOCKS=['Ужин'];
 function guildCards(d){
   var order=[], by={};
   d.myTeams.forEach(function(tm){
@@ -1151,6 +1158,7 @@ function guildCards(d){
     var def=days.filter(function(x){return isToday(x)})[0]||'';
     var day=S.gDay&&(b in S.gDay)?S.gDay[b]:def; if(day&&days.indexOf(day)<0) day='';
     var rows=G.rows.filter(function(k){return !day||k.day===day});
+    if(PRIVATE_BLOCKS.indexOf(b)>=0) rows=rows.filter(function(k){return k.people.some(function(p){return p.name===S.me})});
     var tasks=[], tby={};
     rows.forEach(function(k){
       var T=tby[k.task]; if(!T){ T=tby[k.task]={name:k.task,days:[],times:{},people:[],pm:{},crowd:0,label:'',rows:[]}; tasks.push(T); }
