@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610281140-->
+<!--build:202610281215-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -443,7 +443,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610281140',
+  build: '202610281215',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1143,22 +1143,29 @@ function myDetails(t){
 function rangeOf_(t){ var n=String(t.note||'').trim(); return /^\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}$/.test(n)?n.replace(/\s*[–-]\s*/,'–'):(t.time||''); }
 function roleOf_(note){ return String(note||'').replace(/\s*\?+\s*$/,'').replace(/,?\s*кроме\s.*$/i,'').trim(); }
 function daysTxt_(days){ return days.map(function(x){return x.toLowerCase()}).join(' · '); }
-// в этих гильдиях гость видит только свои строки (например, свою команду на ужине)
-var PRIVATE_BLOCKS=['Ужин'];
+// порядок карточек гильдий; кого нет в списке — в конец
+var BLOCK_ORDER=['Организация','Ужин','Кухня','Развлечения','Уборка','Видеосъёмка'];
+// задачи, где гость видит только свою строку (свою купатскую команду)
+function privateRow_(b,k){ return b==='Ужин'&&/^купаты/i.test(k.task); }
+// гильдии без деления по дням: одна карточка на все дни, без вкладок
+var NODAY_BLOCKS=['Кухня'];
 function guildCards(d){
   var order=[], by={};
   d.myTeams.forEach(function(tm){
     if(!by[tm.block]){ by[tm.block]={block:tm.block,guild:tm.guild,lead:tm.lead,about:tm.about,rows:[]}; order.push(tm.block); }
     tm.tasks.forEach(function(k){ by[tm.block].rows.push(k); });
   });
+  var ord=function(b){ var k=BLOCK_ORDER.indexOf(b); return k<0?99:k; };
+  order.sort(function(a,c){ return ord(a)-ord(c); });
   return order.map(function(b){
     var G=by[b], days=[];
     G.rows.forEach(function(k){ if(days.indexOf(k.day)<0) days.push(k.day); });
     days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)});
     var def=days.filter(function(x){return isToday(x)})[0]||'';
     var day=S.gDay&&(b in S.gDay)?S.gDay[b]:def; if(day&&days.indexOf(day)<0) day='';
+    var noDays=NODAY_BLOCKS.indexOf(b)>=0; if(noDays) day='';
     var rows=G.rows.filter(function(k){return !day||k.day===day});
-    if(PRIVATE_BLOCKS.indexOf(b)>=0) rows=rows.filter(function(k){return k.people.some(function(p){return p.name===S.me})});
+    rows=rows.filter(function(k){return !privateRow_(b,k)||k.people.some(function(p){return p.name===S.me})});
     var tasks=[], tby={};
     rows.forEach(function(k){
       var T=tby[k.task]; if(!T){ T=tby[k.task]={name:k.task,days:[],times:{},people:[],pm:{},crowd:0,label:'',rows:[]}; tasks.push(T); }
@@ -1176,7 +1183,7 @@ function guildCards(d){
     tasks.sort(function(x,y){ var mx=Math.min.apply(null,x.rows.map(function(k){return k.row||1e9})), my=Math.min.apply(null,y.rows.map(function(k){return k.row||1e9})); return mx-my; });
     tasks.forEach(function(T){ T.days.sort(function(a,c){return DAYS.indexOf(a)-DAYS.indexOf(c)}); T.crowd=T.people.length; var tms={}; T.rows.forEach(function(k){ tms[rangeOf_(k)]=1; }); T.split=Object.keys(tms).length>1&&T.crowd>8; });
     var mine=d.myTasks.filter(function(t){return t.block===b&&(!day||t.day===day)});
-    return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine,days:days,day:day};
+    return {block:b,guild:G.guild,lead:G.lead,about:G.about,tasks:tasks,mine:mine,days:noDays?[]:days,day:day,noDays:noDays};
   });
 }
 function guildCarousel(d){
@@ -1187,7 +1194,7 @@ function guildCarousel(d){
     var tasksHtml=c.tasks.filter(function(T){ return !(c.lead&&!T.label&&T.people.length&&T.people.every(function(P){return P.name===c.lead})); }).map(function(T){
       var tv=function(x){ return /\d/.test(x)?'<b>'+esc(x)+'</b>':'<i>'+esc(x)+'</i>'; };
       var tset={}; T.days.forEach(function(day){ tset[T.split?'':(T.times[day]||'')]=1; });
-      var when=Object.keys(tset).length===1
+      var when=c.noDays&&!Object.keys(T.times).length ? '' : Object.keys(tset).length===1
         ? T.days.map(function(day){return day.toLowerCase()}).join(' · ')+(Object.keys(tset)[0]?' · '+tv(Object.keys(tset)[0]):'')
         : T.days.map(function(day){ return day.toLowerCase()+(T.times[day]?' '+tv(T.times[day]):''); }).join(' · ');
       var body;
@@ -1207,8 +1214,8 @@ function guildCarousel(d){
     var og=[], ok={};
     c.mine.forEach(function(t){ var det=myDetails(t); if(!det) return; var key=t.task+'|'+det;
       if(!ok[key]){ ok[key]={task:t.task,det:det,days:[]}; og.push(ok[key]); }
-      ok[key].days.push(t.day+(rangeOf_(t)?' '+rangeOf_(t):'')); });
-    var own=og.map(function(g){ return '<div class="gc-own"><span>'+esc(g.days.join(', '))+' · '+esc(g.task.charAt(0).toLowerCase()+g.task.slice(1))+'</span><p>'+esc(g.det)+'</p></div>'; }).join('');
+      if(!c.noDays||rangeOf_(t)) ok[key].days.push(t.day+(rangeOf_(t)?' '+rangeOf_(t):'')); });
+    var own=og.map(function(g){ return '<div class="gc-own"><span>'+(g.days.length?esc(g.days.join(', '))+' · ':'')+esc(g.days.length?g.task.charAt(0).toLowerCase()+g.task.slice(1):g.task)+'</span><p>'+esc(g.det)+'</p></div>'; }).join('');
     return '<article class="gc" data-i="'+i+'"><div class="gc-in">'+
       '<header class="gc-h"><h3>'+esc(c.guild)+'</h3><div class="gc-orn" aria-hidden="true"><i></i><svg viewBox="0 0 44 50"><path d="M3 3H41V21C41 35 31 43.5 22 47.5C13 43.5 3 35 3 21Z"/></svg><i></i></div>'+
       (c.lead?'<div class="gc-lead'+(c.lead===S.me?' me':'')+'" role="button" tabindex="0" data-act="lb" data-name="'+esc(c.lead)+'">'+avatar(c.lead)+'<span><b>'+(c.lead===S.me?'Ты':esc(c.lead))+'</b><small>во главе гильдии</small></span></div>':c.about?'<p>'+esc(c.about)+'</p>':'')+'</header>'+
