@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610281425-->
+<!--build:202610292140-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -257,6 +257,8 @@ details.more p{margin-top:6px;font-size:14.5px;background:var(--paper);border-ra
 .ev.now .t,.ev.now .muted{color:var(--on-olive);opacity:.85}
 .day{padding:0;overflow:hidden}
 .slots{display:grid;gap:6px;min-width:0;margin-top:10px}
+.ev-more{display:grid;gap:6px;margin:8px 0 2px 106px;font-size:14.5px;white-space:pre-line}
+@media (max-width:380px){.ev-more{margin-left:0}}
 details.ev,details.ev:first-of-type{display:block;border-top:1px solid var(--line)}
 details.ev > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:start}
 details.ev > summary::-webkit-details-marker{display:none}
@@ -443,7 +445,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610281425',
+  build: '202610292140',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1386,7 +1388,12 @@ function vPlan(){
         var sl=slotsOf(e.note);
         if(sl){ var my=S.me&&sl.filter(function(x){return x.people.some(function(p){return norm_(p)===norm_(S.me)})})[0], key=e.day+e.start+e.title;
           return '<details class="ev'+(isNow(e)?' now':'')+'" data-ev="'+esc(key)+'"'+(S.openEv[key]?' open':'')+'><summary><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div><div class="small muted">'+(my?'твоя группа в '+esc(my.time)+' · ':'')+plural(sl.filter(function(x){return x.people.some(isGuest)}).length,['группа','группы','групп'])+'</div></div></summary>'+slotsHtml(sl)+'</details>'; }
-        return '<div class="ev'+(isNow(e)?' now':'')+'"><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div>'+(!sl&&e.note?'<div class="small muted">'+esc(e.note)+'</div>':'')+'</div>'+(sl?slotsHtml(sl):'')+'</div>';
+        // многострочный комментарий: первая строка видна сразу, остальное раскрывается по нажатию
+        var nl=String(e.note||'').split(/\n+/).map(function(x){return x.trim()}).filter(Boolean);
+        if(!sl&&nl.length>1){ var k2=e.day+e.start+e.title;
+          return '<details class="ev'+(isNow(e)?' now':'')+'" data-ev="'+esc(k2)+'"'+(S.openEv[k2]?' open':'')+'><summary><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div><div class="small muted">'+linkNames(esc(nl[0]))+'</div></div></summary>'+
+            '<div class="ev-more">'+nl.slice(1).map(function(x){return '<p>'+linkNames(esc(x))+'</p>'}).join('')+'</div></details>'; }
+        return '<div class="ev'+(isNow(e)?' now':'')+'"><span class="t">'+esc(tm)+'</span><div style="min-width:0"><div class="ti">'+esc(e.title)+'</div>'+(!sl&&e.note?'<div class="small muted">'+linkNames(esc(e.note))+'</div>':'')+'</div>'+(sl?slotsHtml(sl):'')+'</div>';
       }).join('')+'</div>';
   }).join('');
 }
