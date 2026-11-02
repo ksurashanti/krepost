@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<!--build:202610300920-->
+<!--build:202611022213-->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Крепость Чембало</title>
 <meta name="description" content="Роли, комнаты, пир и дорога для гостей дня рождения Ксении">
@@ -445,7 +445,7 @@ var CONFIG = {
   avatarDir: 'avatars/',   /* фото кладутся в папку avatars как Имя.jpg, например avatars/Маня.jpg */
   address: 'деревня Глазово, Лобня',
   demo: null,
-  build: '202610300920',
+  build: '202611022213',
   av: {"Маша": "1c04da72", "Слава": "131cbe2b", "Савва": "616afa30", "Михаил": "f3310c50", "Яна": "f899758b", "Женя": "0b9654bb", "Тина": "960d8d13", "Люба": "2f204c64", "Айк": "a76f5f58", "Маня": "cc623ffa", "Даня": "35f970f8", "Макар": "ae0dcfff", "Ксения": "f3d65c05", "Илья": "9882b857", "Олеся": "cc53c307", "Катейник": "83f83292", "Лёха": "754f7600", "Регина": "86846dbc", "Николай": "5cefff3f", "Ирина": "3d667042", "Вова": "cd1725b0", "Саша": "5071582a", "Кирилл": "295458fd", "Оля": "a6eb4ba8"}
 };
 </script>
@@ -1578,68 +1578,99 @@ function ftPhase(today){
   return today===off(-1)?'eve':today===off(0)?'fri':today===off(1)?'sat':today===off(2)?'sun':'';
 }
 function ftList(arr){ return arr.length<2?arr.join(''):arr.slice(0,-1).join(', ')+' и '+arr[arr.length-1]; }
-function ftPersonal(me,phase,seed){
+// «вид» предсказания: два дня подряд один вид не выпадает
+function ftKey(t){
+  var K=[[/храпеть|разбудит/,'snore'],[/^Бойся/,'fear'],[/сапоги/i,'boots'],[/^Улыбка/,'smile'],[/замышляют/,'plot'],[/музык/,'music'],[/пассажиров/,'pass'],[/носки/,'socks'],[/Водитель/,'road']];
+  for(var i=0;i<K.length;i++) if(K[i][0].test(t)) return K[i][1];
+  return t;
+}
+function ftShift(iso,n){ var p=iso.split('-'), x=new Date(+p[0],+p[1]-1,+p[2]+n); return x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2); }
+function ftChain(me,phase,today){
+  var order=['eve','fri','sat','sun'], i=order.indexOf(phase);
+  var prev=i>0?ftChain(me,order[i-1],ftShift(today,-1)):'';
+  return ftPersonal(me,phase,me+'|'+today,prev&&ftKey(prev));
+}
+function ftPersonal(me,phase,seed,avoid){
   var d=S.data, g=guest(me), room=roomOf(me), seat=seatOf(me), car=carOf(me), drv=drives(me), out=[];
-  var mates=room?room.people.filter(function(p){return p!==me}):[];
+  var ADJ={tower:['red'],red:['tower','p3'],p3:['red','p2'],p2:['p3','p1'],p1:['p2'],p6:['p7','p5'],p7:['p6','p8'],p8:['p7','p10'],p10:['p8','p9'],p9:['p10'],p5:['p6','p4'],p4:['p5']};
+  var mates=[]; if(room) d.rooms.forEach(function(r){ if((ADJ[room.id]||[]).indexOf(r.id)>=0) mates=mates.concat(r.people.filter(function(p){return p!==me})); });
+  var DAT={'Ксения':'Ксении','Михаил':'Михаилу','Айк':'Айку','Ирина':'Ирине','Оля':'Оле','Паша':'Паше','Маня':'Мане','Саша':'Саше','Тина':'Тине','Вова':'Вове','Савва':'Савве','Регина':'Регине','Юля':'Юле','Люба':'Любе','Лёха':'Лёхе','Илья':'Илье','Маша':'Маше','Слава':'Славе','Кирилл':'Кириллу','Женя':'Жене','Олеся':'Олесе','Николай':'Николаю','Яна':'Яне','Даня':'Дане','Катейник':'Катейнику','Кристи':'Кристи','Макар':'Макару'};
+  var sockFor=ftPick(d.guests.filter(function(x){return x.name!==me&&DAT[x.name]}),seed+'|sk'), socks=sockFor?'Возьми запасные носки, '+DAT[sockFor.name]+' они пригодятся.':'Возьми запасные носки.';
   var nn=d.seats.length, at=function(k){ var x=d.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name&&x.name!==me?x.name:''; };
   var left=seat?at(seat.seat+1):'', right=seat?at(seat.seat-1):'';
+  var L=[23,22,21,20,19,18,17,16,15,14,13], opp=[];
+  if(seat){ var sn=seat.seat;
+    if(sn>=1&&sn<=10) opp=[L[sn-1],L[sn]];
+    else if(sn>=13&&sn<=23){ var j=L.indexOf(sn); opp=[j,j+1].filter(function(r){return r>=1&&r<=10}); }
+    else if(sn===12) opp=[10]; }
+  var across=ftPick(opp.map(function(n){return at(n)}).filter(Boolean),seed+'|op');
   var tasks=function(day){ return (d.myTasks||[]).filter(function(t){return !day||t.day===day}); };
   var others=d.guests.filter(function(x){return x.character&&x.name!==me&&!x.shared});
   var other=ftPick(others,seed+'|o'), mate=ftPick(mates,seed+'|m'), task=function(day){ return ftPick(tasks(day),seed+'|t'+day); };
   var prop=ftPick(d.myProps||[],seed+'|p'), pas=drv.length?drv[0].passengers:[];
   var add=function(ok,txt){ if(ok) out.push(txt); };
   var R=g.character, rn=room&&room.name, dr=car&&car.driver, tk, P=prop&&prop.item;
-  var o1=other&&other.character, o2=(ftPick(others.filter(function(x){return x!==other}),seed+'|o2')||{}).character;
+  // в Чт/Пт/Сб у каждого гостя свои, не повторяющиеся роли
+  var k={eve:0,fri:1,sat:2}[phase], ord=others.slice().sort(function(x,y){return ftHash(me+'|ord|'+x.name)-ftHash(me+'|ord|'+y.name)});
+  if(me==='Ирина'){ var iA=-1,iB=-1; ord.forEach(function(x,i){ if(x.name==='Женя') iA=i; if(x.name==='Илья') iB=i; }); if(iA>=0&&iB>=0){ var tmp=ord[iA]; ord[iA]=ord[iB]; ord[iB]=tmp; } }
+  if(k!==undefined&&ord.length>=6){ other=ord[2*k]; }
+  var o1=other&&other.character, o2=(k!==undefined&&ord.length>=6?ord[2*k+1]:ftPick(others.filter(function(x){return x!==other}),seed+'|o2')||{}).character;
   var G=function(r){ return FT_GEN[r]||('персоны по имени '+r); };
   if(phase==='eve'){
     add(o1,'Бойся '+G(o1)+'.');
     add(o1,'Завтра сапоги '+G(o1)+' будут блестеть ярче твоих.');
     add(o1,'Улыбка '+G(o1)+' обманчива. Проверь завтра.');
-    add(o1,'Тайна '+G(o1)+' раскроется в эти выходные.');
-    add(o1&&o2,o1+' и '+o2+' что-то замышляют. Держись между ними.');
+    add(o1&&o2,o1+' и '+o2+' что-то замышляют. Держись.');
     add(dr,'Не спорь с водителем ('+dr+') о музыке. Проиграешь.');
     add(pas.length,'Кто-то из твоих пассажиров попросит остановиться. Дважды.');
     add(mate,mate+' будет храпеть. Или ты. Звёзды пока не договорились.');
-    add(P,'Не забудь „'+P+'“.');
-    out.push('Возьми запасные носки.');
+    out.push(socks);
   } else if(phase==='fri'){
     add(mate,mate+' этой ночью будет храпеть. Или ты. Звёзды пока не договорились.');
+    add(o1,'Бойся '+G(o1)+'.');
     add(o1,'Бойся '+G(o1)+' у мангала.');
-    add(o1,'Кубок '+G(o1)+' сегодня полнее твоего. Это поправимо.');
+    add(o1,'Завтра сапоги '+G(o1)+' будут блестеть ярче твоих.');
+    add(o1,'Улыбка '+G(o1)+' обманчива. Проверь завтра.');
+    add(o1&&o2,o1+' и '+o2+' что-то замышляют. Держись.');
     add(o1,'Сегодня '+o1+' спросит у тебя совета. Не давай.');
     add(dr,'Водитель ('+dr+') знает короткую дорогу. Не верь.');
+    add(dr,'Не спорь с водителем ('+dr+') о музыке. Проиграешь.');
+    add(pas.length,'Кто-то из твоих пассажиров попросит остановиться. Дважды.');
     add(rn,'Ключ от „'+rn+'“ потеряется. Ненадолго.');
-    tk=task('Пт'); add(tk,'Сегодня твой пост: „'+(tk&&tk.task)+'“. Не сбегай.');
-    out.push('Первый кубок за дорогу. Остальные по ситуации.');
+    out.push(socks);
   } else if(phase==='sat'){
     add(right,'Тот, кто сидит справа ('+right+'), сегодня утащит что-то с твоей тарелки. Защищай самое вкусное.');
-    add(left,'Тот, кто сидит слева ('+left+'), сегодня выпьет твой сидр. Следи за кубком.');
+    add(left,'Тот, кто сидит слева ('+left+'), сегодня выпьет твой напиток. Следи за кубком.');
+    add(across,'Тот, кто сидит напротив ('+across+'), сегодня выпьет твой напиток. Следи за кубком.');
     add(o1,'Бойся '+G(o1)+' на пиру.');
     add(o1,'Сапоги '+G(o1)+' сегодня будут блестеть. Это знак.');
     add(o1,'Сегодня '+o1+' выдаст чужую тайну. Возможно, твою.');
     add(o1,o1+' сегодня врёт. Не во всём.');
     add(mate,mate+' этой ночью будет храпеть. Или ты. Звёзды пока не договорились.');
-    tk=task('Сб'); add(tk,(tk&&tk.time?'В '+tk.time+' ':'Сегодня ')+'тебя ждут на посту „'+(tk&&tk.task)+'“. Не опаздывай.');
-    out.push('Не верь никому, кто трезв после полуночи.');
   } else if(phase==='sun'){
     // игра закончилась: дальше настоящие имена и разъезд
-    var ppl=d.guests.filter(function(x){return x.name!==me&&!x.shared}).map(function(x){return x.name});
-    var F=['Ксения','Ирина','Оля','Маня','Тина','Регина','Люба','Маша','Женя','Олеся','Яна','Катейник','Юля','Кристи'], fem=function(x){return F.indexOf(x)>=0};
-    var n1=ftPick(ppl,seed+'|n1'), n2=ftPick(ppl.filter(function(x){return x!==n1&&fem(x)===fem(n1)}),seed+'|n2');
+    var GONE=['Паша','Тина','Вова','Саша']; // уезжают в субботу
+    if(GONE.indexOf(me)>=0) return 'Крепость отпускает тебя. Ненадолго.';
+    var ppl=d.guests.filter(function(x){return x.name!==me&&!x.shared&&GONE.indexOf(x.name)<0}).map(function(x){return x.name});
+    var n1=ftPick(ppl,seed+'|n1');
     add(n1,n1+' сегодня найдёт чужой носок. Возможно, твой.');
     add(n1,n1+' знает, кто вчера доел торт. Спроси.');
     add(n1,'Сегодня '+n1+' скажет „давайте ещё раз так соберёмся“. Соглашайся.');
     add(n1,'Прощаясь, '+n1+' обнимет тебя дважды. Второй раз за вчерашнее.');
-    add(n1&&n2,n1+' и '+n2+' уедут последними. Не мешай им прощаться.');
-    add(n1,'Твоя зарядка уехала в чужой сумке. Главный подозреваемый: '+n1+'.');
+    add(n1,'Возможно, твоя зарядка уехала в чужой сумке. Главный подозреваемый: '+n1+'.');
     add(mate,mate+' разбудит тебя раньше, чем хотелось бы. Или ты. Звёзды пока не договорились.');
     tk=task('Вс'); add(tk,'Последний подвиг: „'+(tk&&tk.task)+'“. Потом можно домой.');
     add(g.costume,'Не уезжай, не вернув Ксении то, что одолжено: '+g.costume+'.');
     out.push('Домой уедет больше вещей, чем приехало. Проверь, что все они твои.');
-    out.push('Лучшее фото с праздника будет с закрытыми глазами. Твоими.');
     out.push('Крепость отпускает тебя. Ненадолго.');
   }
-  return ftPick(out,seed+'|x');
+  // ручные правки Ксении
+  var FIX={'Тина|fri':{text:'Бойся Михаила у мангала.'},'Савва|sat':{only:/напротив/},'Регина|eve':{not:/музык/},'Слава|sun':{only:/носок/},'Катейник|sun':{only:/носок/}}, fx=FIX[me+'|'+phase];
+  if(fx&&fx.text) return fx.text;
+  if(fx&&fx.only){ var o=out.filter(function(t){return fx.only.test(t)}); if(o.length) return o[0]; }
+  if(fx&&fx.not) out=out.filter(function(t){return !fx.not.test(t)});
+  var fresh=out.filter(function(t){return ftKey(t)!==avoid});
+  return ftPick(fresh.length?fresh:out,seed+'|x');
 }
 function fortune(me){
   var today=ftToday(), who=me;
@@ -1647,7 +1678,7 @@ function fortune(me){
   var seed=who+'|'+today, phase=me?ftPhase(today):'';
   var seers=FT.seers.filter(function(s){return s.n!==me});
   var sr=seers[ftHash(seed+'|s')%seers.length], sg=guest(sr.n);
-  var text=(phase&&ftPersonal(me,phase,seed))||ftPick(FT.common,seed+'|c');
+  var text=(phase&&ftChain(me,phase,today))||ftPick(FT.common,seed+'|c');
   return {key:seed, seer:sr.n, role:sg.character||sr.n, flavor:ftPick(sr.fl,seed+'|f'), text:text};
 }
 function fortuneCard(){
