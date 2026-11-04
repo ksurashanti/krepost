@@ -1089,6 +1089,7 @@ function people(list,limit){
 }
 function roomOf(n){return S.data.rooms.filter(function(r){return r.people.indexOf(n)>=0})[0]}
 function seatOf(n){return S.data.seats.filter(function(s){return s.seat&&s.name===n})[0]}
+function seatNb(seat,dir){var r=S.data.seats.filter(function(z){return z.seat&&z.name}).sort(function(a,b){return a.seat-b.seat}),i=r.indexOf(seat);if(i<0||r.length<2)return '';return r[(i+dir+r.length)%r.length].name}
 function carOf(n){return S.data.cars.filter(function(c){return c.passengers.indexOf(n)>=0})[0]}
 function drives(n){return S.data.cars.filter(function(c){return c.driver===n})}
 function fmtPhone(p){var d=String(p).replace(/\D/g,''); if(d.length===11) return '+'+d[0]+' '+d.slice(1,4)+' '+d.slice(4,7)+'-'+d.slice(7,9)+'-'+d.slice(9); return p;}
@@ -1280,8 +1281,8 @@ function vMe(){
   var mine=d.myProps||[];
   var f=[];
   if(room){var mates=room.people.filter(function(p){return p!==S.me}); f.push(['Комната',esc(room.name),room.floor+'-й этаж'+(mates.length?' · соседи: '+mates.map(pnf).join(', '):''),'home']);}
-  if(seat){ var nn=S.data.seats.length, sn=function(k){var x=S.data.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name?pn(x.name):'свободно'};
-    f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(seat.seat+1)+'<br>справа '+sn(seat.seat-1)+'</span>','','feast']); }
+  if(seat){ var sn=function(d){var x=seatNb(seat,d); return x?pn(x):'—'};
+    f.push(['Место на пиру','<span style="font-size:16px">слева '+sn(1)+'<br>справа '+sn(-1)+'</span>','','feast']); }
   if(drv.length) f.push(['Машина','ты за рулём',drv.map(function(c){return whenFrom(c)+(c.passengers.length?': '+c.passengers.map(pnf).join(', '):'')}).join('<br>'),'road',true]);
   else if(car) f.push(['Машина','водитель: '+pn(car.driver),whenFrom(car),'road']);
   else f.push(['Машина','пока нет',(d.arrivals&&d.arrivals[S.me])?'приезд: '+esc(d.arrivals[S.me]):'','road']);
@@ -1596,8 +1597,8 @@ function ftPersonal(me,phase,seed,avoid){
   var mates=[]; if(room) d.rooms.forEach(function(r){ if((ADJ[room.id]||[]).indexOf(r.id)>=0) mates=mates.concat(r.people.filter(function(p){return p!==me})); });
   var DAT={'Ксения':'Ксении','Михаил':'Михаилу','Айк':'Айку','Ирина':'Ирине','Оля':'Оле','Паша':'Паше','Маня':'Мане','Саша':'Саше','Тина':'Тине','Вова':'Вове','Савва':'Савве','Регина':'Регине','Юля':'Юле','Люба':'Любе','Лёха':'Лёхе','Илья':'Илье','Маша':'Маше','Слава':'Славе','Кирилл':'Кириллу','Женя':'Жене','Олеся':'Олесе','Николай':'Николаю','Яна':'Яне','Даня':'Дане','Катейник':'Катейнику','Кристи':'Кристи','Макар':'Макару'};
   var sockFor=ftPick(d.guests.filter(function(x){return x.name!==me&&DAT[x.name]}),seed+'|sk'), socks=sockFor?'Возьми запасные носки, '+DAT[sockFor.name]+' они пригодятся.':'Возьми запасные носки.';
-  var nn=d.seats.length, at=function(k){ var x=d.seats.filter(function(z){return z.seat===((k-1+nn)%nn)+1})[0]; return x&&x.name&&x.name!==me?x.name:''; };
-  var left=seat?at(seat.seat+1):'', right=seat?at(seat.seat-1):'';
+  var at=function(k){ var x=seatNb(seat,k); return x&&x!==me?x:''; };
+  var left=seat?at(1):'', right=seat?at(-1):'';
   var L=[23,22,21,20,19,18,17,16,15,14,13], opp=[];
   if(seat){ var sn=seat.seat;
     if(sn>=1&&sn<=10) opp=[L[sn-1],L[sn]];
@@ -1692,13 +1693,14 @@ function fortuneCard(){
 
 function seatHtml(n){
   var s=S.data.seats.filter(function(x){return x.seat===n})[0]||{name:''};
+  if(!s.name) return '';
   return '<div class="seat'+(s.name&&s.name===S.me?' me':'')+'"><span class="num">'+(s.name?sigil(s.name):'')+'</span><span class="nm">'+(s.name?(s.name===S.me?'ты':pn(s.name)):'<span class="muted">свободно</span>')+'</span></div>';
 }
 function vHome(){
   var myRoom=roomOf(S.me), seat=seatOf(S.me);
   var seg='<div class="seg" role="tablist"><button data-act="seg" data-seg="rooms" class="'+(S.homeSeg==='rooms'?'on':'')+'">Расселение</button><button data-act="seg" data-seg="feast" class="'+(S.homeSeg==='feast'?'on':'')+'">Пир</button></div>';
   if(S.homeSeg==='feast'){
-    if(S.data.seats.length!==25) return seg+'<p class="muted">Схема рассадки появится позже.</p>';
+    if(!S.data.seats.some(function(x){return x.seat&&x.name})) return seg+'<p class="muted">Схема рассадки появится позже.</p>';
     var right=[1,2,3,4,5,6,7,8,9,10], left=[23,22,21,20,19,18,17,16,15,14,13];
     return seg+'<div class="sub"><span class="eyebrow">суббота, 20:00</span><h2 style="font-size:24px;font-weight:800">Таверна «Пьяный рыцарь»</h2><p class="small muted">'+(seat&&sigilName(S.me)?'Твоё место отмечено твоим гербом. ':'')+'Найди свой герб на столе.</p></div>'+
       '<p class="note">Рассадка может поменяться, если кто-то не сможет приехать или, наоборот, сможет кто-то из тех, кто отказался. Загляни сюда ещё раз прямо перед праздником.</p>'+
